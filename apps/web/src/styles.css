@@ -1,0 +1,12 @@
+:root {
+  --color-header: #1f3a5f;
+  --color-header-text: #ffffff;
+  --color-border: #d0d7de;
+  --color-muted: #57606a;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+}

@@ -417,7 +417,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F api test -- tickets.sse`
   Bloqueada por: T-66
 
-- [ ] T-74 · Crear `apps/web` (Angular CLI, componentes standalone, signals, runner de tests) con la ruta raíz y un test de humo · Satisface: REQ-WEB-08
+- [x] T-74 · Crear `apps/web` (Angular CLI, componentes standalone, signals, runner de tests) con la ruta raíz y un test de humo · Satisface: REQ-WEB-08
   Hecho cuando: When the operator opens the root path `/`, the web app shall redirect to the inbox view `/tickets`.
   Verifica: `pnpm -F web build` y `pnpm -F web test -- app.smoke`
   Bloqueada por: T-01
