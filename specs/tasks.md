@@ -224,7 +224,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- audit.append-only audit.jsonl audit.redaction`
   Bloqueada por: T-34
 
-- [ ] T-37 · Compilar la máquina de estados desde la tabla de transiciones · Satisface: REQ-2.1-04, REQ-2.1-05, REQ-2.1-10
+- [x] T-37 · Compilar la máquina de estados desde la tabla de transiciones · Satisface: REQ-2.1-04, REQ-2.1-05, REQ-2.1-10
   Hecho cuando: When the runtime starts, the runtime shall build the ticket state machine from the transitions table in `ticket-lifecycle.instructions.md` and reject with `INVALID_TRANSITION` every transition absent from that table, including every transition from `CLOSED`.
   Verifica: `pnpm -F api test -- lifecycle.compiled lifecycle.invalid lifecycle.closed`
   Bloqueada por: T-32

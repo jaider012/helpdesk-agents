@@ -5,6 +5,7 @@ export { parseFrontmatter, type FrontmatterKind, type ParsedFrontmatter } from '
 export {
   compileLifecycle,
   isTicketStatus,
+  LIFECYCLE_PATH,
   TICKET_STATUSES,
   type FieldPredicate,
   type StateMachineSpec,
