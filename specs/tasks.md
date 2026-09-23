@@ -204,7 +204,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- bootstrap.invalid-spec`
   Bloqueada por: T-31
 
-- [ ] T-33 · Arrancar con el modelo fake y un aviso cuando no hay variables de LLM (design §12.3, paso 4) · Satisface: REQ-LLM-03
+- [x] T-33 · Arrancar con el modelo fake y un aviso cuando no hay variables de LLM (design §12.3, paso 4) · Satisface: REQ-LLM-03
   Hecho cuando: If no LLM provider variables are set, then the runtime shall start with the deterministic fake model.
   Verifica: `pnpm -F api test -- llm.provider`
   Bloqueada por: T-31
