@@ -60,7 +60,7 @@ export const REDACTION_PATTERNS: readonly RedactionPattern[] = [
   {
     kind: 'USER',
     regex:
-      /\b(usuario|user|login)\b(?:\s*[:=]\s*|\s+es\s+|\s+)[a-z0-9._-]{3,}(?![\p{L}\p{N}._-])/giu,
+      /\b(usuario|user|login)\b(?:\s*[:=]\s*|\s+es\s+|\s+)([a-z0-9._-]{3,})(?![\p{L}\p{N}._-])/giu,
     replace: keepWord('USER'),
   },
 ];

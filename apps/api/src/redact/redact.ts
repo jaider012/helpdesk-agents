@@ -6,13 +6,17 @@ export interface RedactionResult {
   counts: Partial<Record<Placeholder, number>>;
 }
 
+/** Receives each original match, e.g. to derive the userRef; its values must not be stored. */
+export type RedactionObserver = (kind: Placeholder, match: string, groups: string[]) => void;
+
 /** Replaces personal data and secrets with placeholders before any LLM call (REQ-SEC-01..04). */
-export function redact(text: string): RedactionResult {
+export function redact(text: string, observe?: RedactionObserver): RedactionResult {
   const counts: Partial<Record<Placeholder, number>> = {};
   let result = text;
   for (const { kind, regex, replace } of REDACTION_PATTERNS) {
     result = result.replace(regex, (match: string, ...groups: string[]) => {
       counts[kind] = (counts[kind] ?? 0) + 1;
+      observe?.(kind, match, groups);
       return replace(match, ...groups);
     });
   }

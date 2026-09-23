@@ -214,7 +214,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- redact.email redact.phone redact.token redact.secret`
   Bloqueada por: T-31
 
-- [ ] T-35 · Generar el `userRef` opaco con HMAC-SHA256 y `REDACTION_SALT` (design §8.1) · Satisface: REQ-SEC-05
+- [x] T-35 · Generar el `userRef` opaco con HMAC-SHA256 y `REDACTION_SALT` (design §8.1) · Satisface: REQ-SEC-05
   Hecho cuando: When the redact node finds the identifier of the affected user, the redact node shall store an opaque `userRef` of the form `usr_<hash>` in `entities.userRef`.
   Verifica: `pnpm -F api test -- redact.userref`
   Bloqueada por: T-34
