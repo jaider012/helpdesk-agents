@@ -187,7 +187,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- prompts.frontmatter prompts.agent prompts.variables prompts.tool-call`
   Bloqueada por: T-18
 
-- [ ] T-30 · Pasar `pnpm spec:validate` sobre el `.github/` real (test golden) · Satisface: REQ-VAL-04
+- [x] T-30 · Pasar `pnpm spec:validate` sobre el `.github/` real (test golden) · Satisface: REQ-VAL-04
   Hecho cuando: When the spec validator finds no errors in the real `.github/`, the spec validator shall exit with code `0`.
   Verifica: `pnpm spec:validate` y `pnpm -F agent-spec test -- validate.golden`
   Bloqueada por: T-19, T-20, T-22, T-24, T-26, T-28, T-29
