@@ -199,7 +199,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api build` y `pnpm -F api test -- llm.test-mode`
   Bloqueada por: T-30
 
-- [ ] T-32 · Validar la spec al arrancar el api y crear `.env.example` (design §12.5) · Satisface: REQ-API-01
+- [x] T-32 · Validar la spec al arrancar el api y crear `.env.example` (design §12.5) · Satisface: REQ-API-01
   Hecho cuando: If the `.github/` spec fails validation at startup, then the runtime shall abort startup with the list of validation errors.
   Verifica: `pnpm -F api test -- bootstrap.invalid-spec`
   Bloqueada por: T-31

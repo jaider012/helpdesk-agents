@@ -4,13 +4,14 @@
   "type": "module",
   "description": "NestJS runtime that compiles the .github/ spec into a LangGraph graph.",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -b tsconfig.build.json",
     "start": "node dist/main.js",
-    "dev": "tsc -p tsconfig.build.json && node dist/main.js",
+    "dev": "tsc -b tsconfig.build.json && node dist/main.js",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "agent-spec": "workspace:*",
     "@langchain/core": "^1.2.12",
     "@nestjs/common": "^12.1.0",
     "@nestjs/core": "^12.1.0",
