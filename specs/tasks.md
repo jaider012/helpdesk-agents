@@ -194,7 +194,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
 
 ### 2.2 Runtime MUST (`apps/api`)
 
-- [ ] T-31 · Crear `apps/api` (NestJS en ESM con `tsc`, vitest; riesgo R-04) con el selector de proveedor en modo test · Satisface: REQ-LLM-04
+- [x] T-31 · Crear `apps/api` (NestJS en ESM con `tsc`, vitest; riesgo R-04) con el selector de proveedor en modo test · Satisface: REQ-LLM-04
   Hecho cuando: While `NODE_ENV` is `test`, the runtime shall use the deterministic fake model.
   Verifica: `pnpm -F api build` y `pnpm -F api test -- llm.test-mode`
   Bloqueada por: T-30

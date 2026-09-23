@@ -50,7 +50,9 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | DC-27 | `R-X3` son tres reglas con el mismo id (una por agente); `ROUTE_WITHOUT_HANDOFF` señala el `.agent.md` origen y `ROUTING_NOT_DETERMINISTIC` señala `routing.ts`. | La interfaz `RouteRule` de design §2.1 tiene un solo `from`. | Cambiar `from` a una lista. | `3a41ae9`, `feb8715` | |
 | DC-28 | Los fixtures de test quedan fuera de ESLint. | Son datos, no código (por ejemplo, scripts con constantes sin usar). | Quitar `**/test/fixtures/` de `eslint.config.js`. | `1732a5c` | |
 | DC-29 | El test golden fija además el resultado compilado (4 agentes, 5 handoffs, 12 transiciones, allowlist, timeout y variables). | Que «golden» detecte cambios de estructura, no solo errores. | Dejar solo la comprobación de cero errores. | `df45723` | |
-| DC-30 | NestJS se añade con sus dependencias obligatorias `reflect-metadata` y `rxjs`, que no están en la lista de §6. | NestJS no arranca sin ellas; delegaste la decisión. | Ninguno práctico: sin ellas no hay NestJS. | (T-31) | |
+| DC-30 | NestJS se añade con sus dependencias obligatorias `reflect-metadata` y `rxjs`, que no están en la lista de §6. | NestJS no arranca sin ellas; delegaste la decisión. | Ninguno práctico: sin ellas no hay NestJS. | T-31 | |
+| DC-31 | NestJS 12, que ya es ESM nativo; el api compila con `tsc` y Vitest emite los metadatos de decoradores sin el plugin SWC. | Resuelve el riesgo R-04 sin dependencias extra; se comprobó arrancando `dist/main.js`. | Ninguno necesario. | T-31 | |
+| DC-32 | Hasta T-33, el api solo arranca con `NODE_ENV=test`; en otro entorno falla con «No LLM provider is configured» en lugar de usar el modelo fake en silencio. | T-33 añade ese fallback con su aviso; no adelantar comportamiento sin test. | Se resuelve solo al cerrar T-33. | T-31 | |
 
 ## Aprobadas explícitamente por ti (referencia)
 
