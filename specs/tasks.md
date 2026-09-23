@@ -239,7 +239,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- audit.transition`
   Bloqueada por: T-36, T-38
 
-- [ ] T-40 · Compilar la allowlist de remediación y crear el servicio de acciones · Satisface: REQ-2.3-34, REQ-2.3-31, REQ-2.1-11
+- [x] T-40 · Compilar la allowlist de remediación y crear el servicio de acciones · Satisface: REQ-2.3-34, REQ-2.3-31, REQ-2.1-11
   Hecho cuando: If an agent requests an action absent from the remediation allowlist compiled from `diagnostics.agent.md`, or the ticket is in `ESCALATED`, then the runtime shall reject the action with the error `ACTION_NOT_ALLOWLISTED`.
   Verifica: `pnpm -F api test -- allowlist.compiled allowlist.reject lifecycle.escalated-no-remediation`
   Bloqueada por: T-37

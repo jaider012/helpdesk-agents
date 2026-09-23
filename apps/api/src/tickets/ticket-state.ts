@@ -70,7 +70,8 @@ export interface DiagnosticFinding {
 }
 
 export interface ExecutedAction {
-  id: 'instruct_vpn_reconnect' | 'instruct_self_service_unlock';
+  /** Id of the remediation allowlist compiled from `diagnostics.agent.md` (decision DC-40). */
+  id: string;
   kind: 'instruction' | 'automated';
   /** Only the action service sets it, after checking the allowlist. */
   allowlisted: true;

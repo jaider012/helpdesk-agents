@@ -1,4 +1,3 @@
-import { fileURLToPath } from 'node:url';
 import { Module, type DynamicModule } from '@nestjs/common';
 import {
   formatError,
@@ -7,12 +6,13 @@ import {
   type SpecBundle,
   type ValidationError,
 } from 'agent-spec';
+import { REPO_ROOT } from '../paths.js';
 
 /** Injection token of the validated `.github/` spec bundle. */
 export const SPEC_BUNDLE = Symbol('SPEC_BUNDLE');
 
-/** Repository root, the folder that contains `.github/` (same depth from `src/` and `dist/`). */
-export const DEFAULT_SPEC_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
+/** Folder that contains `.github/`: the repository root. */
+export const DEFAULT_SPEC_ROOT = REPO_ROOT;
 
 export class SpecValidationError extends Error {
   readonly errors: ValidationError[];
