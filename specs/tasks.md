@@ -209,7 +209,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- llm.provider`
   Bloqueada por: T-31
 
-- [ ] T-34 · Implementar los patrones 1–7 del redact node (design §8.1) · Satisface: REQ-SEC-01, REQ-SEC-02, REQ-SEC-03, REQ-SEC-04
+- [x] T-34 · Implementar los patrones 1–7 del redact node (design §8.1) · Satisface: REQ-SEC-01, REQ-SEC-02, REQ-SEC-03, REQ-SEC-04
   Hecho cuando: When ticket text enters the runtime, the redact node shall replace emails with `[EMAIL]`, phone numbers with `[PHONE]`, token-like strings with `[TOKEN]` and credential patterns with `[SECRET]` before any LLM call.
   Verifica: `pnpm -F api test -- redact.email redact.phone redact.token redact.secret`
   Bloqueada por: T-31

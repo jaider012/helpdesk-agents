@@ -55,6 +55,8 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | DC-32 | Hasta T-33, el api solo arranca con `NODE_ENV=test`; en otro entorno falla con «No LLM provider is configured» en lugar de usar el modelo fake en silencio. | T-33 añade ese fallback con su aviso; no adelantar comportamiento sin test. | Resuelta en T-33: ahora arranca con el modelo fake y un aviso. | T-31, T-33 | |
 | DC-33 | El api consume `agent-spec` así: `tsc -b` compila `agent-spec` a `dist/` por referencia de proyecto; Node usa ese `dist/`; Vitest y el editor leen el código fuente con la condición de export `source`. | `agent-spec` usa imports `.ts` (DC-18) y el api compila con `tsc`; así ninguno de los dos cambia su forma de trabajar. | Publicar `agent-spec` solo compilado y ajustar los imports. | T-32 | |
 | DC-34 | La raíz de la spec es la raíz del repositorio por defecto; los tests pasan otra raíz con `SpecModule.forRoot({ root })`. No hay variable `SPEC_ROOT`. | Design §12.5 no define esa variable. | Añadir `SPEC_ROOT` a `.env.example`. | T-32 | |
+| DC-35 | El patrón del documento de identidad se aplica antes que el del teléfono (design §8.1 los pone al revés). | Con el orden del diseño, «cédula 1020304050» salía como `[PHONE]`. | Invertir el orden en `patterns.ts`. | T-34 | |
+| DC-36 | El patrón 7 acepta también «usuario es <nombre>», y ni `userRef` ni «usuario está» cuentan como usuario. | Con el patrón literal, el ticket F de M-07 («Mi usuario es ana.demo») no se redactaba. | Volver a la expresión literal de design §8.1. | T-34 | |
 
 ## Aprobadas explícitamente por ti (referencia)
 
