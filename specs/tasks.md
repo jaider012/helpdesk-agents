@@ -167,7 +167,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- graph.acyclic graph.terminal graph.self graph.unknown-target`
   Bloqueada por: T-23
 
-- [ ] T-26 · Validar el contexto de los prompts de handoff y las etiquetas de la allowlist · Satisface: REQ-2.3-11, REQ-2.3-33
+- [x] T-26 · Validar el contexto de los prompts de handoff y las etiquetas de la allowlist · Satisface: REQ-2.3-11, REQ-2.3-33
   Hecho cuando: When the spec validator loads the `.agent.md` files, the spec validator shall report `HANDOFF_CONTEXT_EXCEEDED` for a handoff `prompt` that names a field outside the allowed context and `UNSAFE_ALLOWLIST_ACTION` for an allowlist action tagged `mfa`, `credentials` or `permissions`.
   Verifica: `pnpm -F agent-spec test -- agents.handoff-context allowlist.unsafe`
   Bloqueada por: T-20, T-23

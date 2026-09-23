@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import type { SpecFile } from './load.ts';
-import { AGENT_POLICY, isAgentName, REGISTRY_TOOLS } from './policy.ts';
+import { allowlistIssues } from './allowlist.ts';
+import { AGENT_POLICY, HANDOFF_CONTEXT_FIELDS, isAgentName, REGISTRY_TOOLS } from './policy.ts';
+import { TICKET_STATE_KEYS } from './ticket-state.ts';
 
 export interface AgentIssue {
   code:
@@ -9,7 +11,9 @@ export interface AgentIssue {
     | 'AGENT_VISIBILITY_INVALID'
     | 'HANDOFF_NOT_ALLOWED'
     | 'TOOL_NOT_PERMITTED'
-    | 'UNKNOWN_TOOL';
+    | 'UNKNOWN_TOOL'
+    | 'HANDOFF_CONTEXT_EXCEEDED'
+    | 'UNSAFE_ALLOWLIST_ACTION';
   message: string;
 }
 
@@ -77,6 +81,26 @@ export function agentIssues(file: SpecFile): AgentIssue[] {
       }
     }
   });
+
+  const allowedContext: readonly string[] = HANDOFF_CONTEXT_FIELDS;
+  const context = `(${HANDOFF_CONTEXT_FIELDS.map((field) => `\`${field}\``).join(', ')})`;
+  for (const handoff of handoffs.filter(isRecord)) {
+    if (typeof handoff.prompt !== 'string') continue;
+    // Design §5.4: a backticked token whose root is a TicketState key names a context field.
+    const fields = [...handoff.prompt.matchAll(/`([^`]+)`/g)].map(
+      ([, token]) => token.split(/[.[]/)[0],
+    );
+    for (const field of new Set(fields)) {
+      if (TICKET_STATE_KEYS.has(field) && !allowedContext.includes(field)) {
+        issues.push({
+          code: 'HANDOFF_CONTEXT_EXCEEDED',
+          message: `handoff \`${String(handoff.label)}\` names \`${field}\`, outside the allowed context ${context}`,
+        });
+      }
+    }
+  }
+
+  issues.push(...allowlistIssues(file.frontmatter.body));
 
   const tools = Array.isArray(data.tools)
     ? data.tools.filter((tool): tool is string => typeof tool === 'string')

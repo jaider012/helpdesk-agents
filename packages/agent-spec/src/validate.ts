@@ -29,7 +29,9 @@ export type ErrorCode =
   | 'HANDOFF_CYCLE'
   | 'TERMINAL_HAS_HANDOFFS'
   | 'SELF_HANDOFF'
-  | 'UNKNOWN_HANDOFF_TARGET';
+  | 'UNKNOWN_HANDOFF_TARGET'
+  | 'HANDOFF_CONTEXT_EXCEEDED'
+  | 'UNSAFE_ALLOWLIST_ACTION';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [

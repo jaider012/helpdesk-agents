@@ -1,4 +1,5 @@
 import { findTable } from './tables.ts';
+import { LIST_FLAGS, TICKET_STATE_PATHS } from './ticket-state.ts';
 
 export const LIFECYCLE_PATH = '.github/instructions/ticket-lifecycle.instructions.md';
 export const TRANSITIONS_HEADING = '## Tabla de transiciones';
@@ -37,44 +38,6 @@ export interface LifecycleIssue {
   code: 'LIFECYCLE_APPLYTO_MISSING' | 'LIFECYCLE_TABLE_INVALID' | 'UNKNOWN_STATUS';
   message: string;
 }
-
-// TicketState fields (design §4) that a predicate may reference.
-const TICKET_STATE_PATHS = new Set([
-  'ticketId',
-  'channel',
-  'createdAt',
-  'redactedText',
-  'category',
-  'severity',
-  'urgency',
-  'entities',
-  'entities.userRef',
-  'entities.service',
-  'entities.issueType',
-  'entities.businessImpact',
-  'entities.request',
-  'entities.request.resource',
-  'entities.request.accessLevel',
-  'entities.request.justification',
-  'findings',
-  'actions',
-  'status',
-  'entryAgent',
-  'nextAgent',
-  'lastRoute',
-  'escalation',
-  'escalation.reason',
-  'escalation.targetTeam',
-  'escalation.approvalRequest',
-  'escalation.summary',
-  'userMessage',
-  'slaDueAt',
-  'closeReason',
-]);
-const LIST_FLAGS: Record<string, readonly string[]> = {
-  findings: ['conclusive'],
-  actions: ['allowlisted'],
-};
 
 const COLUMNS = { from: 'desde', to: 'hacia', required: 'campos obligatorios' } as const;
 
