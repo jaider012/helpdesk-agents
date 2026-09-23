@@ -115,3 +115,5 @@ La bitácora del ticket: una línea JSON por entrada, en orden de escritura. Eje
 - `from` y `to` son estados en una entrada `transition` y agentes en una entrada `routed`.
 - `data` solo lleva identificadores, códigos, duraciones y conteos. Nunca texto del ticket ni datos personales.
 - Solo se añaden líneas al final del archivo. Nunca se modifica ni se borra una línea existente.
+- Cada entrada va en su propia línea y el archivo termina siempre con un salto de línea. Al añadir una entrada, no la pegues a la línea anterior.
+- Después de escribir, relee la bitácora y comprueba que cada línea es un JSON válido y que `seq` sube de uno en uno.
