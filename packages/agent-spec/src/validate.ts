@@ -1,3 +1,4 @@
+import { agentIssues } from './agents.ts';
 import { unknownKeys } from './frontmatter.ts';
 import { LIFECYCLE_PATH, lifecycleIssues } from './lifecycle.ts';
 import type { SpecBundle, SpecFile } from './load.ts';
@@ -17,7 +18,10 @@ export type ErrorCode =
   | 'SKILL_STEPS_MISSING'
   | 'SKILL_RESOURCE_UNLINKED'
   | 'SKILL_FAILURE_SECTION_MISSING'
-  | 'SKILL_DEADLINE_INVALID';
+  | 'SKILL_DEADLINE_INVALID'
+  | 'AGENT_FRONTMATTER_INVALID'
+  | 'HANDOFF_INVALID'
+  | 'AGENT_VISIBILITY_INVALID';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
@@ -47,6 +51,9 @@ export function validateSpec(bundle: SpecBundle): ValidationError[] {
     ...bundle.files.flatMap(validateFrontmatter),
     ...validateLifecycle(bundle),
     ...bundle.files.flatMap((file) => validateSkill(file, bundle.resources)),
+    ...bundle.files
+      .filter((file) => file.kind === 'agent')
+      .flatMap((file) => agentIssues(file).map((issue) => ({ ...issue, path: file.path }))),
   ];
 }
 

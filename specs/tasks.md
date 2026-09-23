@@ -152,7 +152,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- skill.steps skill.resource skill.failure-section skill.timeout`
   Bloqueada por: T-21
 
-- [ ] T-23 · Crear `policy.ts` (design §5.2, Anexo B) y validar el frontmatter de los agentes, los campos de handoff y la visibilidad · Satisface: REQ-2.3-01, REQ-2.3-02, REQ-2.3-08
+- [x] T-23 · Crear `policy.ts` (design §5.2, Anexo B) y validar el frontmatter de los agentes, los campos de handoff y la visibilidad · Satisface: REQ-2.3-01, REQ-2.3-02, REQ-2.3-08
   Hecho cuando: When the spec validator loads the `.agent.md` files, the spec validator shall report one error code per broken rule among `AGENT_FRONTMATTER_INVALID`, `HANDOFF_INVALID` and `AGENT_VISIBILITY_INVALID`.
   Verifica: `pnpm -F agent-spec test -- agents.frontmatter agents.handoff-fields agents.visibility`
   Bloqueada por: T-18

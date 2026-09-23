@@ -1,3 +1,4 @@
+export { agentName } from './agents.ts';
 export { parseFrontmatter, type FrontmatterKind, type ParsedFrontmatter } from './frontmatter.ts';
 export {
   compileLifecycle,
@@ -18,3 +19,14 @@ export {
 } from './validate.ts';
 export { FAILURE_HEADING, skillTimeoutMs } from './skill.ts';
 export { findSection, findTable, type GfmTable } from './tables.ts';
+export {
+  AGENT_NAMES,
+  AGENT_POLICY,
+  FORBIDDEN_ALLOWLIST_TAGS,
+  HANDOFF_CONTEXT_FIELDS,
+  isAgentName,
+  REGISTRY_TOOLS,
+  type AgentName,
+  type AgentPolicy,
+  type ToolName,
+} from './policy.ts';
