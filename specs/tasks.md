@@ -137,7 +137,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm test -- trace.check` y `node scripts/trace.mjs --write && git diff --exit-code specs/tasks.md`
   Bloqueada por: T-18
 
-- [ ] T-20 · Crear el parser de tablas GFM (`tables.ts`) y validar `ticket-lifecycle.instructions.md` (`lifecycle.ts`) · Satisface: REQ-2.1-01, REQ-2.1-02, REQ-2.1-03
+- [x] T-20 · Crear el parser de tablas GFM (`tables.ts`) y validar `ticket-lifecycle.instructions.md` (`lifecycle.ts`) · Satisface: REQ-2.1-01, REQ-2.1-02, REQ-2.1-03
   Hecho cuando: When the spec validator loads `ticket-lifecycle.instructions.md`, the spec validator shall report `LIFECYCLE_APPLYTO_MISSING` for a missing `applyTo` glob, `LIFECYCLE_TABLE_INVALID` for a malformed transitions table and `UNKNOWN_STATUS` for a status outside `TicketStatus`.
   Verifica: `pnpm -F agent-spec test -- lifecycle.applyTo lifecycle.table lifecycle.status`
   Bloqueada por: T-18

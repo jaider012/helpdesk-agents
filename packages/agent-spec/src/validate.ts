@@ -1,8 +1,14 @@
 import { unknownKeys } from './frontmatter.ts';
+import { LIFECYCLE_PATH, lifecycleIssues } from './lifecycle.ts';
 import type { SpecBundle, SpecFile } from './load.ts';
 
 export type ErrorCode =
-  'REQUIRED_FILE_MISSING' | 'FRONTMATTER_PARSE_ERROR' | 'UNKNOWN_FRONTMATTER_KEY';
+  | 'REQUIRED_FILE_MISSING'
+  | 'FRONTMATTER_PARSE_ERROR'
+  | 'UNKNOWN_FRONTMATTER_KEY'
+  | 'LIFECYCLE_APPLYTO_MISSING'
+  | 'LIFECYCLE_TABLE_INVALID'
+  | 'UNKNOWN_STATUS';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
@@ -27,7 +33,11 @@ export interface ValidationError {
 }
 
 export function validateSpec(bundle: SpecBundle): ValidationError[] {
-  return [...validateRequiredFiles(bundle), ...bundle.files.flatMap(validateFrontmatter)];
+  return [
+    ...validateRequiredFiles(bundle),
+    ...bundle.files.flatMap(validateFrontmatter),
+    ...validateLifecycle(bundle),
+  ];
 }
 
 /** One line per error, as `pnpm spec:validate` prints it. */
@@ -53,5 +63,15 @@ function validateFrontmatter(file: SpecFile): ValidationError[] {
     code: 'UNKNOWN_FRONTMATTER_KEY',
     path: file.path,
     message: `unknown frontmatter key \`${key}\``,
+  }));
+}
+
+function validateLifecycle(bundle: SpecBundle): ValidationError[] {
+  const file = bundle.files.find(({ path }) => path === LIFECYCLE_PATH);
+  // A missing file or a broken frontmatter is already reported by the rules above.
+  if (!file?.frontmatter.ok) return [];
+  return lifecycleIssues(file.frontmatter.data, file.frontmatter.body).map((issue) => ({
+    ...issue,
+    path: LIFECYCLE_PATH,
   }));
 }
