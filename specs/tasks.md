@@ -64,22 +64,22 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: `pnpm test -- check-vpn.deadline check-vpn.output-schema`
   Bloqueada por: T-04, T-05
 
-- [ ] T-07 · Escribir `triage.agent.md` (design §2.1, §4, §5.2–5.4, §8.1 modo Copilot) y crear `docs/manual-tests.md` · Satisface: REQ-2.3-26
+- [x] T-07 · Escribir `triage.agent.md` (design §2.1, §4, §5.2–5.4, §8.1 modo Copilot) y crear `docs/manual-tests.md` · Satisface: REQ-2.3-26
   Hecho cuando: When the triage agent completes a classification in Copilot Chat, the triage agent shall recommend exactly one handoff according to the routing rules.
   Verifica: Manual M-05 (tickets `infra`, `provisioning` y `P1`) y M-09 (tools de `triage`)
   Bloqueada por: ninguna
 
-- [ ] T-08 · Escribir `copilot-instructions.md` con reglas de PII, tono, lista de jerga y plantillas de mensaje (design §8.1, §9) · Satisface: REQ-SEC-11, REQ-SEC-12
+- [x] T-08 · Escribir `copilot-instructions.md` con reglas de PII, tono, lista de jerga y plantillas de mensaje (design §8.1, §9) · Satisface: REQ-SEC-11, REQ-SEC-12
   Hecho cuando: If a ticket in Copilot Chat contains a credential, then the triage agent shall omit that credential from every response and recommend that the user change the exposed credential.
   Verifica: Manual M-07
   Bloqueada por: T-07
 
-- [ ] T-09 · Escribir `triage-ticket.prompt.md` (design §7) · Satisface: REQ-2.4-08, REQ-2.1-12, REQ-AUD-07
+- [x] T-09 · Escribir `triage-ticket.prompt.md` (design §7) · Satisface: REQ-2.4-08, REQ-2.1-12, REQ-AUD-07
   Hecho cuando: When an operator runs `/triage-ticket` in Copilot Chat, the triage agent shall return `category`, `severity` and `entities`, save `data/tickets/<ticketId>.json` with status `TRIAGED` and append an audit entry to `data/audit/<ticketId>.jsonl`.
   Verifica: Manual M-02
   Bloqueada por: T-07, T-08
 
-- [ ] T-10 · Escribir `ticket-lifecycle.instructions.md` con la tabla de transiciones, la definición de resuelto y el SLA (design §3.1–3.2) · Satisface: REQ-2.1-13
+- [x] T-10 · Escribir `ticket-lifecycle.instructions.md` con la tabla de transiciones, la definición de resuelto y el SLA (design §3.1–3.2) · Satisface: REQ-2.1-13
   Hecho cuando: If an operator asks the triage agent in Copilot Chat to apply a transition absent from the transitions table, then the triage agent shall refuse the transition citing the allowed transitions from the current status.
   Verifica: Manual M-01 (ticket creado en M-02 y adjunto al chat)
   Bloqueada por: T-09

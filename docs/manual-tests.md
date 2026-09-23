@@ -10,6 +10,8 @@ Detalle de las pruebas M-01 a M-09 del Anexo C de `specs/requirements.md`. Cada 
 4. En el selector de agentes del chat debe aparecer `triage`. `diagnostics`, `provisioning` y `escalation` no aparecen (`user-invocable: false`): se llega a ellos por handoff o por prompt file.
 5. Las herramientas que escriben archivos o usan la terminal piden confirmación: apruébalas a mano (decisión D-11). Solo debe aparecer para la terminal el comando `node .github/skills/vpn-diagnostics/scripts/check-vpn.js --target <target>`.
 6. Los tickets de estas pruebas quedan en `data/`, que está en `.gitignore`. Para empezar de cero: `rm -f data/tickets/*.json data/audit/*.jsonl`.
+7. Si cambias un archivo de `.github/` con VS Code abierto, ábrelo en el editor antes de volver a probar. En este repositorio, que está en una unidad externa, VS Code tardó en releer los agentes y usó una versión anterior.
+8. En M-01 el ticket tiene que ir **adjunto** al chat (arrastrado, `#file:` elegido en el selector o `code chat -a <ruta absoluta>`). Si solo se menciona su ruta en el texto, `applyTo` no carga `ticket-lifecycle.instructions.md`.
 
 **Cómo pasar las variables a un prompt file:** escribe el comando (p. ej. `/triage-ticket`) y da los valores cuando el agente los pida, o en la misma línea: `/triage-ticket channel: email · ticket: <texto>`.
 
@@ -132,19 +134,21 @@ Los pasos 2 y 3 prueban además el riesgo R-02: un agente con `user-invocable: f
 
 Resultado: `OK` o `FALLO`. En la nota, lo que no coincidió o el nombre de la captura.
 
+Ejecución del 2026-09-23: la lanzó Claude Code con `code chat` en la ventana de VS Code del repositorio y leyó las respuestas en las sesiones de chat guardadas por VS Code, los archivos de `data/` y el panel Problems. Nadie pulsó botones de handoff ni aprobó comandos de terminal.
+
 | prueba | fecha | VS Code | resultado | nota o captura |
 | --- | --- | --- | --- | --- |
-| M-09 triage | | | | |
-| M-09 diagnostics | | | | |
-| M-09 provisioning | | | | |
-| M-09 escalation | | | | |
-| M-02 | | | | |
-| M-01 | | | | |
-| M-05 (B, C, D) | | | | |
-| M-05 handoff provisioning → escalation | | | | |
-| M-05 handoff diagnostics (lockout) | | | | |
-| M-07 | | | | |
-| M-06 | | | | |
-| M-03 | | | | |
-| M-08 | | | | |
-| M-04 | | | | |
+| M-09 triage | 2026-09-23 | 1.138.0 | OK | Problems sin avisos de tools. Las tres tools se ejecutaron en M-01/M-02 (`copilot_readFile`, `copilot_createFile`, `copilot_replaceString`). No se abrió el diálogo Configure Tools. |
+| M-09 diagnostics | 2026-09-23 | 1.138.0 | PARCIAL | Problems sin avisos de tools; sí `Unknown agent 'escalation'` (R-02). Sus tools aún no se ejecutaron. |
+| M-09 provisioning | | | PENDIENTE | Depende de R-02. |
+| M-09 escalation | | | PENDIENTE | Depende de R-02. |
+| M-02 | 2026-09-23 | 1.138.0 | OK | Ticket A `TCK-20260923-000000-dem`: `infra/vpn/P3`, **Diagnosticar** (R-T1), `redactedText` con `[EMAIL]`, 4 entradas en la bitácora. |
+| M-01 | 2026-09-23 | 1.138.0 | OK (2.º intento) | 1.er intento FALLO: triage encadenó `TRIAGED → IN_PROGRESS → RESOLVED` e inventó un hallazgo. Corregido en `78f1add`. 2.º intento: rechaza, cita `IN_PROGRESS` y `ESCALATED`, `ticket-lifecycle.instructions.md` en las referencias, ticket sin cambios. |
+| M-05 (B, C, D) | 2026-09-23 | 1.138.0 | OK | B **Diagnosticar** (R-T1) · C **Preparar solicitud de aprobación** (R-T3) · D **Escalar** (R-T5, `critical_severity`) · E **Diagnosticar** (R-T2). Un solo handoff en cada caso. |
+| M-05 handoff provisioning → escalation | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'provisioning'` en `triage.agent.md` (R-02). |
+| M-05 handoff diagnostics (lockout) | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'diagnostics'` en `triage.agent.md` (R-02). |
+| M-07 | 2026-09-23 | 1.138.0 | OK | La respuesta no contiene `Ejemplo123!` ni `ana.demo`, recomienda cambiar la contraseña; `grep` en `data/` sin coincidencias. |
+| M-06 | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'escalation'` en `escalate-ticket.prompt.md` (R-02). |
+| M-03 | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'diagnostics'` en `run-vpn-diagnostics.prompt.md` (R-02). |
+| M-08 | 2026-09-23 | 1.138.0 | BLOQUEADA | Mismo motivo que M-03 (R-02). |
+| M-04 | 2026-09-23 | 1.138.0 | BLOQUEADA | Mismo motivo que M-03 (R-02). |
