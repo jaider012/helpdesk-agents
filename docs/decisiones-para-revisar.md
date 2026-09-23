@@ -62,6 +62,8 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | DC-39 | Al aplicar una transición: primero se valida, después se escribe la entrada de bitácora y por último se guarda el ticket. Una transición rechazada deja una entrada `transition_rejected` con su código. | «Sin bitácora no hay cambio de estado» (UC-SYS-09): si falla la bitácora, el estado no cambia. El caso inverso (bitácora escrita y ticket sin guardar) lo cubre `STORE_WRITE_FAILED` en T-57. | Invertir el orden en `ticket-lifecycle.ts`. | T-39 | |
 | DC-40 | `ExecutedAction.id` es un `string` (design §4 lo fija a los dos ids actuales). | La allowlist compilada de `diagnostics.agent.md` es la fuente de verdad (ADR-01): una fila nueva no debe exigir cambiar el tipo. | Volver a la unión de ids en `ticket-state.ts`. | T-40 | |
 | DC-41 | `DATA_DIR` se resuelve contra la raíz del repositorio (por defecto `data/`), no contra la carpeta desde la que arranca el api. | `pnpm -F api dev` arranca en `apps/api`; así el api y el modo Copilot comparten los mismos tickets y bitácora. | Resolverlo contra `process.cwd()` en `paths.ts`. | T-40 | |
+| DC-42 | En el estado del grafo, `TicketState.escalation` se llama `escalationPackage`; al guardar el ticket vuelve a llamarse `escalation`. | LangGraph no permite un canal con el mismo nombre que un nodo, y `escalation` es a la vez agente y campo (lo usa la tabla de transiciones). | Renombrar el nodo en lugar del campo. | T-41 | |
+| DC-43 | Hasta que cada nodo tenga su comportamiento (T-42 en adelante), el grafo compilado usa nodos que no cambian el estado. | T-41 solo compila la estructura del grafo. | Se resuelve nodo a nodo en las tareas siguientes. | T-41 | |
 
 ## Aprobadas explícitamente por ti (referencia)
 

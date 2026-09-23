@@ -244,7 +244,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- allowlist.compiled allowlist.reject lifecycle.escalated-no-remediation`
   Bloqueada por: T-37
 
-- [ ] T-41 · Compilar el grafo LangGraph desde los `.agent.md` con el registry de tools (design §10, §10.1) · Satisface: REQ-2.3-12, REQ-2.3-13, REQ-2.3-14
+- [x] T-41 · Compilar el grafo LangGraph desde los `.agent.md` con el registry de tools (design §10, §10.1) · Satisface: REQ-2.3-12, REQ-2.3-13, REQ-2.3-14
   Hecho cuando: When the runtime starts, the runtime shall create one graph node per `.agent.md` file with its body as system prompt and one graph edge per declared handoff.
   Verifica: `pnpm -F api test -- graph.compile graph.system-prompt`
   Bloqueada por: T-31, T-39
