@@ -134,21 +134,21 @@ Los pasos 2 y 3 prueban además el plan B de R-02: los agentes destino funcionan
 
 Resultado: `OK` o `FALLO`. En la nota, lo que no coincidió o el nombre de la captura.
 
-Ejecución del 2026-09-23: la lanzó Claude Code con `code chat` en la ventana de VS Code del repositorio y leyó las respuestas en las sesiones de chat guardadas por VS Code, los archivos de `data/` y el panel Problems. Nadie pulsó botones de handoff ni aprobó comandos de terminal.
+Ejecución del 2026-09-23: la lanzó Claude Code con `code chat` en la ventana de VS Code del repositorio y leyó las respuestas en las sesiones de chat guardadas por VS Code, los archivos de `data/` y el panel Problems. En la primera tanda nadie pulsó botones ni aprobó comandos. En la segunda, tras D-12, pulsó los botones de handoff y aprobó u omitió los comandos de terminal con clics simulados, después de comprobar en una captura que el comando era exactamente el de la skill.
 
 | prueba | fecha | VS Code | resultado | nota o captura |
 | --- | --- | --- | --- | --- |
 | M-09 triage | 2026-09-23 | 1.138.0 | OK | Problems sin avisos de tools. Las tres tools se ejecutaron en M-01/M-02 (`copilot_readFile`, `copilot_createFile`, `copilot_replaceString`). No se abrió el diálogo Configure Tools. |
-| M-09 diagnostics | 2026-09-23 | 1.138.0 | PARCIAL | Problems sin avisos de tools; sí `Unknown agent 'escalation'` (R-02). Sus tools aún no se ejecutaron. |
-| M-09 provisioning | | | PENDIENTE | Depende de R-02. |
-| M-09 escalation | | | PENDIENTE | Depende de R-02. |
+| M-09 diagnostics | 2026-09-23 | 1.138.0 | OK | Problems sin avisos tras D-12. `read/readFile`, `edit/editFiles` y `execute/runInTerminal` se ejecutaron en M-03 y M-04. No se abrió el diálogo Configure Tools. |
+| M-09 provisioning | 2026-09-23 | 1.138.0 | OK | Problems sin avisos tras D-12. `read/readFile` y `edit/editFiles` se ejecutaron en el handoff de M-05. |
+| M-09 escalation | 2026-09-23 | 1.138.0 | OK | Problems sin avisos tras D-12. `read/readFile` y `edit/editFiles` se ejecutaron en M-06 y en el handoff de M-05. |
 | M-02 | 2026-09-23 | 1.138.0 | OK | Ticket A `TCK-20260923-000000-dem`: `infra/vpn/P3`, **Diagnosticar** (R-T1), `redactedText` con `[EMAIL]`, 4 entradas en la bitácora. |
 | M-01 | 2026-09-23 | 1.138.0 | OK (2.º intento) | 1.er intento FALLO: triage encadenó `TRIAGED → IN_PROGRESS → RESOLVED` e inventó un hallazgo. Corregido en `78f1add`. 2.º intento: rechaza, cita `IN_PROGRESS` y `ESCALATED`, `ticket-lifecycle.instructions.md` en las referencias, ticket sin cambios. |
 | M-05 (B, C, D) | 2026-09-23 | 1.138.0 | OK | B **Diagnosticar** (R-T1) · C **Preparar solicitud de aprobación** (R-T3) · D **Escalar** (R-T5, `critical_severity`) · E **Diagnosticar** (R-T2). Un solo handoff en cada caso. |
-| M-05 handoff provisioning → escalation | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'provisioning'` en `triage.agent.md` (R-02). |
-| M-05 handoff diagnostics (lockout) | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'diagnostics'` en `triage.agent.md` (R-02). |
+| M-05 handoff provisioning → escalation | 2026-09-23 | 1.138.0 | OK | Clic en **Preparar solicitud de aprobación** y en **Enviar a aprobación**: ticket `…-nad` pasa por `IN_PROGRESS` a `ESCALATED` con `approval_required`, `Gestión de Accesos (aprobadores)` y `approvalRequest` (`requesterRef`, `complete: true`). Desvío menor: `approvalRequest.summary` no es literalmente la plantilla `internal.approval`. |
+| M-05 handoff diagnostics (lockout) | 2026-09-23 | 1.138.0 | OK | Clic en **Diagnosticar**: ticket `…-mev` en `RESOLVED` con hallazgo `rule` concluyente y la plantilla `resolved.instruct_self_service_unlock`. La acción se guardó como `act_1`: corregido en `5d22a27` y confirmado en M-03. |
 | M-07 | 2026-09-23 | 1.138.0 | OK | La respuesta no contiene `Ejemplo123!` ni `ana.demo`, recomienda cambiar la contraseña; `grep` en `data/` sin coincidencias. |
-| M-06 | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'escalation'` en `escalate-ticket.prompt.md` (R-02). |
-| M-03 | 2026-09-23 | 1.138.0 | BLOQUEADA | VS Code: `Unknown agent 'diagnostics'` en `run-vpn-diagnostics.prompt.md` (R-02). |
-| M-08 | 2026-09-23 | 1.138.0 | BLOQUEADA | Mismo motivo que M-03 (R-02). |
-| M-04 | 2026-09-23 | 1.138.0 | BLOQUEADA | Mismo motivo que M-03 (R-02). |
+| M-06 | 2026-09-23 | 1.138.0 | OK | Ticket D `…-nel`: `operator_request`, `Infraestructura y Redes`, `userMessage` con el `ticketId`, estado `ESCALATED`, bitácora `escalated` + `transition` (`TRIAGED` → `ESCALATED`). `escalation` sirve como `agent` del prompt file (D-12). |
+| M-03 | 2026-09-23 | 1.138.0 | OK | `SKILL.md` cargado como skill. Comando exacto de la skill (con `cd` a la raíz delante), exit 0. Ticket A en `RESOLVED` con `gateway_healthy` y `instruct_vpn_reconnect`; mensaje sin jerga. El agente propuso además dos `ls` y un `python3` que no se aprobaron; regla endurecida en `23ababc`. |
+| M-08 | 2026-09-23 | 1.138.0 | OK | Rechaza `x:1; echo INJECTED`, no propone ningún comando, pide `host:puerto`; ticket B sigue en `TRIAGED`. La entrada `invalid_target` quedó pegada a la línea anterior (JSONL roto): regla corregida en `c4f7787` y bitácora de B reparada. |
+| M-04 | 2026-09-23 | 1.138.0 | OK | Con el script renombrado, Node sale con exit 1 sin JSON (`MODULE_NOT_FOUND`) y el agente lo trata como `skill_resource_unavailable`: bitácora `tool_run` + `skill_resource_unavailable` + `routed`, botón **Escalar**. Un solo comando, el exacto. `durationMs` queda en `null` (el agente no mide el tiempo en modo Copilot). Script restaurado. |

@@ -84,32 +84,32 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: Manual M-01 (ticket creado en M-02 y adjunto al chat)
   Bloqueada por: T-09
 
-- [ ] T-11 · Escribir `escalation.agent.md` y `escalate-ticket.prompt.md` (design §4 `EscalationPackage`, §5.2, §5.6, §7) · Satisface: REQ-2.4-10
+- [x] T-11 · Escribir `escalation.agent.md` y `escalate-ticket.prompt.md` (design §4 `EscalationPackage`, §5.2, §5.6, §7) · Satisface: REQ-2.4-10
   Hecho cuando: When an operator runs `/escalate-ticket` in Copilot Chat, the escalation agent shall produce the escalation package for the given `ticketId` and `reason`.
   Verifica: Manual M-06 (confirma además el plan B de R-02: `escalation` sirve como `agent` de un prompt file) y M-09 (tools de `escalation`)
   Bloqueada por: T-10
 
-- [ ] T-12 · Escribir `provisioning.agent.md` (design §4 `Entities.request`, §5.2, §5.4) · Satisface: REQ-2.3-36
+- [x] T-12 · Escribir `provisioning.agent.md` (design §4 `Entities.request`, §5.2, §5.4) · Satisface: REQ-2.3-36
   Hecho cuando: When the provisioning agent completes the approval request in Copilot Chat, the provisioning agent shall hand off to the escalation agent with reason `approval_required`.
   Verifica: Manual M-05 (ticket `provisioning`: pulsar «Preparar solicitud de aprobación» y después «Enviar a aprobación») y M-09 (tools de `provisioning`)
   Bloqueada por: T-11
 
-- [ ] T-13 · Escribir `diagnostics.agent.md` con el procedimiento determinista y la allowlist de remediación (design §2.2, §5.2, §5.5) · Satisface: REQ-2.3-27
+- [x] T-13 · Escribir `diagnostics.agent.md` con el procedimiento determinista y la allowlist de remediación (design §2.2, §5.2, §5.5) · Satisface: REQ-2.3-27
   Hecho cuando: While a ticket has category `access`, when `entities.issueType` is `lockout`, the diagnostics agent shall deliver the allowlisted instruction `instruct_self_service_unlock` to the user.
   Verifica: Manual M-05 (ticket `access/lockout`: pulsar «Diagnosticar») y M-09 (tools de `diagnostics`)
   Bloqueada por: T-11
 
-- [ ] T-14 · Escribir el procedimiento de `SKILL.md` de `vpn-diagnostics` y `run-vpn-diagnostics.prompt.md` (design §6.1, §7) · Satisface: REQ-2.2-09, REQ-2.4-09, REQ-COM-05
+- [x] T-14 · Escribir el procedimiento de `SKILL.md` de `vpn-diagnostics` y `run-vpn-diagnostics.prompt.md` (design §6.1, §7) · Satisface: REQ-2.2-09, REQ-2.4-09, REQ-COM-05
   Hecho cuando: When an operator runs `/run-vpn-diagnostics` in Copilot Chat, the diagnostics agent shall apply the `vpn-diagnostics` skill, run `check-vpn.js` against the `target` value and write the message for the end user in Spanish without terms from the jargon list.
   Verifica: Manual M-03
   Bloqueada por: T-06, T-13
 
-- [ ] T-15 · Añadir a `SKILL.md` el paso que valida el formato de `target` antes de ejecutar (design §6.1, §6.3) · Satisface: REQ-SEC-15
+- [x] T-15 · Añadir a `SKILL.md` el paso que valida el formato de `target` antes de ejecutar (design §6.1, §6.3) · Satisface: REQ-SEC-15
   Hecho cuando: If the `target` value does not match `^[a-z0-9.-]+:\d{1,5}$`, then the diagnostics agent shall refuse to run `check-vpn.js`.
   Verifica: Manual M-08
   Bloqueada por: T-14
 
-- [ ] T-16 · Añadir a `SKILL.md` la sección `Manejo de fallos` (timeout 10 s, salida no JSON = `skill_resource_unavailable`, bitácora, handoff; design §6.1) · Satisface: REQ-2.2-30
+- [x] T-16 · Añadir a `SKILL.md` la sección `Manejo de fallos` (timeout 10 s, salida no JSON = `skill_resource_unavailable`, bitácora, handoff; design §6.1) · Satisface: REQ-2.2-30
   Hecho cuando: If `check-vpn.js` exits with code `2`, prints output that is not valid JSON or does not respond within 10 s during a Copilot Chat session, then the diagnostics agent shall hand off to the escalation agent with reason `skill_resource_unavailable`.
   Verifica: Manual M-04 (con `check-vpn.js` renombrado temporalmente: Node sale con exit `1` sin JSON)
   Bloqueada por: T-14
