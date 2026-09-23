@@ -97,7 +97,7 @@ El estado actual del ticket. Ejemplo sintético justo después de triage:
 - `entities.issueType`: `lockout`, `password_reset`, `mfa`, `disabled_account` (access) · `vpn`, `performance`, `app` (infra) · `folder_access`, `repo_access`, `license`, `profile_change` (provisioning) · `unknown`.
 - `entities.request` (solo provisioning): `{ "resource", "accessLevel": "read" | "write" | "admin" | "license", "justification" }`.
 - `findings[]`: `{ "id": "fnd_<n>", "source": "check-vpn" | "rule", "conclusive", "cause", "checks", "exitCode", "summary", "durationMs", "ts" }`.
-- `actions[]`: `{ "id", "kind": "instruction" | "automated", "allowlisted": true, "agent", "result": "delivered" | "succeeded" | "failed", "ts" }`.
+- `actions[]`: `{ "id", "kind": "instruction" | "automated", "allowlisted": true, "agent", "result": "delivered" | "succeeded" | "failed", "ts" }`, donde `id` es el de la allowlist de remediación (`instruct_vpn_reconnect` o `instruct_self_service_unlock`).
 - `escalation` (solo al escalar): `{ "ticketId", "category", "severity", "entities", "findings", "reason", "targetTeam", "approvalRequest", "summary", "createdAt" }`.
 - `userMessage`: el mensaje para el usuario final. `closeReason`: `user_confirmed`, `no_user_reply` o `handled_by_team`.
 
