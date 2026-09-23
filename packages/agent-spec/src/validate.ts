@@ -1,5 +1,6 @@
 import { agentIssues } from './agents.ts';
 import { unknownKeys } from './frontmatter.ts';
+import { graphIssues } from './graph.ts';
 import { LIFECYCLE_PATH, lifecycleIssues } from './lifecycle.ts';
 import type { SpecBundle, SpecFile } from './load.ts';
 import { skillBodyIssues, skillFrontmatterIssues } from './skill.ts';
@@ -24,7 +25,11 @@ export type ErrorCode =
   | 'AGENT_VISIBILITY_INVALID'
   | 'HANDOFF_NOT_ALLOWED'
   | 'TOOL_NOT_PERMITTED'
-  | 'UNKNOWN_TOOL';
+  | 'UNKNOWN_TOOL'
+  | 'HANDOFF_CYCLE'
+  | 'TERMINAL_HAS_HANDOFFS'
+  | 'SELF_HANDOFF'
+  | 'UNKNOWN_HANDOFF_TARGET';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
@@ -57,6 +62,7 @@ export function validateSpec(bundle: SpecBundle): ValidationError[] {
     ...bundle.files
       .filter((file) => file.kind === 'agent')
       .flatMap((file) => agentIssues(file).map((issue) => ({ ...issue, path: file.path }))),
+    ...graphIssues(bundle),
   ];
 }
 

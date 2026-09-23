@@ -1,4 +1,5 @@
 export { agentName } from './agents.ts';
+export { buildHandoffGraph, type HandoffEdge, type HandoffGraph } from './graph.ts';
 export { parseFrontmatter, type FrontmatterKind, type ParsedFrontmatter } from './frontmatter.ts';
 export {
   compileLifecycle,

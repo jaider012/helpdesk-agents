@@ -42,7 +42,7 @@ export function agentName(file: SpecFile): string {
     : (file.path.split('/').at(-1) ?? '').replace(/\.agent\.md$/, '');
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 

@@ -162,7 +162,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- graph.allowed-handoffs agents.tool-permissions agents.unknown-tool`
   Bloqueada por: T-23
 
-- [ ] T-25 · Validar la forma del grafo de handoffs (ciclos, terminal, auto-handoff, destino) · Satisface: REQ-2.3-03, REQ-2.3-04, REQ-2.3-05, REQ-2.3-06
+- [x] T-25 · Validar la forma del grafo de handoffs (ciclos, terminal, auto-handoff, destino) · Satisface: REQ-2.3-03, REQ-2.3-04, REQ-2.3-05, REQ-2.3-06
   Hecho cuando: When the spec validator builds the handoff graph, the spec validator shall report one error code per broken rule among `HANDOFF_CYCLE`, `TERMINAL_HAS_HANDOFFS`, `SELF_HANDOFF` and `UNKNOWN_HANDOFF_TARGET`.
   Verifica: `pnpm -F agent-spec test -- graph.acyclic graph.terminal graph.self graph.unknown-target`
   Bloqueada por: T-23
