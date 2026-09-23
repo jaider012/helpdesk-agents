@@ -229,7 +229,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- lifecycle.compiled lifecycle.invalid lifecycle.closed`
   Bloqueada por: T-32
 
-- [ ] T-38 · Evaluar los campos obligatorios y la definición de resuelto en cada transición (design §3.1, predicados) · Satisface: REQ-2.1-06, REQ-2.1-07, REQ-2.1-08, REQ-2.1-09, REQ-COM-01
+- [x] T-38 · Evaluar los campos obligatorios y la definición de resuelto en cada transición (design §3.1, predicados) · Satisface: REQ-2.1-06, REQ-2.1-07, REQ-2.1-08, REQ-2.1-09, REQ-COM-01
   Hecho cuando: If a status transition is requested while a required field of its row is empty, then the runtime shall reject the transition with `RESOLUTION_INCOMPLETE` for target `RESOLVED` and with `MISSING_REQUIRED_FIELDS` for any other target.
   Verifica: `pnpm -F api test -- lifecycle.required-fields lifecycle.resolved`
   Bloqueada por: T-37

@@ -6,8 +6,11 @@ import {
   type TicketStatus,
   type TransitionSpec,
 } from 'agent-spec';
+import { describePredicate, holds } from './predicates.js';
+import type { TicketState } from './ticket-state.js';
 
-export type TransitionErrorCode = 'INVALID_TRANSITION';
+export type TransitionErrorCode =
+  'INVALID_TRANSITION' | 'MISSING_REQUIRED_FIELDS' | 'RESOLUTION_INCOMPLETE';
 
 export class TransitionError extends Error {
   readonly code: TransitionErrorCode;
@@ -58,6 +61,24 @@ export class TicketStateMachine {
       throw new TransitionError(
         'INVALID_TRANSITION',
         `${from} → ${to} is not in the transitions table; allowed from ${from}: ${allowed.length > 0 ? allowed.join(', ') : 'none'}`,
+      );
+    }
+    return transition;
+  }
+
+  /**
+   * Checks a transition of `candidate`, the ticket with its new data still in its current status:
+   * the table row first, then its required fields (REQ-2.1-06..09, REQ-COM-01).
+   */
+  validateTransition(candidate: TicketState, to: TicketStatus): TransitionSpec {
+    const transition = this.assertTransition(candidate.status, to);
+    const missing = transition.required
+      .filter((predicate) => !holds(predicate, candidate))
+      .map(describePredicate);
+    if (missing.length > 0) {
+      throw new TransitionError(
+        to === 'RESOLVED' ? 'RESOLUTION_INCOMPLETE' : 'MISSING_REQUIRED_FIELDS',
+        `${candidate.status} → ${to} (${transition.id}) lacks ${missing.join(', ')}`,
       );
     }
     return transition;
