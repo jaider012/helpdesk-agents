@@ -44,7 +44,7 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: `pnpm test -- check-vpn.exit2`
   Bloqueada por: T-01
 
-- [ ] T-03 · Implementar los checks `dns`, `tcp` y `latency` de `check-vpn.js` (design §6.2) · Satisface: REQ-2.2-10, REQ-2.2-11, REQ-2.2-12, REQ-2.2-17
+- [x] T-03 · Implementar los checks `dns`, `tcp` y `latency` de `check-vpn.js` (design §6.2) · Satisface: REQ-2.2-10, REQ-2.2-11, REQ-2.2-12, REQ-2.2-17
   Hecho cuando: When the check-vpn script runs with `--target localhost:<port>` against a listening local server, the check-vpn script shall report the checks `dns`, `tcp` and `latency` as `pass`, include the connection latency in milliseconds and exit with code `0`.
   Verifica: `pnpm test -- check-vpn.dns check-vpn.tcp check-vpn.latency check-vpn.exit0`
   Bloqueada por: T-02
