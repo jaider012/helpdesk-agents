@@ -1,27 +1,41 @@
 import { spawn } from 'node:child_process';
 import { createServer, type AddressInfo } from 'node:net';
+import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 
 export const SCRIPT_PATH = fileURLToPath(
   new URL('../../.github/skills/vpn-diagnostics/scripts/check-vpn.js', import.meta.url),
 );
 
+/** Preload fixtures for `runCheckVpn({ preload })`: they patch node:dns or node:net in the child. */
+export const SLOW_DNS = new URL('./fixtures/slow-dns.mjs', import.meta.url).href;
+export const SLOW_TCP = new URL('./fixtures/slow-tcp.mjs', import.meta.url).href;
+
 export interface CheckVpnRun {
   code: number | null;
   stdout: string;
   stderr: string;
+  /** Wall time from spawn to exit. */
+  durationMs: number;
 }
 
 /** Runs check-vpn.js as a child process, the same way the runtime and the skill do. */
-export function runCheckVpn(args: readonly string[]): Promise<CheckVpnRun> {
+export function runCheckVpn(
+  args: readonly string[],
+  options: { preload?: string } = {},
+): Promise<CheckVpnRun> {
+  const nodeArgs = options.preload ? ['--import', options.preload] : [];
+  const start = performance.now();
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [SCRIPT_PATH, ...args]);
+    const child = spawn(process.execPath, [...nodeArgs, SCRIPT_PATH, ...args]);
     let stdout = '';
     let stderr = '';
     child.stdout.setEncoding('utf8').on('data', (chunk: string) => (stdout += chunk));
     child.stderr.setEncoding('utf8').on('data', (chunk: string) => (stderr += chunk));
     child.on('error', reject);
-    child.on('close', (code) => resolve({ code, stdout, stderr }));
+    child.on('close', (code) =>
+      resolve({ code, stdout, stderr, durationMs: performance.now() - start }),
+    );
   });
 }
 

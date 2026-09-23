@@ -23,16 +23,23 @@ class InvalidArgsError extends Error {
   code = 'INVALID_ARGS';
 }
 
-const DEFAULT_OPTIONS = { latencyThresholdMs: 300 };
+const DEFAULT_OPTIONS = { timeoutMs: 3000, latencyThresholdMs: 300 };
 
 const OPTIONS = new Map([
   ['--target', { key: 'target', parse: parseTarget }],
+  ['--timeout-ms', { key: 'timeoutMs', parse: parsePositiveMilliseconds }],
   ['--latency-threshold-ms', { key: 'latencyThresholdMs', parse: parseMilliseconds }],
 ]);
 
 function parseMilliseconds(value, flag) {
   if (!/^\d+$/.test(value)) throw new InvalidArgsError(`${flag} must be a non-negative integer`);
   return Number(value);
+}
+
+function parsePositiveMilliseconds(value, flag) {
+  const milliseconds = parseMilliseconds(value, flag);
+  if (milliseconds === 0) throw new InvalidArgsError(`${flag} must be greater than 0`);
+  return milliseconds;
 }
 
 function parseTarget(value) {
@@ -68,10 +75,22 @@ function skipped(name, reason) {
   return { name, status: 'skip', durationMs: 0, reason };
 }
 
-async function checkDns(host) {
+/** Rejects with an error whose code is `timeout` when `promise` does not settle within `timeoutMs`. */
+function withTimeout(promise, timeoutMs) {
+  let timer;
+  const expired = new Promise((_resolve, reject) => {
+    timer = setTimeout(
+      () => reject(Object.assign(new Error('check timed out'), { code: 'timeout' })),
+      timeoutMs,
+    );
+  });
+  return Promise.race([promise, expired]).finally(() => clearTimeout(timer));
+}
+
+async function checkDns(host, timeoutMs) {
   const start = performance.now();
   try {
-    const addresses = await dns.lookup(host, { all: true });
+    const addresses = await withTimeout(dns.lookup(host, { all: true }), timeoutMs);
     return { check: { name: 'dns', status: 'pass', durationMs: elapsedMs(start) }, addresses };
   } catch (error) {
     const reason = error.code ?? 'lookup_failed';
@@ -79,7 +98,7 @@ async function checkDns(host) {
   }
 }
 
-function checkTcp({ host, port }, addresses) {
+function checkTcp({ host, port }, addresses, timeoutMs) {
   // Reuse the DNS answer so the measured time covers only the TCP handshake.
   const lookup = (_hostname, options, callback) =>
     options.all
@@ -88,16 +107,17 @@ function checkTcp({ host, port }, addresses) {
   const start = performance.now();
   return new Promise((resolve) => {
     const socket = net.connect({ host, port, lookup });
-    socket.once('connect', () => {
+    const finish = (status, reason) => {
       const durationMs = elapsedMs(start);
+      clearTimeout(timer);
       socket.destroy();
-      resolve({ name: 'tcp', status: 'pass', durationMs });
-    });
-    socket.once('error', (error) => {
-      socket.destroy();
-      const reason = error.code ?? 'connect_failed';
-      resolve({ name: 'tcp', status: 'fail', durationMs: elapsedMs(start), reason });
-    });
+      resolve(
+        reason ? { name: 'tcp', status, durationMs, reason } : { name: 'tcp', status, durationMs },
+      );
+    };
+    const timer = setTimeout(() => finish('fail', 'timeout'), timeoutMs);
+    socket.once('connect', () => finish('pass'));
+    socket.once('error', (error) => finish('fail', error.code ?? 'connect_failed'));
   });
 }
 
@@ -116,13 +136,13 @@ function describeCheck({ name, status, durationMs, reason }) {
   return details.length > 0 ? `${name} ${status} (${details.join(', ')})` : `${name} ${status}`;
 }
 
-async function runChecks({ target, latencyThresholdMs }) {
-  const resolution = await checkDns(target.host);
+async function runChecks({ target, timeoutMs, latencyThresholdMs }) {
+  const resolution = await checkDns(target.host, timeoutMs);
   const checks = [resolution.check];
   if (resolution.check.status === 'fail') {
     checks.push(skipped('tcp', 'dns_failed'), skipped('latency', 'dns_failed'));
   } else {
-    const tcp = await checkTcp(target, resolution.addresses);
+    const tcp = await checkTcp(target, resolution.addresses, timeoutMs);
     checks.push(
       tcp,
       tcp.status === 'pass'
@@ -148,8 +168,9 @@ function errorResult(error) {
 }
 
 function emit(result, exitCode) {
-  process.stdout.write(`${JSON.stringify(result)}\n`);
-  process.exitCode = exitCode;
+  // Exit as soon as stdout is flushed: a timed-out DNS lookup cannot be cancelled and would keep
+  // the process alive until the resolver gives up.
+  process.stdout.write(`${JSON.stringify(result)}\n`, () => process.exit(exitCode));
 }
 
 async function main(argv) {

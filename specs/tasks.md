@@ -54,7 +54,7 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: `pnpm test -- check-vpn.threshold check-vpn.exit1`
   Bloqueada por: T-03
 
-- [ ] T-05 · Añadir el timeout por check (`--timeout-ms`) a `check-vpn.js` · Satisface: REQ-2.2-14, REQ-2.2-15
+- [x] T-05 · Añadir el timeout por check (`--timeout-ms`) a `check-vpn.js` · Satisface: REQ-2.2-14, REQ-2.2-15
   Hecho cuando: If a DNS or TCP check does not complete within the value of `--timeout-ms`, then the check-vpn script shall mark that check as `fail` with reason `timeout`.
   Verifica: `pnpm test -- check-vpn.timeout-arg check-vpn.check-timeout`
   Bloqueada por: T-03
