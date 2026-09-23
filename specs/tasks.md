@@ -147,7 +147,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- skill.frontmatter skill.name skill.description skill.activation`
   Bloqueada por: T-18
 
-- [ ] T-22 · Validar el cuerpo de `SKILL.md` (pasos, enlace al script, `Manejo de fallos`, plazo < timeout) · Satisface: REQ-2.2-05, REQ-2.2-06, REQ-2.2-07, REQ-2.2-08
+- [x] T-22 · Validar el cuerpo de `SKILL.md` (pasos, enlace al script, `Manejo de fallos`, plazo < timeout) · Satisface: REQ-2.2-05, REQ-2.2-06, REQ-2.2-07, REQ-2.2-08
   Hecho cuando: When the spec validator loads a `SKILL.md` body, the spec validator shall report one error code per broken rule among `SKILL_STEPS_MISSING`, `SKILL_RESOURCE_UNLINKED`, `SKILL_FAILURE_SECTION_MISSING` and `SKILL_DEADLINE_INVALID`.
   Verifica: `pnpm -F agent-spec test -- skill.steps skill.resource skill.failure-section skill.timeout`
   Bloqueada por: T-21

@@ -1,7 +1,7 @@
 import { unknownKeys } from './frontmatter.ts';
 import { LIFECYCLE_PATH, lifecycleIssues } from './lifecycle.ts';
 import type { SpecBundle, SpecFile } from './load.ts';
-import { skillFrontmatterIssues } from './skill.ts';
+import { skillBodyIssues, skillFrontmatterIssues } from './skill.ts';
 
 export type ErrorCode =
   | 'REQUIRED_FILE_MISSING'
@@ -13,7 +13,11 @@ export type ErrorCode =
   | 'SKILL_FRONTMATTER_INVALID'
   | 'SKILL_NAME_MISMATCH'
   | 'SKILL_DESCRIPTION_TOO_LONG'
-  | 'SKILL_ACTIVATION_MISSING';
+  | 'SKILL_ACTIVATION_MISSING'
+  | 'SKILL_STEPS_MISSING'
+  | 'SKILL_RESOURCE_UNLINKED'
+  | 'SKILL_FAILURE_SECTION_MISSING'
+  | 'SKILL_DEADLINE_INVALID';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
@@ -42,7 +46,7 @@ export function validateSpec(bundle: SpecBundle): ValidationError[] {
     ...validateRequiredFiles(bundle),
     ...bundle.files.flatMap(validateFrontmatter),
     ...validateLifecycle(bundle),
-    ...bundle.files.flatMap(validateSkillFrontmatter),
+    ...bundle.files.flatMap((file) => validateSkill(file, bundle.resources)),
   ];
 }
 
@@ -82,10 +86,10 @@ function validateLifecycle(bundle: SpecBundle): ValidationError[] {
   }));
 }
 
-function validateSkillFrontmatter(file: SpecFile): ValidationError[] {
+function validateSkill(file: SpecFile, resources: Record<string, string>): ValidationError[] {
   if (file.kind !== 'skill' || !file.frontmatter.ok) return [];
-  return skillFrontmatterIssues(file.path, file.frontmatter.data).map((issue) => ({
-    ...issue,
-    path: file.path,
-  }));
+  return [
+    ...skillFrontmatterIssues(file.path, file.frontmatter.data),
+    ...skillBodyIssues(file.path, file.frontmatter.body, resources),
+  ].map((issue) => ({ ...issue, path: file.path }));
 }

@@ -16,4 +16,5 @@ export {
   type ErrorCode,
   type ValidationError,
 } from './validate.ts';
-export { findTable, type GfmTable } from './tables.ts';
+export { FAILURE_HEADING, skillTimeoutMs } from './skill.ts';
+export { findSection, findTable, type GfmTable } from './tables.ts';

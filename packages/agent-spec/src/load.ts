@@ -18,6 +18,8 @@ export interface SpecBundle {
   paths: string[];
   /** Customization files, sorted by `path`. */
   files: SpecFile[];
+  /** Contents of the skill resources (`.github/skills/<name>/scripts/**`), by path. */
+  resources: Record<string, string>;
 }
 
 const KIND_PATTERNS: ReadonlyArray<[SpecFileKind, RegExp]> = [
@@ -27,6 +29,8 @@ const KIND_PATTERNS: ReadonlyArray<[SpecFileKind, RegExp]> = [
   ['instructions', /^\.github\/instructions\/.+\.instructions\.md$/],
   ['copilot-instructions', /^\.github\/copilot-instructions\.md$/],
 ];
+
+const SKILL_RESOURCE = /^\.github\/skills\/[^/]+\/scripts\/.+/;
 
 function kindOf(path: string): SpecFileKind | undefined {
   return KIND_PATTERNS.find(([, pattern]) => pattern.test(path))?.[0];
@@ -56,5 +60,9 @@ export async function loadSpec(root: string): Promise<SpecBundle> {
     const raw = await readFile(join(root, path), 'utf8');
     files.push({ kind, path, frontmatter: parseFrontmatter(raw) });
   }
-  return { root, paths, files };
+  const resources: Record<string, string> = {};
+  for (const path of paths.filter((candidate) => SKILL_RESOURCE.test(candidate))) {
+    resources[path] = await readFile(join(root, path), 'utf8');
+  }
+  return { root, paths, files, resources };
 }
