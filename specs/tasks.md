@@ -39,7 +39,7 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: `pnpm test -- check-vpn.imports` y `pnpm lint`
   Bloqueada por: ninguna
 
-- [ ] T-02 · Validar los argumentos de `check-vpn.js` y emitir el JSON de error · Satisface: REQ-2.2-19, REQ-2.2-21
+- [x] T-02 · Validar los argumentos de `check-vpn.js` y emitir el JSON de error · Satisface: REQ-2.2-19, REQ-2.2-21
   Hecho cuando: If the check-vpn script runs without `--target` or with a `--target` value without port, then the check-vpn script shall print one JSON object with `ok` set to `false` and a non-null `error` and exit with code `2`.
   Verifica: `pnpm test -- check-vpn.exit2`
   Bloqueada por: T-01
