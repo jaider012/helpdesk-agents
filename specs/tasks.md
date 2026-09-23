@@ -177,7 +177,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- routing.triage routing.diagnostics routing.provisioning`
   Bloqueada por: T-17
 
-- [ ] T-28 · Validar que cada ruta es un handoff declarado y que el enrutamiento es determinista · Satisface: REQ-2.3-15, REQ-2.3-16
+- [x] T-28 · Validar que cada ruta es un handoff declarado y que el enrutamiento es determinista · Satisface: REQ-2.3-15, REQ-2.3-16
   Hecho cuando: When the spec validator checks the routing rules, the spec validator shall report `ROUTE_WITHOUT_HANDOFF` for a rule whose target is not a declared handoff of its source agent and `ROUTING_NOT_DETERMINISTIC` for a route input that matches zero rules or more than one rule.
   Verifica: `pnpm -F agent-spec test -- routing.declared routing.deterministic`
   Bloqueada por: T-25, T-27

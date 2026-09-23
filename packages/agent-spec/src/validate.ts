@@ -1,8 +1,10 @@
 import { agentIssues } from './agents.ts';
 import { unknownKeys } from './frontmatter.ts';
-import { graphIssues } from './graph.ts';
+import { buildHandoffGraph, graphIssues } from './graph.ts';
 import { LIFECYCLE_PATH, lifecycleIssues } from './lifecycle.ts';
 import type { SpecBundle, SpecFile } from './load.ts';
+import { routeHandoffIssues, routingDeterminismIssues } from './routing-check.ts';
+import { ROUTE_INPUT_DOMAINS, ROUTING_RULES } from './routing.ts';
 import { skillBodyIssues, skillFrontmatterIssues } from './skill.ts';
 
 export type ErrorCode =
@@ -31,7 +33,9 @@ export type ErrorCode =
   | 'SELF_HANDOFF'
   | 'UNKNOWN_HANDOFF_TARGET'
   | 'HANDOFF_CONTEXT_EXCEEDED'
-  | 'UNSAFE_ALLOWLIST_ACTION';
+  | 'UNSAFE_ALLOWLIST_ACTION'
+  | 'ROUTE_WITHOUT_HANDOFF'
+  | 'ROUTING_NOT_DETERMINISTIC';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
@@ -65,6 +69,8 @@ export function validateSpec(bundle: SpecBundle): ValidationError[] {
       .filter((file) => file.kind === 'agent')
       .flatMap((file) => agentIssues(file).map((issue) => ({ ...issue, path: file.path }))),
     ...graphIssues(bundle),
+    ...routeHandoffIssues(buildHandoffGraph(bundle), ROUTING_RULES),
+    ...routingDeterminismIssues(ROUTING_RULES, ROUTE_INPUT_DOMAINS),
   ];
 }
 

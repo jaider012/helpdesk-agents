@@ -53,3 +53,10 @@ export {
   type Severity,
   type TriageRouteInput,
 } from './routing.ts';
+export {
+  routeHandoffIssues,
+  routingDeterminismIssues,
+  ROUTING_PATH,
+  type RouteInputDomains,
+  type RoutingRules,
+} from './routing-check.ts';
