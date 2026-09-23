@@ -219,7 +219,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- redact.userref`
   Bloqueada por: T-34
 
-- [ ] T-36 · Crear la bitácora JSONL append-only con redacción previa a la escritura (design §8.1, §12.4) · Satisface: REQ-AUD-01, REQ-AUD-02, REQ-SEC-09
+- [x] T-36 · Crear la bitácora JSONL append-only con redacción previa a la escritura (design §8.1, §12.4) · Satisface: REQ-AUD-01, REQ-AUD-02, REQ-SEC-09
   Hecho cuando: When the runtime appends an audit entry, the audit log shall replace every string that matches a redaction pattern with its placeholder and append the entry as one JSON line to `data/audit/<ticketId>.jsonl` without modifying previous lines.
   Verifica: `pnpm -F api test -- audit.append-only audit.jsonl audit.redaction`
   Bloqueada por: T-34
