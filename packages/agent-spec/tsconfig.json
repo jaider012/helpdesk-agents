@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    // Node runs these sources directly (type stripping): `.ts` import paths and erasable syntax only.
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
 }

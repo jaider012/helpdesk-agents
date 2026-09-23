@@ -1,7 +1,23 @@
-import { unknownKeys } from './frontmatter.js';
-import type { SpecBundle, SpecFile } from './load.js';
+import { unknownKeys } from './frontmatter.ts';
+import type { SpecBundle, SpecFile } from './load.ts';
 
-export type ErrorCode = 'FRONTMATTER_PARSE_ERROR' | 'UNKNOWN_FRONTMATTER_KEY';
+export type ErrorCode =
+  'REQUIRED_FILE_MISSING' | 'FRONTMATTER_PARSE_ERROR' | 'UNKNOWN_FRONTMATTER_KEY';
+
+/** Annex D of requirements.md. */
+export const REQUIRED_FILES = [
+  '.github/agents/diagnostics.agent.md',
+  '.github/agents/escalation.agent.md',
+  '.github/agents/provisioning.agent.md',
+  '.github/agents/triage.agent.md',
+  '.github/copilot-instructions.md',
+  '.github/instructions/ticket-lifecycle.instructions.md',
+  '.github/prompts/escalate-ticket.prompt.md',
+  '.github/prompts/run-vpn-diagnostics.prompt.md',
+  '.github/prompts/triage-ticket.prompt.md',
+  '.github/skills/vpn-diagnostics/SKILL.md',
+  '.github/skills/vpn-diagnostics/scripts/check-vpn.js',
+] as const;
 
 export interface ValidationError {
   code: ErrorCode;
@@ -11,7 +27,20 @@ export interface ValidationError {
 }
 
 export function validateSpec(bundle: SpecBundle): ValidationError[] {
-  return bundle.files.flatMap(validateFrontmatter);
+  return [...validateRequiredFiles(bundle), ...bundle.files.flatMap(validateFrontmatter)];
+}
+
+/** One line per error, as `pnpm spec:validate` prints it. */
+export function formatError(error: ValidationError): string {
+  return `${error.code} ${error.path}: ${error.message}`;
+}
+
+function validateRequiredFiles(bundle: SpecBundle): ValidationError[] {
+  return REQUIRED_FILES.filter((path) => !bundle.paths.includes(path)).map((path) => ({
+    code: 'REQUIRED_FILE_MISSING',
+    path,
+    message: 'required file is missing',
+  }));
 }
 
 function validateFrontmatter(file: SpecFile): ValidationError[] {

@@ -127,7 +127,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- validate.yaml validate.unknown-key`
   Bloqueada por: T-01
 
-- [ ] T-18 · Validar los archivos obligatorios y exponer `pnpm spec:validate` (CLI, exit code, salida) · Satisface: REQ-VAL-01, REQ-VAL-05, REQ-VAL-06
+- [x] T-18 · Validar los archivos obligatorios y exponer `pnpm spec:validate` (CLI, exit code, salida) · Satisface: REQ-VAL-01, REQ-VAL-05, REQ-VAL-06
   Hecho cuando: If a required `.github/` file listed in Annex D is missing, then the spec validator shall print `REQUIRED_FILE_MISSING` with the file path and exit with code `1`.
   Verifica: `pnpm -F agent-spec test -- validate.required-files validate.exit-code validate.output`
   Bloqueada por: T-17

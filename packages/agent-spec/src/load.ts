@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { join, sep } from 'node:path';
-import { parseFrontmatter, type FrontmatterKind, type ParsedFrontmatter } from './frontmatter.js';
+import { join, relative, sep } from 'node:path';
+import { parseFrontmatter, type FrontmatterKind, type ParsedFrontmatter } from './frontmatter.ts';
 
 export type SpecFileKind = FrontmatterKind | 'copilot-instructions';
 
@@ -14,7 +14,9 @@ export interface SpecFile {
 export interface SpecBundle {
   /** Folder that contains `.github/`. */
   root: string;
-  /** Files sorted by `path`. */
+  /** Every file under `.github/`, relative to `root` and sorted, whatever its type. */
+  paths: string[];
+  /** Customization files, sorted by `path`. */
   files: SpecFile[];
 }
 
@@ -30,10 +32,23 @@ function kindOf(path: string): SpecFileKind | undefined {
   return KIND_PATTERNS.find(([, pattern]) => pattern.test(path))?.[0];
 }
 
+async function listGithubFiles(root: string): Promise<string[]> {
+  try {
+    const entries = await readdir(join(root, '.github'), { recursive: true, withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile())
+      .map((entry) => relative(root, join(entry.parentPath, entry.name)).split(sep).join('/'))
+      .sort();
+  } catch (error) {
+    // A missing `.github/` is a spec error (REQUIRED_FILE_MISSING), not a crash.
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
+    throw error;
+  }
+}
+
 /** Reads every customization file under `<root>/.github/` and parses its frontmatter. */
 export async function loadSpec(root: string): Promise<SpecBundle> {
-  const entries = await readdir(join(root, '.github'), { recursive: true });
-  const paths = entries.map((entry) => ['.github', ...entry.split(sep)].join('/')).sort();
+  const paths = await listGithubFiles(root);
   const files: SpecFile[] = [];
   for (const path of paths) {
     const kind = kindOf(path);
@@ -41,5 +56,5 @@ export async function loadSpec(root: string): Promise<SpecBundle> {
     const raw = await readFile(join(root, path), 'utf8');
     files.push({ kind, path, frontmatter: parseFrontmatter(raw) });
   }
-  return { root, files };
+  return { root, paths, files };
 }

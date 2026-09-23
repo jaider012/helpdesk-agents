@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { loadSpec, validateSpec } from '../src/index.js';
-import { fixture } from './helpers.js';
+import { loadSpec, validateSpec } from '../src/index.ts';
+import { fixture } from './helpers.ts';
 
 describe('validate.unknown-key', () => {
   it('reports UNKNOWN_FRONTMATTER_KEY for each key outside the Annex A set of its file type', async () => {
-    const errors = validateSpec(await loadSpec(fixture('unknown-key')));
+    const errors = validateSpec(await loadSpec(fixture('unknown-key'))).filter(
+      (error) => error.code === 'UNKNOWN_FRONTMATTER_KEY',
+    );
 
     expect(errors).toEqual([
       {
