@@ -1,6 +1,6 @@
 # Tareas — Ecosistema de Agentes Help Desk
 
-> **Fase 0 · v0.3 · 2026-09-23 · Estado: borrador pendiente de aprobación** (v0.3: scaffold de Angular separado de la bandeja, T-74/T-75. v0.2: revisión con 4 puntos — M-04 ejecutable, tickets antes de las pruebas manuales, T-01 y la antigua T-29 divididas, tarea para `scripts/trace.mjs` — y Q-01..Q-03 resueltas)
+> **Fase 0 · v0.3 · 2026-09-23 · Estado: aprobado 2026-09-23 (`aprobado fase 0`)** (v0.3: scaffold de Angular separado de la bandeja, T-74/T-75. v0.2: revisión con 4 puntos — M-04 ejecutable, tickets antes de las pruebas manuales, T-01 y la antigua T-29 divididas, tarea para `scripts/trace.mjs` — y Q-01..Q-03 resueltas)
 > Implementa `specs/requirements.md` v0.4 y `specs/design.md` v0.3. Cada tarea cita los `REQ` que satisface; la tabla de trazabilidad del final se genera desde las líneas `Satisface:` (hasta T-19 con un script temporal; después con `scripts/trace.mjs`).
 
 ---

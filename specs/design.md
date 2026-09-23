@@ -1,6 +1,6 @@
 # Diseño — Ecosistema de Agentes Help Desk
 
-> **Fase 0 · v0.3 · 2026-09-23 · Estado: borrador pendiente de aprobación** (v0.2: revisión con 5 puntos bloqueantes; v0.3: revisión de `tasks.md`. Ver §15)
+> **Fase 0 · v0.3 · 2026-09-23 · Estado: aprobado 2026-09-23 (`aprobado fase 0`)** (v0.2: revisión con 5 puntos bloqueantes; v0.3: revisión de `tasks.md`. Ver §15)
 > Implementa `specs/requirements.md` v0.4. Cada sección cita los `REQ` que satisface.
 > Principio rector: **`.github/` es la especificación ejecutable**. VS Code la usa tal cual y el runtime la compila; ninguna regla se escribe a mano en dos sitios.
 > **Excepción deliberada, los permisos:** `packages/agent-spec/src/policy.ts` es la **fuente normativa** de lo que cada agente puede declarar (visibilidad, handoffs permitidos, tools permitidas, campos de contexto de handoff, etiquetas prohibidas en la allowlist, nombres del registry). Es la guarda contra lo que declaran los `.md`, y por eso vive fuera de ellos. Las tablas de este documento (§5.2) y los Anexos B de `requirements.md` la **citan**; si difieren, gana `policy.ts` y el cambio necesita aprobación.

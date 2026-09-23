@@ -1,6 +1,6 @@
 # Requisitos — Ecosistema de Agentes Help Desk
 
-> **Fase 0 · v0.4 · 2026-09-23 · Estado: borrador pendiente de aprobación** (v0.2: D-01..D-03 aprobadas; ajustes de diseño en SEC-05, 2.3-20, 2.2-08, API-08, ESC-04 y altas COM-06, ESC-08, SEC-14. v0.3: revisión de diseño, cambios en 2.2-08, 2.2-20, 2.3-07..09, 2.3-35 y altas SEC-15, ESC-09, ESC-10, AUD-08. v0.4: revisión de `tasks.md`, cambios en 2.1-12, 2.2-30, SEC-12 y Anexo C (M-01, M-02, M-04, nueva M-09), altas VAL-07, DOC-01 y WEB-08, decisiones D-10 y D-11. Detalle en `design.md` §15)
+> **Fase 0 · v0.4 · 2026-09-23 · Estado: aprobado 2026-09-23 (`aprobado fase 0`)** (v0.2: D-01..D-03 aprobadas; ajustes de diseño en SEC-05, 2.3-20, 2.2-08, API-08, ESC-04 y altas COM-06, ESC-08, SEC-14. v0.3: revisión de diseño, cambios en 2.2-08, 2.2-20, 2.3-07..09, 2.3-35 y altas SEC-15, ESC-09, ESC-10, AUD-08. v0.4: revisión de `tasks.md`, cambios en 2.1-12, 2.2-30, SEC-12 y Anexo C (M-01, M-02, M-04, nueva M-09), altas VAL-07, DOC-01 y WEB-08, decisiones D-10 y D-11. Detalle en `design.md` §15)
 > Fuentes: `docs/prueba-tecnica.pdf` (§1 caso de negocio, §2 requerimientos técnicos) y `CLAUDE.md` (§2 criterios de aceptación, §3 arquitectura).
 > Claves de frontmatter verificadas contra la documentación oficial de VS Code el 2026-09-23 (ver Anexo A).
 
