@@ -17,17 +17,21 @@ Comprueba en tres pasos si el servicio central de VPN responde, con el script si
 
 1. Verifica que el ticket es `infra` con `entities.issueType` igual a `vpn`, o que el operador indicó un `target` con `/run-vpn-diagnostics`. Si no, no uses esta skill.
 2. Obtén el `target`: el que indicó el operador o, si no hay ninguno, el objetivo por defecto `vpn-gw.example.internal:443`.
-3. Ejecuta en la terminal, desde la raíz del repositorio, exactamente este comando con el `target` y sin añadir nada más:
+3. Valida el `target` antes de ejecutar nada. Debe cumplir completo la expresión `^[a-z0-9.-]+:\d{1,5}$`: solo minúsculas, dígitos, puntos y guiones, después `:` y de 1 a 5 dígitos. Si no la cumple (por ejemplo, si contiene espacios, `;`, `|`, `&`, `$`, comillas, barras o mayúsculas):
+   - no ejecutes ningún comando en la terminal, ni siquiera una versión «limpiada» del valor;
+   - no cambies el estado del ticket y añade a la bitácora una entrada `error` con `reason: invalid_target`, sin copiar el valor recibido;
+   - pide al operador un `target` válido con la forma `host:puerto`, por ejemplo `vpn-gw.example.internal:443`.
+4. Ejecuta en la terminal, desde la raíz del repositorio, exactamente este comando con el `target` ya validado y sin añadir nada más:
 
    ```sh
    node .github/skills/vpn-diagnostics/scripts/check-vpn.js --target <target>
    ```
 
-4. Antes de mirar el exit code, comprueba que la salida es un único objeto JSON con las claves `ok`, `checks` y `summary`.
-5. Interpreta el resultado con la tabla de [Interpretación del resultado](#interpretación-del-resultado).
-6. Registra el hallazgo en `findings` del ticket, con `source: check-vpn`, los `checks`, el `exitCode`, el `summary` y la duración.
-7. Añade a la bitácora una entrada `tool_run` con `data`: `{ "tool": "check-vpn", "exitCode", "status", "durationMs" }`, donde `status` es `ok`, `failed` o `unavailable`.
-8. Aplica la acción o recomienda el handoff que indica la tabla. El mensaje para el usuario sale de la plantilla de la acción, en español llano y sin términos de la lista de jerga.
+5. Antes de mirar el exit code, comprueba que la salida es un único objeto JSON con las claves `ok`, `checks` y `summary`.
+6. Interpreta el resultado con la tabla de [Interpretación del resultado](#interpretación-del-resultado).
+7. Registra el hallazgo en `findings` del ticket, con `source: check-vpn`, los `checks`, el `exitCode`, el `summary` y la duración.
+8. Añade a la bitácora una entrada `tool_run` con `data`: `{ "tool": "check-vpn", "exitCode", "status", "durationMs" }`, donde `status` es `ok`, `failed` o `unavailable`.
+9. Aplica la acción o recomienda el handoff que indica la tabla. El mensaje para el usuario sale de la plantilla de la acción, en español llano y sin términos de la lista de jerga.
 
 ## Interpretación del resultado
 
