@@ -132,7 +132,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- validate.required-files validate.exit-code validate.output`
   Bloqueada por: T-17
 
-- [ ] T-19 · Crear `scripts/trace.mjs` (tabla de trazabilidad, plantilla de tareas, cobertura MUST) y encadenarlo en `pnpm spec:validate` (design §13) · Satisface: REQ-VAL-07
+- [x] T-19 · Crear `scripts/trace.mjs` (tabla de trazabilidad, plantilla de tareas, cobertura MUST) y encadenarlo en `pnpm spec:validate` (design §13) · Satisface: REQ-VAL-07
   Hecho cuando: If a requirement with priority `MUST` in `specs/requirements.md` appears in no task of `specs/tasks.md`, then the spec validator shall report `REQ_WITHOUT_TASK` with the requirement id and exit with code `1`.
   Verifica: `pnpm test -- trace.check` y `node scripts/trace.mjs --write && git diff --exit-code specs/tasks.md`
   Bloqueada por: T-18

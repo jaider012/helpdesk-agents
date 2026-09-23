@@ -7,7 +7,7 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "spec:validate": "node packages/agent-spec/src/cli.ts",
+    "spec:validate": "node scripts/trace.mjs --check && node packages/agent-spec/src/cli.ts",
     "test": "vitest run",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
