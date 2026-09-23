@@ -122,7 +122,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
 
 ### 2.1 Validador, trazabilidad y routing (`packages/agent-spec`, `scripts/`)
 
-- [ ] T-17 · Crear `packages/agent-spec` con el loader de `.github/` y los esquemas zod `.strict()` de frontmatter (Anexo A) · Satisface: REQ-VAL-02, REQ-VAL-03
+- [x] T-17 · Crear `packages/agent-spec` con el loader de `.github/` y los esquemas zod `.strict()` de frontmatter (Anexo A) · Satisface: REQ-VAL-02, REQ-VAL-03
   Hecho cuando: When the spec validator parses a frontmatter, the spec validator shall report `FRONTMATTER_PARSE_ERROR` for invalid YAML and `UNKNOWN_FRONTMATTER_KEY` for a key outside the Annex A set of its file type.
   Verifica: `pnpm -F agent-spec test -- validate.yaml validate.unknown-key`
   Bloqueada por: T-01
