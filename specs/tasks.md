@@ -157,7 +157,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- agents.frontmatter agents.handoff-fields agents.visibility`
   Bloqueada por: T-18
 
-- [ ] T-24 · Validar las tools y los handoffs de cada agente contra `policy.ts` y el registry · Satisface: REQ-2.3-07, REQ-2.3-09, REQ-2.3-10
+- [x] T-24 · Validar las tools y los handoffs de cada agente contra `policy.ts` y el registry · Satisface: REQ-2.3-07, REQ-2.3-09, REQ-2.3-10
   Hecho cuando: When the spec validator compares the `.agent.md` files with `policy.ts`, the spec validator shall report one error code per broken rule among `HANDOFF_NOT_ALLOWED`, `TOOL_NOT_PERMITTED` and `UNKNOWN_TOOL`.
   Verifica: `pnpm -F agent-spec test -- graph.allowed-handoffs agents.tool-permissions agents.unknown-tool`
   Bloqueada por: T-23

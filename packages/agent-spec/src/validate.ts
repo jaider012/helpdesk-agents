@@ -21,7 +21,10 @@ export type ErrorCode =
   | 'SKILL_DEADLINE_INVALID'
   | 'AGENT_FRONTMATTER_INVALID'
   | 'HANDOFF_INVALID'
-  | 'AGENT_VISIBILITY_INVALID';
+  | 'AGENT_VISIBILITY_INVALID'
+  | 'HANDOFF_NOT_ALLOWED'
+  | 'TOOL_NOT_PERMITTED'
+  | 'UNKNOWN_TOOL';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [

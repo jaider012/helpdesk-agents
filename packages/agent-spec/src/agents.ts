@@ -1,9 +1,15 @@
 import { z } from 'zod';
 import type { SpecFile } from './load.ts';
-import { AGENT_POLICY, isAgentName } from './policy.ts';
+import { AGENT_POLICY, isAgentName, REGISTRY_TOOLS } from './policy.ts';
 
 export interface AgentIssue {
-  code: 'AGENT_FRONTMATTER_INVALID' | 'HANDOFF_INVALID' | 'AGENT_VISIBILITY_INVALID';
+  code:
+    | 'AGENT_FRONTMATTER_INVALID'
+    | 'HANDOFF_INVALID'
+    | 'AGENT_VISIBILITY_INVALID'
+    | 'HANDOFF_NOT_ALLOWED'
+    | 'TOOL_NOT_PERMITTED'
+    | 'UNKNOWN_TOOL';
   message: string;
 }
 
@@ -72,6 +78,14 @@ export function agentIssues(file: SpecFile): AgentIssue[] {
     }
   });
 
+  const tools = Array.isArray(data.tools)
+    ? data.tools.filter((tool): tool is string => typeof tool === 'string')
+    : [];
+  const registry: readonly string[] = REGISTRY_TOOLS;
+  for (const tool of tools.filter((candidate) => !registry.includes(candidate))) {
+    issues.push({ code: 'UNKNOWN_TOOL', message: `tool \`${tool}\` is not in the tool registry` });
+  }
+
   const name = agentName(file);
   if (!isAgentName(name)) {
     issues.push({
@@ -92,6 +106,27 @@ export function agentIssues(file: SpecFile): AgentIssue[] {
       issues.push({
         code: 'AGENT_VISIBILITY_INVALID',
         message: `\`${key}\` is ${value} but policy.ts requires ${expected}`,
+      });
+    }
+  }
+
+  const allowedHandoffs: readonly string[] = policy.handoffs;
+  const targets = handoffs.filter(isRecord).map((handoff) => handoff.agent);
+  for (const target of targets.filter((agent): agent is string => typeof agent === 'string')) {
+    if (!allowedHandoffs.includes(target)) {
+      issues.push({
+        code: 'HANDOFF_NOT_ALLOWED',
+        message: `policy.ts does not allow the handoff \`${name}\` → \`${target}\``,
+      });
+    }
+  }
+
+  const permittedTools: readonly string[] = policy.tools;
+  for (const tool of tools.filter((candidate) => registry.includes(candidate))) {
+    if (!permittedTools.includes(tool)) {
+      issues.push({
+        code: 'TOOL_NOT_PERMITTED',
+        message: `policy.ts does not permit the tool \`${tool}\` for \`${name}\``,
       });
     }
   }
