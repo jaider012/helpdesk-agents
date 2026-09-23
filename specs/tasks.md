@@ -86,7 +86,7 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
 
 - [ ] T-11 · Escribir `escalation.agent.md` y `escalate-ticket.prompt.md` (design §4 `EscalationPackage`, §5.2, §5.6, §7) · Satisface: REQ-2.4-10
   Hecho cuando: When an operator runs `/escalate-ticket` in Copilot Chat, the escalation agent shall produce the escalation package for the given `ticketId` and `reason`.
-  Verifica: Manual M-06 (confirma además R-02: un agente con `user-invocable: false` sirve como `agent` de un prompt file) y M-09 (tools de `escalation`)
+  Verifica: Manual M-06 (confirma además el plan B de R-02: `escalation` sirve como `agent` de un prompt file) y M-09 (tools de `escalation`)
   Bloqueada por: T-10
 
 - [ ] T-12 · Escribir `provisioning.agent.md` (design §4 `Entities.request`, §5.2, §5.4) · Satisface: REQ-2.3-36

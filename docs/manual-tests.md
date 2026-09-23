@@ -7,7 +7,7 @@ Detalle de las pruebas M-01 a M-09 del Anexo C de `specs/requirements.md`. Cada 
 1. Abre en VS Code la carpeta raíz del repositorio (`helpdesk-agents`), no una carpeta superior. Versión probada al escribir este documento: **1.138.0**.
 2. En Copilot Chat usa el entorno **Local agent**. Agent Host no carga los prompt files.
 3. Comprueba que el ajuste `github.copilot.chat.codeGeneration.useInstructionFiles` está activado, para que se cargue `.github/copilot-instructions.md`.
-4. En el selector de agentes del chat debe aparecer `triage`. `diagnostics`, `provisioning` y `escalation` no aparecen (`user-invocable: false`): se llega a ellos por handoff o por prompt file.
+4. En el selector de agentes del chat aparecen los cuatro agentes (plan B de R-02, D-12). El flujo normal empieza en `triage` y sigue por los botones de handoff o por los prompt files.
 5. Las herramientas que escriben archivos o usan la terminal piden confirmación: apruébalas a mano (decisión D-11). Solo debe aparecer para la terminal el comando `node .github/skills/vpn-diagnostics/scripts/check-vpn.js --target <target>`.
 6. Los tickets de estas pruebas quedan en `data/`, que está en `.gitignore`. Para empezar de cero: `rm -f data/tickets/*.json data/audit/*.jsonl`.
 7. Si cambias un archivo de `.github/` con VS Code abierto, ábrelo en el editor antes de volver a probar. En este repositorio, que está en una unidad externa, VS Code tardó en releer los agentes y usó una versión anterior.
@@ -79,7 +79,7 @@ Detalle de las pruebas M-01 a M-09 del Anexo C de `specs/requirements.md`. Cada 
 2. **Handoff a provisioning (T-12):** en la conversación del ticket C pulsa **Preparar solicitud de aprobación**. Comprueba que `provisioning` normaliza `entities.request` (`resource: carpeta finanzas-2026`, `accessLevel: read`, `justification`), pasa el ticket a `IN_PROGRESS` y recomienda **Enviar a aprobación** con `approval_required`. Pulsa **Enviar a aprobación**: `escalation` genera el paquete con `reason: approval_required`, `targetTeam: Gestión de Accesos (aprobadores)` y un `approvalRequest`, y el ticket queda en `ESCALATED`.
 3. **Handoff a diagnostics (T-13):** ejecuta `/triage-ticket` con el ticket **E** y pulsa **Diagnosticar**. Comprueba que `diagnostics` aplica la regla de bloqueo, entrega el mensaje de la plantilla `resolved.instruct_self_service_unlock`, y que el ticket queda en `RESOLVED` con un hallazgo `source: rule` concluyente, la acción `instruct_self_service_unlock` y sus entradas en la bitácora.
 
-Los pasos 2 y 3 prueban además el riesgo R-02: un agente con `user-invocable: false` funciona como destino de handoff.
+Los pasos 2 y 3 prueban además el plan B de R-02: los agentes destino funcionan como destino de handoff.
 
 ## M-07 · Credencial en el ticket
 
@@ -96,7 +96,7 @@ Los pasos 2 y 3 prueban además el riesgo R-02: un agente con `user-invocable: f
    - El paquete trae `ticketId`, `category`, `severity`, `entities`, `findings`, `reason: operator_request` y `targetTeam`.
    - `userMessage` incluye el `ticketId`, y el ticket queda en `ESCALATED`.
    - La bitácora tiene las entradas `escalated` y `transition` (`TRIAGED` → `ESCALATED`).
-   - Riesgo R-02: `escalation` (`user-invocable: false`) funciona como `agent` de un prompt file. Si no funciona, anótalo: el plan B necesita aprobación.
+   - Plan B de R-02: `escalation` funciona como `agent` de un prompt file.
 
 ## M-03 · `/run-vpn-diagnostics` con el servicio respondiendo
 

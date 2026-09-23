@@ -2,7 +2,8 @@
 name: provisioning
 description: Estructura solicitudes de acceso a carpetas o repositorios, licencias y cambios de perfil como una solicitud de aprobación. Nunca concede nada; entrega la solicitud a escalation.
 tools: ['read/readFile', 'edit/editFiles']
-user-invocable: false
+user-invocable: true
+disable-model-invocation: true
 handoffs:
   - label: Enviar a aprobación
     agent: escalation

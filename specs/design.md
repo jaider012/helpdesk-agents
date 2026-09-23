@@ -822,7 +822,7 @@ tests/             # proyecto vitest de la raíz
 | ID | Riesgo | Mitigación |
 | --- | --- | --- |
 | R-01 | VS Code conserva el historial en el handoff (confirmado en la doc) | aislamiento estricto en el runtime; en Copilot, handoff `prompt` + instrucciones |
-| R-02 | un agente `user-invocable: false` podría no servir como `agent` de un prompt file | se prueba en M-02..M-06. Plan B: `user-invocable: true` + `disable-model-invocation`, y registrar el cambio en la tabla del Anexo B con tu aprobación |
+| R-02 | un agente `user-invocable: false` podría no servir como `agent` de un prompt file | **Materializado en Fase 1:** VS Code 1.138 lo marca como `Unknown agent` en los handoffs y en los prompt files. Aplicado el plan B (D-12, aprobado 2026-09-23): `user-invocable: true` + `disable-model-invocation: true` en `diagnostics`, `provisioning` y `escalation`; `policy.ts` lo recogerá en la Fase 2 |
 | R-03 | la redacción en modo Copilot depende del LLM | documentado como limitación; el runtime es determinista |
 | R-04 | NestJS con ESM estricto puede dar fricción de compilación | `moduleResolution: nodenext` y build con `tsc`; si bloquea, se consulta antes de cambiar |
 | R-05 | `runInTerminal` pide confirmación manual en Copilot, y `${input:target}` acaba dentro del comando | **Decisión v1 (D-11): sin `.vscode/settings.json` y sin auto-aprobación.** La confirmación manual de cada ejecución es la guarda frente a la inyección de comandos en modo Copilot, junto con la validación del target que hace el agente (SEC-15). Si algún día se activa la auto-aprobación, solo con la regex anclada de §6.3, nunca por prefijo |

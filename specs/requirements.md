@@ -1023,11 +1023,12 @@ When `pnpm spec:graph` runs, the spec validator shall print a Mermaid flowchart 
 | D-09 | Sin variables de LLM, el runtime arranca con el modelo fake (demo sin secretos). | Asumida |
 | D-10 | REQ-SEC-12 (recomendar el cambio de una credencial expuesta) se cubre solo en modo Copilot en v1. | ✅ Aprobada 2026-09-23 |
 | D-11 | Sin `.vscode/settings.json` de auto-aprobación: en modo Copilot, la confirmación manual de cada ejecución de `check-vpn.js` es la guarda frente a la inyección de comandos (R-05). | ✅ Aprobada 2026-09-23 |
+| D-12 | Plan B de R-02: `diagnostics`, `provisioning` y `escalation` con `user-invocable: true` y `disable-model-invocation: true`. En VS Code 1.138 un agente con `user-invocable: false` aparece como `Unknown agent` en los handoffs y en el `agent` de los prompt files. | ✅ Aprobada 2026-09-23 |
 
 ### Riesgos a verificar en Fase 1
 
 - **R-01 (confirmado en la doc de VS Code).** Al ejecutar un handoff, VS Code conserva el historial de la conversación. En Copilot Chat, "solo el contexto necesario" se consigue con el `prompt` del handoff y las instrucciones del agente; el aislamiento estricto lo garantiza el runtime (REQ-2.3-17).
-- **R-02.** Hay que confirmar que un agente con `user-invocable: false` sigue sirviendo como destino de handoff y como `agent` de un prompt file.
+- **R-02 (materializado en Fase 1, resuelto con D-12).** En VS Code 1.138 un agente con `user-invocable: false` no sirve como destino de handoff ni como `agent` de un prompt file: el editor lo marca como `Unknown agent`.
 
 ---
 
@@ -1058,12 +1059,14 @@ Fuentes: [custom agents](https://code.visualstudio.com/docs/copilot/customizatio
 
 Cita de la fuente normativa `packages/agent-spec/src/policy.ts`. Si difieren, gana `policy.ts`, y cambiar cualquiera de los dos requiere aprobación.
 
+Cambio aprobado el 2026-09-23 (D-12, plan B de R-02): `diagnostics`, `provisioning` y `escalation` pasan de `user-invocable: false` a `true` con `disable-model-invocation: true`.
+
 | Agente | `user-invocable` | Handoffs permitidos |
 | --- | --- | --- |
 | `triage` | `true` | → `diagnostics`, → `provisioning`, → `escalation` |
-| `diagnostics` | `false` | → `escalation` |
-| `provisioning` | `false` | → `escalation` |
-| `escalation` | `false` | ninguno (terminal) |
+| `diagnostics` | `true` + `disable-model-invocation: true` | → `escalation` |
+| `provisioning` | `true` + `disable-model-invocation: true` | → `escalation` |
+| `escalation` | `true` + `disable-model-invocation: true` | ninguno (terminal) |
 
 ## Anexo C · Pruebas manuales en Copilot Chat (detalle en `docs/manual-tests.md`, Fase 1)
 

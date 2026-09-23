@@ -2,7 +2,8 @@
 name: diagnostics
 description: Diagnostica tickets de infraestructura y de acceso con procedimientos deterministas (skill vpn-diagnostics, regla de bloqueo de cuenta) y aplica solo las acciones seguras de su allowlist de remediación. Lo que no puede resolver con seguridad lo envía a escalation.
 tools: ['read/readFile', 'edit/editFiles', 'execute/runInTerminal']
-user-invocable: false
+user-invocable: true
+disable-model-invocation: true
 handoffs:
   - label: Escalar
     agent: escalation

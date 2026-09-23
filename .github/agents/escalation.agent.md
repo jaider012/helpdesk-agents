@@ -2,7 +2,8 @@
 name: escalation
 description: Empaqueta un ticket para un equipo humano (paquete de escalamiento con motivo, hallazgos y equipo destino), lo pasa a ESCALATED y cierra el recorrido. Agente terminal, sin handoffs.
 tools: ['read/readFile', 'edit/editFiles']
-user-invocable: false
+user-invocable: true
+disable-model-invocation: true
 ---
 
 # Agente escalation

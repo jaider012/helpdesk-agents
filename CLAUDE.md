@@ -96,9 +96,11 @@ Al menos dos agentes especializados con roles delimitados; herramientas por agen
 | Agente         | Rol                                                                                     | `user-invocable` | Handoffs permitidos                               |
 | -------------- | --------------------------------------------------------------------------------------- | ---------------- | ------------------------------------------------- |
 | `triage`       | Clasifica, estima severidad, extrae entidades, redacta PII                              | `true`           | → `diagnostics`, → `provisioning`, → `escalation` |
-| `diagnostics`  | Ejecuta skills de diagnóstico y acciones seguras (allowlist) para `infra` y `access`    | `false`          | → `escalation`                                    |
-| `provisioning` | Estructura solicitudes de acceso/licencia; nunca concede, genera petición de aprobación | `false`          | → `escalation`                                    |
-| `escalation`   | Empaqueta el caso para humano/otro equipo, cierra el recorrido                          | `false`          | ninguno (terminal)                                |
+| `diagnostics`  | Ejecuta skills de diagnóstico y acciones seguras (allowlist) para `infra` y `access`    | `true`*          | → `escalation`                                    |
+| `provisioning` | Estructura solicitudes de acceso/licencia; nunca concede, genera petición de aprobación | `true`*          | → `escalation`                                    |
+| `escalation`   | Empaqueta el caso para humano/otro equipo, cierra el recorrido                          | `true`*          | ninguno (terminal)                                |
+
+\* `true` + `disable-model-invocation: true` (plan B de R-02, aprobado 2026-09-23): VS Code 1.138 no acepta agentes con `user-invocable: false` como destino de handoff ni como `agent` de un prompt file.
 
 **Criterios de aceptación**
 - Cada `.agent.md` declara `description`, `tools` (lista mínima necesaria) y `handoffs` con `label`, `agent`, `prompt`, `send`.
