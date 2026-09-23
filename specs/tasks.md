@@ -142,7 +142,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- lifecycle.applyTo lifecycle.table lifecycle.status`
   Bloqueada por: T-18
 
-- [ ] T-21 · Validar el frontmatter de `SKILL.md` (nombre, longitud y activación de `description`) · Satisface: REQ-2.2-01, REQ-2.2-02, REQ-2.2-03, REQ-2.2-04
+- [x] T-21 · Validar el frontmatter de `SKILL.md` (nombre, longitud y activación de `description`) · Satisface: REQ-2.2-01, REQ-2.2-02, REQ-2.2-03, REQ-2.2-04
   Hecho cuando: When the spec validator loads a `SKILL.md`, the spec validator shall report one error code per broken rule among `SKILL_FRONTMATTER_INVALID`, `SKILL_NAME_MISMATCH`, `SKILL_DESCRIPTION_TOO_LONG` and `SKILL_ACTIVATION_MISSING`.
   Verifica: `pnpm -F agent-spec test -- skill.frontmatter skill.name skill.description skill.activation`
   Bloqueada por: T-18
