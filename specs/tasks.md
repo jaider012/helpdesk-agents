@@ -49,7 +49,7 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: `pnpm test -- check-vpn.dns check-vpn.tcp check-vpn.latency check-vpn.exit0`
   Bloqueada por: T-02
 
-- [ ] T-04 · Añadir el umbral de latencia y el exit code `1` a `check-vpn.js` · Satisface: REQ-2.2-13, REQ-2.2-18
+- [x] T-04 · Añadir el umbral de latencia y el exit code `1` a `check-vpn.js` · Satisface: REQ-2.2-13, REQ-2.2-18
   Hecho cuando: Where `--latency-threshold-ms` is provided, when the measured latency exceeds that threshold, the check-vpn script shall mark the `latency` check as `fail` and exit with code `1`.
   Verifica: `pnpm test -- check-vpn.threshold check-vpn.exit1`
   Bloqueada por: T-03

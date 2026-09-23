@@ -23,7 +23,17 @@ class InvalidArgsError extends Error {
   code = 'INVALID_ARGS';
 }
 
-const OPTION_PARSERS = new Map([['--target', parseTarget]]);
+const DEFAULT_OPTIONS = { latencyThresholdMs: 300 };
+
+const OPTIONS = new Map([
+  ['--target', { key: 'target', parse: parseTarget }],
+  ['--latency-threshold-ms', { key: 'latencyThresholdMs', parse: parseMilliseconds }],
+]);
+
+function parseMilliseconds(value, flag) {
+  if (!/^\d+$/.test(value)) throw new InvalidArgsError(`${flag} must be a non-negative integer`);
+  return Number(value);
+}
 
 function parseTarget(value) {
   const match = /^([^\s:]+):(\d{1,5})$/.exec(value);
@@ -34,20 +44,24 @@ function parseTarget(value) {
 }
 
 function parseArgs(argv) {
-  const options = {};
+  const options = { ...DEFAULT_OPTIONS };
   for (let i = 0; i < argv.length; i += 2) {
     const flag = argv[i];
-    const parse = OPTION_PARSERS.get(flag);
-    if (!parse) throw new InvalidArgsError(`unknown argument: ${flag}`);
+    const option = OPTIONS.get(flag);
+    if (!option) throw new InvalidArgsError(`unknown argument: ${flag}`);
     if (argv[i + 1] === undefined) throw new InvalidArgsError(`${flag} requires a value`);
-    options[flag.slice(2)] = parse(argv[i + 1]);
+    options[option.key] = option.parse(argv[i + 1], flag);
   }
   if (!options.target) throw new InvalidArgsError('--target <host>:<port> is required');
   return options;
 }
 
+/**
+ * Rounds up to 0.1 ms: any positive duration stays above 0, and comparing the reported value with
+ * an integer threshold gives the same result as comparing the raw measurement.
+ */
 function elapsedMs(start) {
-  return Math.round((performance.now() - start) * 10) / 10;
+  return Math.ceil((performance.now() - start) * 10) / 10;
 }
 
 function skipped(name, reason) {
@@ -88,24 +102,33 @@ function checkTcp({ host, port }, addresses) {
 }
 
 /** The latency is the TCP handshake time, reported as the `durationMs` of the latency check. */
-function checkLatency(tcp) {
-  return { name: 'latency', status: 'pass', durationMs: tcp.durationMs };
+function checkLatency(tcp, thresholdMs) {
+  const latency = { name: 'latency', status: 'pass', durationMs: tcp.durationMs };
+  return tcp.durationMs > thresholdMs
+    ? { ...latency, status: 'fail', reason: 'threshold_exceeded' }
+    : latency;
 }
 
 function describeCheck({ name, status, durationMs, reason }) {
-  if (status === 'fail') return `${name} fail (${reason})`;
-  if (name === 'latency' && status === 'pass') return `latency pass (${durationMs} ms)`;
-  return `${name} ${status}`;
+  const details = [];
+  if (status === 'fail') details.push(reason);
+  if (name === 'latency' && status !== 'skip') details.push(`${durationMs} ms`);
+  return details.length > 0 ? `${name} ${status} (${details.join(', ')})` : `${name} ${status}`;
 }
 
-async function runChecks({ target }) {
+async function runChecks({ target, latencyThresholdMs }) {
   const resolution = await checkDns(target.host);
   const checks = [resolution.check];
   if (resolution.check.status === 'fail') {
     checks.push(skipped('tcp', 'dns_failed'), skipped('latency', 'dns_failed'));
   } else {
     const tcp = await checkTcp(target, resolution.addresses);
-    checks.push(tcp, tcp.status === 'pass' ? checkLatency(tcp) : skipped('latency', 'tcp_failed'));
+    checks.push(
+      tcp,
+      tcp.status === 'pass'
+        ? checkLatency(tcp, latencyThresholdMs)
+        : skipped('latency', 'tcp_failed'),
+    );
   }
   const ok = checks.every((check) => check.status === 'pass');
   return {
