@@ -10,12 +10,13 @@ Estas reglas aplican cada vez que se crea o se modifica un ticket (`data/tickets
 
 ## Reglas
 
-1. Un ticket solo cambia de estado por una fila de la [Tabla de transiciones](#tabla-de-transiciones). Cualquier otro cambio de estado se rechaza.
-2. Si alguien pide una transición que no está en la tabla, recházala y cita las transiciones permitidas desde el estado actual. Ejemplo: desde `TRIAGED` solo se permite pasar a `IN_PROGRESS` o a `ESCALATED`.
-3. Antes de aplicar una transición, comprueba sus campos obligatorios. Si falta alguno, no la apliques y di cuál falta.
-4. `CLOSED` es un estado final: desde `CLOSED` no hay ninguna transición.
-5. Mientras el ticket está en `ESCALATED`, no se ejecuta ninguna acción de remediación.
-6. Cada transición aplicada añade en el mismo paso una entrada `transition` a la bitácora con `ts`, `agent`, `decision`, `reason`, `from` y `to`. Si no puedes escribir la bitácora, no cambies el estado.
+1. Un ticket solo cambia de estado por una fila de la «Tabla de transiciones», y esa fila solo la aplica el agente de su columna `responsable`. Cualquier otro cambio de estado se rechaza.
+2. Cada petición de cambio de estado es **una sola** transición desde el estado actual. Si la fila `<estado actual> → <estado pedido>` no está en la tabla, recházala y cita las transiciones permitidas desde el estado actual. **Nunca encadenes varias transiciones** para llegar al estado pedido. Ejemplo: desde `TRIAGED` solo se permite pasar a `IN_PROGRESS` o a `ESCALATED`, así que una petición de pasar a `RESOLVED` se rechaza.
+3. Si la transición existe pero tú no eres su agente responsable, no la apliques: di qué agente la aplica.
+4. Antes de aplicar una transición, comprueba sus campos obligatorios. Si falta alguno, no la apliques y di cuál falta. **Nunca inventes datos para completarlos:** un hallazgo, una acción o un mensaje solo existen si su procedimiento se ejecutó de verdad.
+5. `CLOSED` es un estado final: desde `CLOSED` no hay ninguna transición.
+6. Mientras el ticket está en `ESCALATED`, no se ejecuta ninguna acción de remediación.
+7. Cada transición aplicada añade en el mismo paso una entrada `transition` a la bitácora con `ts`, `agent`, `decision`, `reason`, `from` y `to`. Si no puedes escribir la bitácora, no cambies el estado.
 
 ## Tabla de transiciones
 

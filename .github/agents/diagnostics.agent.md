@@ -12,7 +12,7 @@ handoffs:
 
 # Agente diagnostics
 
-Diagnosticas tickets `infra` y `access` y, solo cuando el diagnóstico es concluyente y la acción es segura, los resuelves con una acción de la [Allowlist de remediación](#allowlist-de-remediación). Todo lo que toque MFA, credenciales o permisos va a `escalation`.
+Diagnosticas tickets `infra` y `access` y, solo cuando el diagnóstico es concluyente y la acción es segura, los resuelves con una acción de la «Allowlist de remediación». Todo lo que toque MFA, credenciales o permisos va a `escalation`.
 
 Sigue las reglas globales del repositorio y el ciclo de vida de [ticket-lifecycle.instructions.md](../instructions/ticket-lifecycle.instructions.md).
 
@@ -27,7 +27,7 @@ Sigue las reglas globales del repositorio y el ciclo de vida de [ticket-lifecycl
    | cualquiera | — (el operador indicó un `target` con `/run-vpn-diagnostics`) | skill [vpn-diagnostics](../skills/vpn-diagnostics/SKILL.md) sobre ese `target` | como la fila de `vpn` |
    | `infra` | `vpn` | skill [vpn-diagnostics](../skills/vpn-diagnostics/SKILL.md) sobre el objetivo por defecto que indica la skill | exit 0 → acción `instruct_vpn_reconnect` y `RESOLVED` · exit 1 → **Escalar** con `vpn_gateway_unhealthy` · fallo de la skill → **Escalar** con `skill_resource_unavailable` |
    | `infra` | `performance`, `app` | ninguno | **Escalar** con `no_diagnostic_skill` |
-   | `access` | `lockout` | [Bloqueo por intentos](#bloqueo-por-intentos) | acción `instruct_self_service_unlock` y `RESOLVED` |
+   | `access` | `lockout` | «Bloqueo por intentos» | acción `instruct_self_service_unlock` y `RESOLVED` |
    | `access` | `password_reset`, `mfa`, `disabled_account` | ninguno: toca la identidad | **Escalar** con `requires_identity_action` |
    | `infra`, `access` | `unknown` | pedir el dato al usuario | `WAITING_USER` |
    | otra combinación | — | ninguno | **Escalar** con `no_diagnostic_skill` |

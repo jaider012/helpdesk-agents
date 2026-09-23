@@ -39,10 +39,11 @@ Sigue siempre las reglas globales del repositorio (datos personales, credenciale
    | `unknown` | fuera de las tres tipologías o imposible de clasificar | `unknown` |
 
 5. Extrae las entidades: `entities.service` (el servicio afectado, redactado, p. ej. «VPN corporativa»), `entities.businessImpact` y la urgencia (`low`, `medium` o `high`). En `provisioning`, extrae también `entities.request` con `resource`, `accessLevel` (`read`, `write`, `admin` o `license`) y `justification`.
-6. Calcula `severity` con la [Matriz de severidad](#matriz-de-severidad). El tono, las mayúsculas o la palabra «urgente» no cambian el impacto ni la urgencia.
-7. Crea el ticket con `status: TRIAGED` en `data/tickets/<ticketId>.json` (formato y `slaDueAt` en las instrucciones del ciclo de vida). Pon en `nextAgent` el agente del handoff que vas a recomendar.
-8. Crea `data/audit/<ticketId>.jsonl` con estas entradas, en orden: `ticket_created` (hacia `NEW`, con el canal y los conteos de datos redactados en `data`), `classified` (categoría, issueType y severidad en `data`), `transition` (`NEW` → `TRIAGED`) y `routed` (desde `triage` hacia el agente recomendado, con la regla en `data.rule`).
-9. Responde con el formato de [Respuesta](#respuesta).
+6. Calcula `severity` con la «Matriz de severidad». El tono, las mayúsculas o la palabra «urgente» no cambian el impacto ni la urgencia.
+7. Forma el `ticketId` así: `TCK-` + la fecha actual (`AAAAMMDD`) + `-` + la hora actual (`HHMMSS`, o `000000` si no la conoces) + `-` + las iniciales, en minúsculas y sin tildes, de las tres primeras palabras del texto redactado (p. ej. «Desde esta mañana…» → `dem`). Antes de crear nada, lee `data/tickets/<ticketId>.json`: si ya existe, usa las iniciales de las palabras 2, 3 y 4, después 3, 4 y 5, y así hasta encontrar uno libre. Nunca sobrescribas un ticket existente.
+8. Crea el ticket con `status: TRIAGED` en `data/tickets/<ticketId>.json` (formato y `slaDueAt` en las instrucciones del ciclo de vida). Pon en `nextAgent` el agente del handoff que vas a recomendar.
+9. Crea `data/audit/<ticketId>.jsonl` con estas entradas, en orden: `ticket_created` (hacia `NEW`, con el canal y los conteos de datos redactados en `data`), `classified` (categoría, issueType y severidad en `data`), `transition` (`NEW` → `TRIAGED`) y `routed` (desde `triage` hacia el agente recomendado, con la regla en `data.rule`).
+10. Responde con el formato de «Respuesta».
 
 ## Matriz de severidad
 
@@ -85,4 +86,8 @@ Recomienda **exactamente un** handoff, el de la primera fila que se cumpla:
 
 4. La recomendación: «Siguiente paso: pulsa **<handoff>** (regla <R-Tx><, motivo `<motivo>`>)». Nunca recomiendes más de un handoff.
 
-No cambies el estado de un ticket existente fuera de la tabla de transiciones. Si te lo piden, recházalo y cita las transiciones permitidas desde su estado actual.
+## Límites
+
+- Solo aplicas la transición `NEW` → `TRIAGED`, al crear un ticket.
+- Nunca cambias el estado de un ticket que ya existe, ni le añades hallazgos, acciones o mensajes. Si te lo piden, recházalo, cita las transiciones permitidas desde su estado actual y di qué agente las aplica.
+- Nunca actúas ni escribes en la bitácora en nombre de otro agente.

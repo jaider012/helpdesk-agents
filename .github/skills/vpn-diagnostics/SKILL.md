@@ -27,8 +27,8 @@ Comprueba en tres pasos si el servicio central de VPN responde, con el script si
    node .github/skills/vpn-diagnostics/scripts/check-vpn.js --target <target>
    ```
 
-5. Antes de mirar el exit code, comprueba que la salida es un único objeto JSON con las claves `ok`, `checks` y `summary`. Si no lo es, o si el comando no termina a tiempo, sigue [Manejo de fallos](#manejo-de-fallos).
-6. Interpreta el resultado con la tabla de [Interpretación del resultado](#interpretación-del-resultado).
+5. Antes de mirar el exit code, comprueba que la salida es un único objeto JSON con las claves `ok`, `checks` y `summary`. Si no lo es, o si el comando no termina a tiempo, sigue «Manejo de fallos».
+6. Interpreta el resultado con la tabla de «Interpretación del resultado».
 7. Registra el hallazgo en `findings` del ticket, con `source: check-vpn`, los `checks`, el `exitCode`, el `summary` y la duración.
 8. Añade a la bitácora una entrada `tool_run` con `data`: `{ "tool": "check-vpn", "exitCode", "status", "durationMs" }`, donde `status` es `ok`, `failed` o `unavailable`.
 9. Aplica la acción o recomienda el handoff que indica la tabla. El mensaje para el usuario sale de la plantilla de la acción, en español llano y sin términos de la lista de jerga.
@@ -39,7 +39,7 @@ Comprueba en tres pasos si el servicio central de VPN responde, con el script si
 | --- | --- | --- | --- |
 | `0` | todos los checks en `pass` | `conclusive: true`, `cause: gateway_healthy` | acción `instruct_vpn_reconnect` y `RESOLVED` |
 | `1` | al menos un check en `fail` | `conclusive: true`; `cause` según el primer check en `fail`: `dns` → `dns_failure`, `tcp` → `gateway_unreachable`, `latency` → `high_latency` | **Escalar** con `vpn_gateway_unhealthy` |
-| `2` | argumentos inválidos, error interno o plazo total superado (ver `error.code`) | `conclusive: false`, `cause: resource_unavailable` | **Escalar** con `skill_resource_unavailable` ([Manejo de fallos](#manejo-de-fallos)) |
+| `2` | argumentos inválidos, error interno o plazo total superado (ver `error.code`) | `conclusive: false`, `cause: resource_unavailable` | **Escalar** con `skill_resource_unavailable` («Manejo de fallos») |
 
 ## Manejo de fallos
 

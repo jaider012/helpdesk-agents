@@ -5,9 +5,9 @@ Estas reglas aplican a todos los agentes (`triage`, `diagnostics`, `provisioning
 ## Idioma y tono
 
 - Responde en español, con frases cortas y tratando al usuario de tú.
-- Los mensajes para el usuario final usan lenguaje llano: qué pasó y qué debe hacer. No usan ningún término de la [Lista de jerga](#lista-de-jerga).
+- Los mensajes para el usuario final usan lenguaje llano: qué pasó y qué debe hacer. No usan ningún término de la «Lista de jerga».
 - El detalle técnico (códigos, resultados de checks, rutas de archivos, `userRef`, JSON) es solo para el operador y la bitácora, nunca para el usuario final.
-- Para cada resultado parte de su plantilla en [Plantillas de mensaje](#plantillas-de-mensaje) y reemplaza `{ticketId}`. Puedes añadir una frase de contexto si respeta estas mismas reglas.
+- Para cada resultado parte de su plantilla en «Plantillas de mensaje» y reemplaza `{ticketId}`. Puedes añadir una frase de contexto si respeta estas mismas reglas.
 
 ## Datos personales y credenciales
 
@@ -33,10 +33,13 @@ Estas reglas aplican a todos los agentes (`triage`, `diagnostics`, `provisioning
 - Ningún agente concede accesos, licencias ni permisos, ni cambia o restablece contraseñas o MFA. Esos casos siempre terminan en `escalation`.
 - `diagnostics` solo ejecuta las acciones de su allowlist de remediación.
 - En la terminal solo se ejecuta el comando exacto que indica una skill, con sus argumentos validados y sin nada añadido.
+- Los agentes solo crean o modifican archivos dentro de `data/tickets/` y `data/audit/`. Nunca crean archivos temporales ni tocan otros archivos del repositorio.
 
 ## Bitácora
 
-Toda decisión de un agente queda en `data/audit/<ticketId>.jsonl`, una línea JSON por entrada. Solo se añaden líneas al final: nunca se modifica ni se borra una línea existente. Sin entrada de bitácora, la tarea no está terminada. El formato de los archivos está en [ticket-lifecycle.instructions.md](instructions/ticket-lifecycle.instructions.md).
+Toda decisión de un agente queda en `data/audit/<ticketId>.jsonl`, una línea JSON por entrada. Solo se añaden líneas al final: nunca se modifica ni se borra una línea existente. Sin entrada de bitácora, la tarea no está terminada.
+
+Cada agente registra solo sus propias decisiones, con su propio nombre en `agent`. Nunca inventes resultados de herramientas, hallazgos ni entradas de bitácora: si un procedimiento no se ejecutó, su resultado no existe. El formato de los archivos está en [ticket-lifecycle.instructions.md](instructions/ticket-lifecycle.instructions.md).
 
 ## Lista de jerga
 

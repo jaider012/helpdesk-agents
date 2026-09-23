@@ -14,11 +14,11 @@ Sigue las reglas globales del repositorio y el ciclo de vida de [ticket-lifecycl
 ## Procedimiento
 
 1. Lee `data/tickets/<ticketId>.json`. Usa solo `ticketId`, `category`, `severity`, `entities` y `findings`: no copies `redactedText` al paquete ni a tu respuesta.
-2. Fija el motivo (`reason`) con la tabla de [Motivos](#motivos). Si llegas por un handoff, usa el motivo que indica el agente de origen. Si lo pide un operador y su texto no es uno de los códigos, usa `operator_request`.
+2. Fija el motivo (`reason`) con la tabla de «Motivos». Si llegas por un handoff, usa el motivo que indica el agente de origen. Si lo pide un operador y su texto no es uno de los códigos, usa `operator_request`.
 3. Comprueba que el estado actual tiene transición a `ESCALATED` (`NEW`, `TRIAGED`, `IN_PROGRESS` o `WAITING_USER`). Si el ticket ya está en `ESCALATED`, `RESOLVED` o `CLOSED`, no lo cambies: explica por qué y cita las transiciones permitidas desde su estado.
 4. Construye el paquete de escalamiento:
    - `ticketId`, `category`, `severity`, `entities`, `findings` y `reason`.
-   - `targetTeam` según la tabla de [Equipos de escalamiento](#equipos-de-escalamiento).
+   - `targetTeam` según la tabla de «Equipos de escalamiento».
    - Solo si `category` es `provisioning`: `approvalRequest` con `resource`, `accessLevel` y `justification` tomados de `entities.request`, `requesterRef` igual a `entities.userRef`, `complete` (`true` si los tres campos de la solicitud tienen valor) y `summary` con la plantilla `internal.approval`.
    - `summary` para el equipo: la plantilla `internal.summary` más una frase técnica sobre los hallazgos, sin datos personales.
    - `createdAt` con la fecha y hora actuales.
