@@ -34,7 +34,7 @@
 
 Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Después los `.md`, en un orden que garantiza que cada prueba manual tenga lo que necesita: `/triage-ticket` (T-09) llega antes que cualquier prueba que trabaje sobre un ticket existente.
 
-- [ ] T-01 · Crear el workspace pnpm (vitest con proyectos, ESLint, Prettier, `.gitignore`, `data/.gitkeep`, `AGENTS.md -> CLAUDE.md`) con el esqueleto de `check-vpn.js` · Satisface: REQ-2.2-22
+- [x] T-01 · Crear el workspace pnpm (vitest con proyectos, ESLint, Prettier, `.gitignore`, `data/.gitkeep`, `AGENTS.md -> CLAUDE.md`) con el esqueleto de `check-vpn.js` · Satisface: REQ-2.2-22
   Hecho cuando: The check-vpn script shall import only the modules `node:dns`, `node:net` and `node:perf_hooks`.
   Verifica: `pnpm test -- check-vpn.imports` y `pnpm lint`
   Bloqueada por: ninguna
