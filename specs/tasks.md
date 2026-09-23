@@ -234,7 +234,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- lifecycle.required-fields lifecycle.resolved`
   Bloqueada por: T-37
 
-- [ ] T-39 · Crear el ticket store (escritura atómica, regex de `ticketId`) y registrar cada transición en la bitácora · Satisface: REQ-AUD-03
+- [x] T-39 · Crear el ticket store (escritura atómica, regex de `ticketId`) y registrar cada transición en la bitácora · Satisface: REQ-AUD-03
   Hecho cuando: When the runtime applies a status transition, the audit log shall record an entry with `ts`, `agent`, `decision`, `reason`, `from` and `to` in the same step that persists the new ticket state.
   Verifica: `pnpm -F api test -- audit.transition`
   Bloqueada por: T-36, T-38
