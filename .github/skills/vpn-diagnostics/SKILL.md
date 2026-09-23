@@ -21,7 +21,7 @@ Comprueba en tres pasos si el servicio central de VPN responde, con el script si
    - no ejecutes ningún comando en la terminal, ni siquiera una versión «limpiada» del valor;
    - no cambies el estado del ticket y añade a la bitácora una entrada `error` con `reason: invalid_target`, sin copiar el valor recibido;
    - pide al operador un `target` válido con la forma `host:puerto`, por ejemplo `vpn-gw.example.internal:443`.
-4. Ejecuta en la terminal, desde la raíz del repositorio, exactamente este comando con el `target` ya validado y sin añadir nada más:
+4. Ejecuta en la terminal, desde la raíz del repositorio, exactamente este comando con el `target` ya validado y sin añadir nada más. Es el único comando de terminal de toda la skill: para leer o comprobar archivos usa la herramienta de lectura, nunca `ls`, `cat` ni otros comandos.
 
    ```sh
    node .github/skills/vpn-diagnostics/scripts/check-vpn.js --target <target>

@@ -38,7 +38,8 @@ Sigue las reglas globales del repositorio y el ciclo de vida de [ticket-lifecycl
    - **Resuelto:** añade la acción a `actions` con `id` igual al `id` de la allowlist (p. ej. `instruct_self_service_unlock`, nunca un número o un `act_<n>`), `allowlisted: true`, `kind: instruction`, `result: delivered` y `agent: diagnostics`, y una entrada `action_executed` a la bitácora con ese `id` en `data.action`. Pon en `userMessage` la plantilla `resolved.<id de la acción>` y pasa el ticket a `RESOLVED` con su entrada `transition`, siempre que se cumpla la definición de resuelto del ciclo de vida.
    - **Falta un dato:** pon en `userMessage` la plantilla `waiting_user` y pasa el ticket a `WAITING_USER` con su entrada `transition`.
    - **Escalar:** no cambies el estado (lo hace `escalation`). Añade una entrada `routed` a la bitácora (desde `diagnostics` hacia `escalation`, con la regla y el motivo en `data`) y recomienda pulsar **Escalar** indicando el motivo.
-6. Responde al operador con el procedimiento aplicado, el hallazgo en una línea técnica, el resultado y, si hay, el mensaje para el usuario en español llano, sin términos de la lista de jerga.
+6. Usa la terminal solo para el comando de la skill. Para leer el ticket o la bitácora, o comprobar si existen, usa `read/readFile`.
+7. Responde al operador con el procedimiento aplicado, el hallazgo en una línea técnica, el resultado y, si hay, el mensaje para el usuario en español llano, sin términos de la lista de jerga.
 
 ## Bloqueo por intentos
 
