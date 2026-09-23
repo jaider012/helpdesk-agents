@@ -172,7 +172,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- agents.handoff-context allowlist.unsafe`
   Bloqueada por: T-20, T-23
 
-- [ ] T-27 · Implementar las reglas R-T1…R-X3 en `routing.ts` (design §2.1) · Satisface: REQ-2.3-21, REQ-2.3-22, REQ-2.3-23, REQ-2.3-24, REQ-2.3-25, REQ-2.3-28, REQ-2.3-29, REQ-2.3-36
+- [x] T-27 · Implementar las reglas R-T1…R-X3 en `routing.ts` (design §2.1) · Satisface: REQ-2.3-21, REQ-2.3-22, REQ-2.3-23, REQ-2.3-24, REQ-2.3-25, REQ-2.3-28, REQ-2.3-29, REQ-2.3-36
   Hecho cuando: When an agent produces a route input, the runtime shall resolve the target agent and the escalation reason from the matching rule of `routing.ts`.
   Verifica: `pnpm -F agent-spec test -- routing.triage routing.diagnostics routing.provisioning`
   Bloqueada por: T-17

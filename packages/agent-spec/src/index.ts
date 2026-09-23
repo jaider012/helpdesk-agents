@@ -33,3 +33,23 @@ export {
   type ToolName,
 } from './policy.ts';
 export { TICKET_STATE_KEYS } from './ticket-state.ts';
+export {
+  CATEGORIES,
+  DIAGNOSTICS_OUTCOMES,
+  matchingRules,
+  resolveRoute,
+  ROUTE_INPUT_DOMAINS,
+  ROUTING_RULES,
+  SEVERITIES,
+  type Category,
+  type DiagnosticsOutcome,
+  type DiagnosticsRouteInput,
+  type EscalationReason,
+  type ProvisioningRouteInput,
+  type RouteDecision,
+  type RouteInputs,
+  type RouteRule,
+  type RoutingAgent,
+  type Severity,
+  type TriageRouteInput,
+} from './routing.ts';
