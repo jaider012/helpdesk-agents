@@ -182,7 +182,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F agent-spec test -- routing.declared routing.deterministic`
   Bloqueada por: T-25, T-27
 
-- [ ] T-29 · Validar los prompt files (frontmatter, agente, variables y referencias `#tool:`) · Satisface: REQ-2.4-01, REQ-2.4-02, REQ-2.4-03, REQ-2.4-04, REQ-2.4-05, REQ-2.4-06, REQ-2.4-07
+- [x] T-29 · Validar los prompt files (frontmatter, agente, variables y referencias `#tool:`) · Satisface: REQ-2.4-01, REQ-2.4-02, REQ-2.4-03, REQ-2.4-04, REQ-2.4-05, REQ-2.4-06, REQ-2.4-07
   Hecho cuando: When the spec validator loads the `.prompt.md` files, the spec validator shall report one error code per broken rule among `PROMPT_FRONTMATTER_INVALID`, `UNKNOWN_PROMPT_AGENT`, `PROMPT_VARIABLE_MISSING`, `PROMPT_WITHOUT_TOOL_CALL` and `PROMPT_TOOL_UNDECLARED`.
   Verifica: `pnpm -F agent-spec test -- prompts.frontmatter prompts.agent prompts.variables prompts.tool-call`
   Bloqueada por: T-18

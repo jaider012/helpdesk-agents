@@ -3,6 +3,7 @@ import { unknownKeys } from './frontmatter.ts';
 import { buildHandoffGraph, graphIssues } from './graph.ts';
 import { LIFECYCLE_PATH, lifecycleIssues } from './lifecycle.ts';
 import type { SpecBundle, SpecFile } from './load.ts';
+import { promptIssues } from './prompts.ts';
 import { routeHandoffIssues, routingDeterminismIssues } from './routing-check.ts';
 import { ROUTE_INPUT_DOMAINS, ROUTING_RULES } from './routing.ts';
 import { skillBodyIssues, skillFrontmatterIssues } from './skill.ts';
@@ -35,7 +36,12 @@ export type ErrorCode =
   | 'HANDOFF_CONTEXT_EXCEEDED'
   | 'UNSAFE_ALLOWLIST_ACTION'
   | 'ROUTE_WITHOUT_HANDOFF'
-  | 'ROUTING_NOT_DETERMINISTIC';
+  | 'ROUTING_NOT_DETERMINISTIC'
+  | 'PROMPT_FRONTMATTER_INVALID'
+  | 'UNKNOWN_PROMPT_AGENT'
+  | 'PROMPT_VARIABLE_MISSING'
+  | 'PROMPT_WITHOUT_TOOL_CALL'
+  | 'PROMPT_TOOL_UNDECLARED';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
@@ -71,6 +77,7 @@ export function validateSpec(bundle: SpecBundle): ValidationError[] {
     ...graphIssues(bundle),
     ...routeHandoffIssues(buildHandoffGraph(bundle), ROUTING_RULES),
     ...routingDeterminismIssues(ROUTING_RULES, ROUTE_INPUT_DOMAINS),
+    ...validatePrompts(bundle),
   ];
 }
 
@@ -116,4 +123,13 @@ function validateSkill(file: SpecFile, resources: Record<string, string>): Valid
     ...skillFrontmatterIssues(file.path, file.frontmatter.data),
     ...skillBodyIssues(file.path, file.frontmatter.body, resources),
   ].map((issue) => ({ ...issue, path: file.path }));
+}
+
+function validatePrompts(bundle: SpecBundle): ValidationError[] {
+  const agentNames = new Set(buildHandoffGraph(bundle).agents.keys());
+  return bundle.files
+    .filter((file) => file.kind === 'prompt')
+    .flatMap((file) =>
+      promptIssues(file, agentNames).map((issue) => ({ ...issue, path: file.path })),
+    );
 }

@@ -60,3 +60,10 @@ export {
   type RouteInputDomains,
   type RoutingRules,
 } from './routing-check.ts';
+export {
+  promptName,
+  promptToolReferences,
+  promptVariables,
+  REQUIRED_PROMPT_VARIABLES,
+  type PromptVariable,
+} from './prompts.ts';
