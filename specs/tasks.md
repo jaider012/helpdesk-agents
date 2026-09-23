@@ -59,7 +59,7 @@ Gate de entrada: `aprobado fase 0`. Primero el script (tests automáticos). Desp
   Verifica: `pnpm test -- check-vpn.timeout-arg check-vpn.check-timeout`
   Bloqueada por: T-03
 
-- [ ] T-06 · Añadir el plazo total (`DEFAULT_DEADLINE_MS = 9000`, `--deadline-ms`) y fijar el esquema de salida de `check-vpn.js` · Satisface: REQ-2.2-16, REQ-2.2-20
+- [x] T-06 · Añadir el plazo total (`DEFAULT_DEADLINE_MS = 9000`, `--deadline-ms`) y fijar el esquema de salida de `check-vpn.js` · Satisface: REQ-2.2-16, REQ-2.2-20
   Hecho cuando: If the total execution exceeds the deadline, then the check-vpn script shall print one JSON object with the keys `ok`, `checks` and `summary` and `error.code` set to `DEADLINE_EXCEEDED`, and exit with code `2`.
   Verifica: `pnpm test -- check-vpn.deadline check-vpn.output-schema`
   Bloqueada por: T-04, T-05
