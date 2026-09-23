@@ -19,3 +19,4 @@
 2026-09-23 · T-14 · Manual M-03 OK: `/run-vpn-diagnostics` contra `localhost:8443` cargó la skill, ejecutó `check-vpn.js` (exit 0) y dejó el ticket A en `RESOLVED` con un mensaje en español sin jerga; los comandos de terminal ajenos a la skill no se aprobaron y la regla se endureció en `23ababc`
 2026-09-23 · T-15 · Manual M-08 OK: con `target: x:1; echo INJECTED` el agente no ejecutó ningún comando y pidió un `host:puerto` válido; el JSONL roto por esa entrada se corrigió en `c4f7787`
 2026-09-23 · T-16 · Manual M-04 OK: con `check-vpn.js` renombrado, Node salió con exit 1 sin JSON y el agente registró `skill_resource_unavailable` y enrutó a `escalation`; script restaurado. Ejecución de T-11 a T-16 por Claude Code con `code chat` y clics simulados, detalle en `docs/manual-tests.md`
+2026-09-23 · Gate · `aprobado fase 1` recibido: Fase 1 cerrada con 16/16 tareas y las pruebas manuales M-01 a M-09 en verde
