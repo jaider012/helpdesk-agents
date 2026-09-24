@@ -334,7 +334,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- guard.credential-request guard.jargon guard.internal-data`
   Bloqueada por: T-45, T-52
 
-- [ ] T-59 · Usar la plantilla cuando el LLM que redacta textos falla o tarda más de 30 s · Satisface: REQ-COM-06
+- [x] T-59 · Usar la plantilla cuando el LLM que redacta textos falla o tarda más de 30 s · Satisface: REQ-COM-06
   Hecho cuando: If an LLM call that drafts a `userMessage` or a summary fails or exceeds 30 s, then the runtime shall use the plain-language template for that text.
   Verifica: `pnpm -F api test -- llm.drafting-fallback`
   Bloqueada por: T-58

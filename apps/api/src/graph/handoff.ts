@@ -41,12 +41,17 @@ export function handoffEnvelope(
   };
 }
 
-/** The LLM messages of a target agent: its system prompt, then the handoff prompt and envelope. */
-export function handoffMessages(systemPrompt: string, envelope: HandoffEnvelope): BaseMessage[] {
+/**
+ * The LLM messages of a target agent: its system prompt, then the handoff prompt, the template the
+ * draft starts from (when there is one) and the envelope.
+ */
+export function handoffMessages(
+  systemPrompt: string,
+  envelope: HandoffEnvelope,
+  template?: string,
+): BaseMessage[] {
   const { prompt, context, route } = envelope;
   const data = JSON.stringify({ context, ...(route && { route }) });
-  return [
-    new SystemMessage(systemPrompt),
-    new HumanMessage(prompt ? `${prompt}\n\n${data}` : data),
-  ];
+  const parts = [prompt, template && `Plantilla: ${template}`, data].filter(Boolean);
+  return [new SystemMessage(systemPrompt), new HumanMessage(parts.join('\n\n'))];
 }

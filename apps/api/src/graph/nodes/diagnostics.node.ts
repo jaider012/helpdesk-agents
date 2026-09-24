@@ -1,12 +1,30 @@
-import type { Category, DiagnosticsOutcome } from 'agent-spec';
+import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { OutputParserException } from '@langchain/core/output_parsers';
+import type { Category, DiagnosticsOutcome, HandoffEdge, TicketStatus } from 'agent-spec';
+import { z } from 'zod';
+import type { AuditLog } from '../../audit/audit-log.js';
+import type { UserMessageGuard } from '../../guards/user-message.guard.js';
+import { DRAFT_MESSAGE_TOOL } from '../../llm/fake-responder.js';
 import type { MessageTemplates } from '../../messages/templates.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { DiagnosticFinding, IssueType } from '../../tickets/ticket-state.js';
 import { ActionError, type ActionService } from '../../tools/actions.js';
 import type { CheckVpnTool } from '../../tools/check-vpn-tool.js';
+import { isIoError } from '../errors.js';
+import { handoffEnvelope, handoffMessages } from '../handoff.js';
 import { mergeUpdate, toTicketState, type GraphState, type GraphUpdate } from '../state.js';
 
+/** The user message that the LLM drafts from the template of the outcome (design §5.1). */
+const MessageDraft = z.object({ userMessage: z.string().min(1) });
+
 export interface DiagnosticsNodeDeps {
+  model: BaseChatModel;
+  systemPrompt: string;
+  audit: AuditLog;
+  guard: UserMessageGuard;
+  /** Limit of the drafting call (`LLM_TIMEOUT_MS`, REQ-COM-06). */
+  timeoutMs: number;
+  handoffs: readonly HandoffEdge[];
   lifecycle: TicketLifecycle;
   actions: ActionService;
   checkVpn: CheckVpnTool;
@@ -39,14 +57,59 @@ function procedureFor(category: Category | undefined, issueType: IssueType | und
  * The diagnostics node (design §2.2): applies the procedure of the ticket and reports its outcome
  * for R-D1..R-D8. Only the steps of the procedure run here; routing and escalation are code outside.
  */
-export function createDiagnosticsNode({
-  lifecycle,
-  actions,
-  checkVpn,
-  templates,
-  vpnTarget,
-  clock,
-}: DiagnosticsNodeDeps) {
+export function createDiagnosticsNode(deps: DiagnosticsNodeDeps) {
+  const { model, systemPrompt, audit, guard, timeoutMs, handoffs } = deps;
+  const { lifecycle, actions, checkVpn, templates, vpnTarget, clock } = deps;
+  const drafter = model.withStructuredOutput(MessageDraft, { name: DRAFT_MESSAGE_TOOL });
+
+  const replaced = (ticketId: string, cause: string) =>
+    audit.append({
+      ticketId,
+      agent: 'diagnostics',
+      decision: 'message_replaced',
+      reason: 'the plain-language template replaces the drafted text',
+      data: { cause },
+    });
+
+  /**
+   * The user message for `status`: the LLM drafts it from the template with only the handoff
+   * envelope; a failed, late or invalid draft, or one that breaks a guard, gives the template.
+   */
+  async function userMessageFor(
+    state: GraphState,
+    templateKey: string,
+    status: TicketStatus,
+  ): Promise<string> {
+    const { ticketId } = state;
+    const template = templates.render(templateKey, { ticketId });
+    let drafted: string;
+    try {
+      const envelope = handoffEnvelope(state, 'diagnostics', handoffs);
+      const result = MessageDraft.safeParse(
+        await drafter.invoke(handoffMessages(systemPrompt, envelope, template), {
+          signal: AbortSignal.timeout(timeoutMs),
+        }),
+      );
+      if (!result.success) {
+        await replaced(ticketId, 'invalid_llm_output');
+        return template;
+      }
+      drafted = result.data.userMessage;
+    } catch (error) {
+      if (isIoError(error)) throw error;
+      const cause =
+        error instanceof OutputParserException ? 'invalid_llm_output' : 'llm_unavailable';
+      await replaced(ticketId, cause);
+      return template;
+    }
+    const broken = guard.check(drafted, { ticketId, status });
+    if (broken) {
+      await replaced(ticketId, broken);
+      return template;
+    }
+    return drafted;
+  }
+
   /** Moves the ticket to IN_PROGRESS when diagnostics takes the case (T3). */
   async function takeCase(state: GraphState): Promise<GraphState> {
     if (state.status === 'IN_PROGRESS') return state;
@@ -59,7 +122,7 @@ export function createDiagnosticsNode({
 
   /**
    * Delivers an allowlisted action after a conclusive finding and resolves the ticket (T5), with the
-   * plain-language template of the action as `userMessage`. A rejected action routes to escalation
+   * user message drafted from the template of the action. A rejected action routes to escalation
    * (R-D8, REQ-2.3-32); the action service has already audited the rejection.
    */
   async function resolveWith(
@@ -68,7 +131,6 @@ export function createDiagnosticsNode({
     actionId: string,
     outcome: DiagnosticsOutcome,
   ): Promise<GraphUpdate> {
-    const { ticketId } = current;
     const found = { status: current.status, findings: [finding] };
     let action;
     try {
@@ -84,7 +146,7 @@ export function createDiagnosticsNode({
     const update = {
       ...found,
       actions: [action],
-      userMessage: templates.render(`resolved.${action.id}`, { ticketId }),
+      userMessage: await userMessageFor(current, `resolved.${action.id}`, 'RESOLVED'),
     };
     const saved = await lifecycle.applyTransition(
       toTicketState(mergeUpdate(current, update)),
@@ -125,7 +187,7 @@ export function createDiagnosticsNode({
   /** Without an issue type there is no procedure: ask the user for it (T6, REQ-2.3-30). */
   async function askUser(state: GraphState): Promise<GraphUpdate> {
     const current = await takeCase(state);
-    const userMessage = templates.render('waiting_user', { ticketId: current.ticketId });
+    const userMessage = await userMessageFor(current, 'waiting_user', 'WAITING_USER');
     const saved = await lifecycle.applyTransition(
       toTicketState({ ...current, userMessage }),
       'WAITING_USER',

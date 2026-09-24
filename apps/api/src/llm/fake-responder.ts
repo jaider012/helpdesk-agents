@@ -6,6 +6,8 @@ import type { FakeReply } from './fake-chat-model.js';
 export const CLASSIFY_TOOL = 'classify_ticket';
 /** Name of the structured-output tool that drafts the escalation texts. */
 export const DRAFT_TOOL = 'draft_escalation';
+/** Name of the structured-output tool that drafts a user message from its template. */
+export const DRAFT_MESSAGE_TOOL = 'draft_user_message';
 
 interface Rule {
   pattern: RegExp;
@@ -90,6 +92,8 @@ export function classifyByKeywords(text: string): Record<string, unknown> {
   };
 }
 
+const TEMPLATE_LINE = /^Plantilla: (.+)$/m;
+
 function lastHumanText(messages: BaseMessage[]): string {
   const human = [...messages].reverse().find((message) => message.getType() === 'human');
   return typeof human?.content === 'string' ? human.content : '';
@@ -104,6 +108,12 @@ export function createFakeResponder(templates?: MessageTemplates) {
     const text = lastHumanText(messages);
     if (tools.includes(CLASSIFY_TOOL)) {
       return { toolCall: { name: CLASSIFY_TOOL, args: classifyByKeywords(text) } };
+    }
+    if (tools.includes(DRAFT_MESSAGE_TOOL)) {
+      // The draft is exactly the template that the node sends (design §9).
+      const template = TEMPLATE_LINE.exec(text)?.[1];
+      const args = template ? { userMessage: template } : {};
+      return { toolCall: { name: DRAFT_MESSAGE_TOOL, args } };
     }
     if (tools.includes(DRAFT_TOOL)) {
       const ticketId = /TCK-\d{8}-\d{6}-[0-9a-z]{3}/.exec(text)?.[0];

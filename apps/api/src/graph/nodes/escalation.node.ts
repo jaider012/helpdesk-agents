@@ -28,6 +28,8 @@ export interface EscalationNodeDeps {
   handoffs: readonly HandoffEdge[];
   /** The guards of the user message (design §8.2). */
   guard: UserMessageGuard;
+  /** Limit of the drafting call (`LLM_TIMEOUT_MS`, REQ-COM-06). */
+  timeoutMs: number;
 }
 
 /** The reason that the routing decision carried, or an operator request when there is none. */
@@ -58,7 +60,8 @@ function approvalRequestFor(state: GraphState, templates: MessageTemplates): App
  * without it, or when the node fails for any reason other than I/O, the templates are used.
  */
 export function createEscalationNode(deps: EscalationNodeDeps) {
-  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs, guard } = deps;
+  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs, guard, timeoutMs } =
+    deps;
   const draft = model.withStructuredOutput(EscalationDraft, { name: DRAFT_TOOL });
 
   const replaced = (ticketId: string, cause: string) =>
@@ -82,7 +85,9 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
       // Only the handoff envelope travels to the LLM, never the ticket text (REQ-2.3-17).
       const envelope = handoffEnvelope(state, 'escalation', handoffs);
       const result = EscalationDraft.safeParse(
-        await draft.invoke(handoffMessages(systemPrompt, envelope)),
+        await draft.invoke(handoffMessages(systemPrompt, envelope), {
+          signal: AbortSignal.timeout(timeoutMs),
+        }),
       );
       if (!result.success) {
         await replaced(ticketId, 'invalid_llm_output');

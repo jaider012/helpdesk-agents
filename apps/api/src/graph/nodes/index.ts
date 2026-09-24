@@ -57,6 +57,8 @@ export function createNodes({
   };
   const lifecycle = new TicketLifecycle(machine, audit, store);
   const templates = templatesFromBundle(bundle);
+  const guard = guardFromBundle(bundle);
+  const handoffs = agents.flatMap((agent) => agent.handoffs);
   const vpnScript = compileSkillScripts(bundle).find(({ skill }) => skill === 'vpn-diagnostics');
   if (!vpnScript) throw new Error('the spec has no vpn-diagnostics script');
   return {
@@ -78,6 +80,12 @@ export function createNodes({
     diagnostics: withRouting(
       'diagnostics',
       createDiagnosticsNode({
+        model,
+        systemPrompt: systemPrompt('diagnostics'),
+        audit,
+        guard,
+        timeoutMs: llmTimeoutMs,
+        handoffs,
         lifecycle,
         actions: ActionService.fromBundle(bundle, audit, clock),
         checkVpn: new CheckVpnTool(new SkillRunner(audit), vpnScript, audit, clock),
@@ -103,8 +111,9 @@ export function createNodes({
       lifecycle,
       templates,
       clock,
-      handoffs: agents.flatMap(({ handoffs }) => handoffs),
-      guard: guardFromBundle(bundle),
+      handoffs,
+      guard,
+      timeoutMs: llmTimeoutMs,
     }),
   };
 }
