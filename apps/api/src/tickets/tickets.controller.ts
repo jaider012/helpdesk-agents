@@ -14,13 +14,13 @@ import type { AuditEntry } from '../audit/audit-entry.js';
 import type { AuditLog } from '../audit/audit-log.js';
 import { AUDIT_LOG } from '../audit/audit.module.js';
 import type { PromptRunner } from '../prompts/prompt-runner.js';
-import { startRun } from '../prompts/start-run.js';
+import { logRunFailure, startRun } from '../prompts/start-run.js';
 import { PROMPT_RUNNER } from '../prompts/tokens.js';
 import { z } from 'zod';
 import { TransitionError, type TicketStateMachine } from './state-machine.js';
 import { TICKET_ID_PATTERN } from './ticket-id.js';
 import { TicketLifecycle } from './ticket-lifecycle.js';
-import type { TicketState } from './ticket-state.js';
+import { ISSUE_TYPES, type Entities, type TicketState } from './ticket-state.js';
 import type { TicketStore } from './ticket-store.js';
 import { STATE_MACHINE, TICKET_STORE } from './tickets.module.js';
 
@@ -32,6 +32,11 @@ interface CreateTicketBody {
 /** Body of `POST /tickets/:id/close` (design §12.1). */
 const CloseBody = z.object({
   closeReason: z.enum(['user_confirmed', 'no_user_reply', 'handled_by_team']),
+});
+
+/** Body of `POST /tickets/:id/reply`: the issue type the user chose (design §12.1). */
+const ReplyBody = z.object({
+  issueType: z.enum(ISSUE_TYPES.filter((issueType) => issueType !== 'unknown')),
 });
 
 /** One row of the ticket inbox (REQ-API-04). */
@@ -121,6 +126,36 @@ export class TicketsController {
       }
       throw error;
     }
+  }
+
+  /**
+   * The user's answer to WAITING_USER (REQ-API-08): the runtime records the issue type with T8
+   * (WAITING_USER → IN_PROGRESS) and resumes the graph at diagnostics.
+   */
+  @Post(':id/reply')
+  @HttpCode(202)
+  async reply(@Param('id') id: string, @Body() body: unknown): Promise<{ ticketId: string }> {
+    const parsed = ReplyBody.safeParse(body);
+    if (!parsed.success) {
+      throw new BadRequestException({ message: 'issueType must be a known issue type' });
+    }
+    const ticket = await this.find(id);
+    if (ticket.status !== 'WAITING_USER') {
+      throw new ConflictException({
+        message: 'only a ticket in WAITING_USER accepts a reply',
+        code: 'INVALID_TRANSITION',
+      });
+    }
+    // A ticket in WAITING_USER went through triage, so it has the rest of its entities.
+    const entities = { ...ticket.entities, issueType: parsed.data.issueType } as Entities;
+    const resumed = await this.lifecycle.applyTransition({ ...ticket, entities }, 'IN_PROGRESS', {
+      agent: 'runtime',
+      reason: 'the user replied with the issue type',
+      data: { issueType: parsed.data.issueType },
+    });
+    const { ticketId, done } = this.runner.resume(resumed, 'diagnostics');
+    logRunFailure(ticketId, done);
+    return { ticketId };
   }
 
   /** The stored ticket; 404 for an unknown or malformed id, which never reaches a file path. */

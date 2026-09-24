@@ -35,7 +35,13 @@ export async function recordingModel() {
 /** The api over a temporary data folder, with `model` as chat model and extra variables. */
 export async function promptApp(model?: BaseChatModel, env: Record<string, string> = {}) {
   const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-prompts-'));
-  Object.assign(process.env, { VPN_ALLOWED_TARGETS: '', ...env, DATA_DIR: dataDir });
+  // A closed local port as gateway: check-vpn exits 1 at once, without DNS lookups.
+  Object.assign(process.env, {
+    VPN_ALLOWED_TARGETS: '',
+    VPN_GATEWAY_TARGET: 'localhost:1',
+    ...env,
+    DATA_DIR: dataDir,
+  });
   const builder = Test.createTestingModule({ imports: [AppModule] });
   if (model) builder.overrideProvider(CHAT_MODEL).useValue(model);
   const moduleRef = await builder.compile();
@@ -82,4 +88,15 @@ export async function postJson(
     body: JSON.stringify(body),
   });
   return { status: response.status, body: (await response.json()) as Record<string, unknown> };
+}
+
+/** Waits until the stored ticket reaches one of `statuses`, up to about 2 s. */
+export async function waitForStatus(store: TicketStore, ticketId: string, statuses: string[]) {
+  let status: string | undefined;
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    status = (await store.read(ticketId))?.status;
+    if (status && statuses.includes(status)) return status;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  return status;
 }

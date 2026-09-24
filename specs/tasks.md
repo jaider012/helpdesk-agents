@@ -381,7 +381,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- tickets.close`
   Bloqueada por: T-66
 
-- [ ] T-68 · Exponer `POST /tickets/:id/reply` y reanudar el grafo en diagnostics · Satisface: REQ-API-08
+- [x] T-68 · Exponer `POST /tickets/:id/reply` y reanudar el grafo en diagnostics · Satisface: REQ-API-08
   Hecho cuando: When the api receives `POST /tickets/:id/reply` with an `issueType` for a ticket in `WAITING_USER`, the runtime shall resume the graph at the diagnostics agent.
   Verifica: `pnpm -F api test -- tickets.reply`
   Bloqueada por: T-53, T-66

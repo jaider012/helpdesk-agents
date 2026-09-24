@@ -3,7 +3,7 @@ import { promptName, promptVariables, type AgentName, type SpecBundle } from 'ag
 import type { AuditLog } from '../audit/audit-log.js';
 import type { buildGraph } from '../graph/build.js';
 import { fromTicketState, type GraphState } from '../graph/state.js';
-import type { Channel } from '../tickets/ticket-state.js';
+import type { Channel, TicketState } from '../tickets/ticket-state.js';
 import { TICKET_ID_PATTERN } from '../tickets/ticket-id.js';
 import type { TicketStore } from '../tickets/ticket-store.js';
 
@@ -90,6 +90,14 @@ export class TicketNotFoundError extends Error {
   }
 }
 
+/** The input of a new run over a stored ticket, starting at `agent`. */
+function runOver(ticket: TicketState, agent: AgentName): GraphState {
+  const state = fromTicketState(ticket);
+  // A new run: the routing decision of an earlier run does not apply.
+  delete (state as Partial<GraphState>).lastRoute;
+  return { ...state, audit: [], entryAgent: agent, nextAgent: agent as GraphState['nextAgent'] };
+}
+
 export interface StartedRun {
   ticketId: string;
   /** Settles when the graph run ends. */
@@ -136,6 +144,15 @@ export class PromptRunner {
     return { ticketId: input.ticketId, done: this.graph.invoke(input) as Promise<GraphState> };
   }
 
+  /**
+   * Resumes a stored ticket at `agent`, e.g. diagnostics after the user replied (REQ-API-08); the
+   * graph still starts at the redact node.
+   */
+  resume(ticket: TicketState, agent: AgentName): StartedRun {
+    const input = runOver(ticket, agent);
+    return { ticketId: ticket.ticketId, done: this.graph.invoke(input) as Promise<GraphState> };
+  }
+
   /** A new ticket for triage-ticket; the stored ticket for the other prompts. */
   private async initialState(
     { agent }: PromptDefinition,
@@ -157,15 +174,6 @@ export class PromptRunner {
     // A malformed id cannot name a stored ticket, and it never reaches a file path.
     const stored = TICKET_ID_PATTERN.test(ticketId) ? await this.store.read(ticketId) : undefined;
     if (!stored) throw new TicketNotFoundError();
-    const state = fromTicketState(stored);
-    // A new run: the routing decision of an earlier run does not apply.
-    delete (state as Partial<GraphState>).lastRoute;
-    return {
-      ...state,
-      audit: [],
-      entryAgent: agent,
-      nextAgent: agent as GraphState['nextAgent'],
-      prompt,
-    };
+    return { ...runOver(stored, agent), prompt };
   }
 }

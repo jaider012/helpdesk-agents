@@ -9,6 +9,13 @@ import {
 
 const logger = new Logger('PromptRun');
 
+/** Logs a run that stops, with only the error name: the ticket text never reaches the logs (REQ-SEC-08). */
+export function logRunFailure(ticketId: string, done: Promise<unknown>): void {
+  done.catch((error: unknown) =>
+    logger.error(`run ${ticketId} stopped: ${error instanceof Error ? error.name : 'error'}`),
+  );
+}
+
 /**
  * Starts a prompt run for an HTTP request and returns its ticketId without waiting for the graph:
  * 404 for an unknown prompt or ticket, 400 for missing variables (named through `fieldOf`) or a
@@ -22,10 +29,7 @@ export async function startRun(
 ): Promise<string> {
   try {
     const { ticketId, done } = await runner.start(name, variables);
-    // Only the error name is logged: the ticket text never reaches the logs (REQ-SEC-08).
-    done.catch((error: unknown) =>
-      logger.error(`run ${ticketId} stopped: ${error instanceof Error ? error.name : 'error'}`),
-    );
+    logRunFailure(ticketId, done);
     return ticketId;
   } catch (error) {
     if (error instanceof PromptNotFoundError || error instanceof TicketNotFoundError) {
