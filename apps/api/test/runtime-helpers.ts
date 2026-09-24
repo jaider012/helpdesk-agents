@@ -61,3 +61,24 @@ export function newTicket(ticketId: string, rawText: string) {
     entryAgent: 'triage' as const,
   };
 }
+
+/** A spec transform that removes the table row starting with `rowStart` from one file body. */
+export const withoutRow =
+  (pathSuffix: string, rowStart: string) =>
+  (bundle: SpecBundle): SpecBundle => ({
+    ...bundle,
+    files: bundle.files.map((file) =>
+      file.path.endsWith(pathSuffix) && file.frontmatter.ok
+        ? {
+            ...file,
+            frontmatter: {
+              ...file.frontmatter,
+              body: file.frontmatter.body
+                .split('\n')
+                .filter((line) => !line.startsWith(rowStart))
+                .join('\n'),
+            },
+          }
+        : file,
+    ),
+  });

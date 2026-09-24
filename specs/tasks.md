@@ -319,7 +319,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- provisioning.request`
   Bloqueada por: T-48
 
-- [ ] T-56 · Envolver cada nodo para escalar las excepciones inesperadas · Satisface: REQ-ESC-08
+- [x] T-56 · Envolver cada nodo para escalar las excepciones inesperadas · Satisface: REQ-ESC-08
   Hecho cuando: If a node raises an unexpected error, then the runtime shall route the ticket to the escalation agent with reason `internal_error`.
   Verifica: `pnpm -F api test -- graph.internal-error`
   Bloqueada por: T-44

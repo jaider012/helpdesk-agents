@@ -6,6 +6,7 @@ import { DRAFT_TOOL } from '../../llm/fake-responder.js';
 import type { MessageTemplates } from '../../messages/templates.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { ApprovalRequest, Entities, EscalationPackage } from '../../tickets/ticket-state.js';
+import { isIoError } from '../errors.js';
 import { handoffEnvelope, handoffMessages } from '../handoff.js';
 import { toTicketState, type GraphState, type GraphUpdate } from '../state.js';
 
@@ -46,13 +47,6 @@ function approvalRequestFor(state: GraphState, templates: MessageTemplates): App
     complete: [resource, accessLevel, justification].every((field) => field.trim() !== ''),
     summary: templates.render('internal.approval', { ticketId: state.ticketId }),
   };
-}
-
-/** Write failures of the audit log or the ticket store stop the run (REQ-AUD-06, REQ-AUD-08). */
-function isIoError(error: unknown): boolean {
-  if (typeof error !== 'object' || error === null) return false;
-  const { code } = error as { code?: unknown };
-  return 'errno' in error || code === 'AUDIT_WRITE_FAILED' || code === 'STORE_WRITE_FAILED';
 }
 
 /**

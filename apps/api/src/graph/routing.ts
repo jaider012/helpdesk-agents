@@ -6,7 +6,9 @@ import {
 } from 'agent-spec';
 import type { AuditLog } from '../audit/audit-log.js';
 import type { TicketState } from '../tickets/ticket-state.js';
+import type { TicketStore } from '../tickets/ticket-store.js';
 import type { GraphNode } from './build.js';
+import { isIoError } from './errors.js';
 import type { GraphState, GraphUpdate } from './state.js';
 
 /** Builds the typed route input of an agent from the state and the update of its node. */
@@ -42,17 +44,44 @@ export const provisioningRouteInput: RouteInputOf<'provisioning'> = (state, upda
 
 /**
  * Applies `routing.ts` when the node finishes: resolves the target, records the decision with its
- * rule in the audit log (REQ-AUD-04) and stores it in `lastRoute` and `nextAgent`.
+ * rule in the audit log (REQ-AUD-04) and stores it in `lastRoute` and `nextAgent`. An unexpected
+ * error of the node is recorded and routed as an internal error (R-X3, REQ-ESC-08); a write failure
+ * of the audit log or the ticket store stops the run. With `store`, the status after an error is
+ * the persisted one, since the node may have moved the ticket before failing.
  */
 export function withRouting<A extends RoutingAgent>(
   agent: A,
   node: GraphNode,
   routeInputOf: RouteInputOf<A>,
   audit: AuditLog,
+  store?: TicketStore,
 ): GraphNode {
+  const internal = { kind: 'error', error: 'internal' } as RouteInputs[A];
+
+  async function recover(state: GraphState, error: unknown): Promise<GraphUpdate> {
+    if (isIoError(error)) throw error;
+    await audit.append({
+      ticketId: state.ticketId,
+      agent,
+      decision: 'error',
+      reason: `unexpected error in the ${agent} node`,
+      data: { error: error instanceof Error ? error.name : typeof error },
+    });
+    const persisted = await store?.read(state.ticketId);
+    return persisted ? { status: persisted.status } : {};
+  }
+
   return async (state) => {
-    const update = await node(state);
-    const decision = resolveRoute(agent, routeInputOf(state, update));
+    let update: GraphUpdate;
+    let input: RouteInputs[A];
+    try {
+      update = await node(state);
+      input = routeInputOf(state, update);
+    } catch (error) {
+      update = await recover(state, error);
+      input = internal;
+    }
+    const decision = resolveRoute(agent, input);
     await audit.append({
       ticketId: state.ticketId,
       agent,

@@ -72,6 +72,7 @@ export function createNodes({
       }),
       triageRouteInput,
       audit,
+      store,
     ),
     diagnostics: withRouting(
       'diagnostics',
@@ -85,12 +86,14 @@ export function createNodes({
       }),
       diagnosticsRouteInput,
       audit,
+      store,
     ),
     provisioning: withRouting(
       'provisioning',
       createProvisioningNode({ audit, lifecycle }),
       provisioningRouteInput,
       audit,
+      store,
     ),
     escalation: createEscalationNode({
       model,
