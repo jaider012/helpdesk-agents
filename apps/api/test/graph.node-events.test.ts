@@ -79,8 +79,9 @@ describe('graph.node-events', () => {
       ).rejects.toBeInstanceOf(StoreWriteError);
 
       const entries = await audit.read(ticketId);
+      // The redact node stores the new ticket first (REQ-API-12), so the run stops there.
       expect(entries.at(-1)).toMatchObject({
-        agent: 'triage',
+        agent: 'redact',
         decision: 'node_finished',
         data: { error: 'StoreWriteError' },
       });

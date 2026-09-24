@@ -488,7 +488,7 @@ Gate de entrada: `aprobado fase 3`.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red) + E2E con LM Studio registrado en `docs/manual-tests.md`
   Bloqueada por: T-83
 
-- [ ] T-90 · Guardar el ticket nuevo en `NEW` desde el redact node (DA-04) · Satisface: REQ-API-12
+- [x] T-90 · Guardar el ticket nuevo en `NEW` desde el redact node (DA-04) · Satisface: REQ-API-12
   Hecho cuando: When the redact node processes a new ticket, the redact node shall store the ticket with status `NEW` and only its redacted text before the triage agent runs.
   Verifica: `pnpm -F api test -- tickets.created-early`
   Bloqueada por: T-66

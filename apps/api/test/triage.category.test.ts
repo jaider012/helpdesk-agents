@@ -34,6 +34,7 @@ describe('triage.category', () => {
 
     expect(audit).toMatchObject([
       { agent: 'redact', decision: 'redacted', data: { counts: { EMAIL: 1 } } },
+      { agent: 'redact', decision: 'ticket_created', data: { status: 'NEW' } },
       {
         agent: 'triage',
         decision: 'classified',

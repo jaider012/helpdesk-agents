@@ -31,8 +31,9 @@ export async function triage(rawText: string) {
   const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-triage-'));
   const audit = new AuditLog(dataDir, () => new Date('2026-09-23T10:15:00.000Z'));
   const machine = TicketStateMachine.fromBundle(bundle);
-  const lifecycle = new TicketLifecycle(machine, audit, new TicketStore(dataDir));
-  const redactNode = createRedactNode({ audit, salt: SALT });
+  const store = new TicketStore(dataDir);
+  const lifecycle = new TicketLifecycle(machine, audit, store);
+  const redactNode = createRedactNode({ audit, salt: SALT, store });
   const triageNode = createTriageNode({
     model,
     systemPrompt: agent.systemPrompt,

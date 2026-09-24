@@ -105,7 +105,7 @@ export class TicketsController {
 
   /**
    * The audit entries as Server-Sent Events, then `done` with the status when the run ends
-   * (REQ-API-07). A new ticket streams while its graph runs, before triage stores it.
+   * (REQ-API-07). A new ticket streams while its graph runs, even before the redact node stores it.
    */
   @Sse(':id/events')
   async events(@Param('id') id: string): Promise<Observable<MessageEvent>> {
@@ -115,7 +115,7 @@ export class TicketsController {
       audit: this.audit,
       feed: this.feed,
       run,
-      // A run that stopped before triage stored the ticket leaves it as it started.
+      // A run that stopped before the redact node stored the ticket leaves it as it started.
       status: async () => (await this.store.read(id))?.status ?? 'NEW',
     });
   }

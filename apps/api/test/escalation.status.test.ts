@@ -24,6 +24,7 @@ describe('escalation.status', () => {
     ).toEqual([
       ['redact', 'node_started', undefined, undefined],
       ['redact', 'redacted', undefined, undefined],
+      ['redact', 'ticket_created', undefined, undefined],
       ['redact', 'node_finished', undefined, undefined],
       ['triage', 'node_started', undefined, undefined],
       ['triage', 'classified', undefined, undefined],

@@ -25,6 +25,7 @@ describe('llm.failure', () => {
     ).toEqual([
       ['node_started', undefined, undefined, undefined],
       ['redacted', undefined, undefined, undefined],
+      ['ticket_created', undefined, undefined, undefined],
       ['node_finished', undefined, undefined, undefined],
       ['node_started', undefined, undefined, undefined],
       ['llm_unavailable', undefined, undefined, 'error'],

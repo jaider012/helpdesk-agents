@@ -1,9 +1,5 @@
-import { loadSpec } from 'agent-spec';
 import { afterEach, describe, expect, it } from 'vitest';
-import { FakeChatModel } from '../src/llm/fake-chat-model.js';
-import { createFakeResponder } from '../src/llm/fake-responder.js';
-import { templatesFromBundle } from '../src/messages/templates.js';
-import { REPO_ROOT } from './lifecycle-helpers.js';
+import { gatedModel } from './gated-model-helpers.js';
 import { postJson, promptApp } from './prompt-helpers.js';
 import { ticket } from './ticket-helpers.js';
 
@@ -31,18 +27,6 @@ async function openEvents(app: App, ticketId: string) {
   return { response, events };
 }
 
-/** The fake model of the runtime, held before its first answer until `release()`. */
-async function gatedModel() {
-  let release!: () => void;
-  const gate = new Promise<void>((resolve) => (release = resolve));
-  const respond = createFakeResponder(templatesFromBundle(await loadSpec(REPO_ROOT)));
-  const model = new FakeChatModel(async (messages, tools) => {
-    await gate;
-    return respond(messages, tools);
-  });
-  return { model, release };
-}
-
 describe('tickets.sse', () => {
   let close: (() => Promise<void>) | undefined;
   afterEach(() => close?.());
@@ -58,7 +42,7 @@ describe('tickets.sse', () => {
     });
     const ticketId = String(body.ticketId);
 
-    // The ticket is not stored until triage classifies it; the stream opens on the running graph.
+    // Triage is still waiting for the model: the stream opens on the running graph.
     const { response, events } = await openEvents(app, ticketId);
     release();
     const received = await events();

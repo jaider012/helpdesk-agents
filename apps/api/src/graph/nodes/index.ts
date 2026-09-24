@@ -65,7 +65,7 @@ export function createNodes({
   const vpnScript = compileSkillScripts(bundle).find(({ skill }) => skill === 'vpn-diagnostics');
   if (!vpnScript) throw new Error('the spec has no vpn-diagnostics script');
   const nodes: GraphNodes = {
-    redact: createRedactNode({ audit, salt }),
+    redact: createRedactNode({ audit, salt, store }),
     triage: withRouting(
       'triage',
       createTriageNode({

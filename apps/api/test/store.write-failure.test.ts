@@ -14,17 +14,14 @@ describe.skipIf(process.getuid?.() === 0)('store.write-failure', () => {
       code: 'STORE_WRITE_FAILED',
     });
     const entries = await audit.read(ticketId);
+    // The redact node stores the new ticket first (REQ-API-12), so the run stops there.
     expect(entries.map(({ decision }) => decision)).toEqual([
       'node_started',
       'redacted',
-      'node_finished',
-      'node_started',
-      'classified',
-      'transition',
       'error',
       'node_finished',
     ]);
-    expect(entries.at(-2)).toMatchObject({ agent: 'triage', data: { code: 'STORE_WRITE_FAILED' } });
-    expect(entries.at(-1)).toMatchObject({ agent: 'triage', data: { error: 'StoreWriteError' } });
+    expect(entries.at(-2)).toMatchObject({ agent: 'redact', data: { code: 'STORE_WRITE_FAILED' } });
+    expect(entries.at(-1)).toMatchObject({ agent: 'redact', data: { error: 'StoreWriteError' } });
   });
 });

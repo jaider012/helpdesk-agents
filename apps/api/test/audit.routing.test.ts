@@ -28,11 +28,8 @@ async function setup() {
   if (!triageAgent) throw new Error('triage agent not found');
   const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-routing-'));
   const audit = new AuditLog(dataDir, () => new Date('2026-09-23T10:15:00.000Z'));
-  const lifecycle = new TicketLifecycle(
-    TicketStateMachine.fromBundle(bundle),
-    audit,
-    new TicketStore(dataDir),
-  );
+  const store = new TicketStore(dataDir);
+  const lifecycle = new TicketLifecycle(TicketStateMachine.fromBundle(bundle), audit, store);
   const triage = withRouting(
     'triage',
     createTriageNode({
@@ -47,7 +44,7 @@ async function setup() {
     triageRouteInput,
     audit,
   );
-  return { bundle, agents, audit, triage };
+  return { bundle, agents, audit, store, triage };
 }
 
 const state = (redactedText: string) =>
@@ -88,14 +85,14 @@ describe('audit.routing', () => {
   );
 
   it('routes the running graph from triage to the target of the decision', async () => {
-    const { bundle, agents, audit, triage } = await setup();
+    const { bundle, agents, audit, store, triage } = await setup();
     const visited: string[] = [];
     const record = (name: string) => () => {
       visited.push(name);
       return {};
     };
     const graph = buildGraph(bundle, agents, {
-      redact: createRedactNode({ audit, salt: 'synthetic-test-salt' }),
+      redact: createRedactNode({ audit, salt: 'synthetic-test-salt', store }),
       triage,
       diagnostics: record('diagnostics'),
       provisioning: record('provisioning'),
@@ -113,6 +110,7 @@ describe('audit.routing', () => {
     expect(final.lastRoute).toEqual({ from: 'triage', to: 'diagnostics', rule: 'R-T1' });
     expect((await audit.read(TICKET_ID)).map(({ decision }) => decision)).toEqual([
       'redacted',
+      'ticket_created',
       'classified',
       'transition',
       'routed',
