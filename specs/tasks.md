@@ -339,7 +339,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- llm.drafting-fallback`
   Bloqueada por: T-58
 
-- [ ] T-60 · Excluir el texto del ticket de los logs y de `data/` (prueba de extremo a extremo con PII sintética) · Satisface: REQ-SEC-07, REQ-SEC-08
+- [x] T-60 · Excluir el texto del ticket de los logs y de `data/` (prueba de extremo a extremo con PII sintética) · Satisface: REQ-SEC-07, REQ-SEC-08
   Hecho cuando: When a ticket with synthetic PII completes the graph, the runtime shall leave zero occurrences of the original values in `data/` and in the application logs.
   Verifica: `pnpm -F api test -- redact.persistence redact.logs`
   Bloqueada por: T-53, T-55, T-58
