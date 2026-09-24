@@ -422,7 +422,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F api test -- graph.node-events`
   Bloqueada por: T-43
 
-- [ ] T-88 · Fijar la versión de Node en `.nvmrc` y el rango de Angular CLI en `engines` · Satisface: REQ-WEB-08, REQ-CI-02
+- [x] T-88 · Fijar la versión de Node en `.nvmrc` y el rango de Angular CLI en `engines` · Satisface: REQ-WEB-08, REQ-CI-02
   Hecho cuando: If the active Node version is outside the range that Angular CLI supports, then the web app shall stop `pnpm install` with `ERR_PNPM_UNSUPPORTED_ENGINE`.
   Verifica: `pnpm test -- node.version` (`.nvmrc` dentro del rango de `engines`, que es el de Angular CLI) + `pnpm install` con Node 22.19 falla con `ERR_PNPM_UNSUPPORTED_ENGINE`
   Bloqueada por: T-74
