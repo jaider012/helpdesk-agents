@@ -152,3 +152,21 @@ Ejecución del 2026-09-23: la lanzó Claude Code con `code chat` en la ventana d
 | M-03 | 2026-09-23 | 1.138.0 | OK | `SKILL.md` cargado como skill. Comando exacto de la skill (con `cd` a la raíz delante), exit 0. Ticket A en `RESOLVED` con `gateway_healthy` y `instruct_vpn_reconnect`; mensaje sin jerga. El agente propuso además dos `ls` y un `python3` que no se aprobaron; regla endurecida en `23ababc`. |
 | M-08 | 2026-09-23 | 1.138.0 | OK | Rechaza `x:1; echo INJECTED`, no propone ningún comando, pide `host:puerto`; ticket B sigue en `TRIAGED`. La entrada `invalid_target` quedó pegada a la línea anterior (JSONL roto): regla corregida en `c4f7787` y bitácora de B reparada. |
 | M-04 | 2026-09-23 | 1.138.0 | OK | Con el script renombrado, Node sale con exit 1 sin JSON (`MODULE_NOT_FOUND`) y el agente lo trata como `skill_resource_unavailable`: bitácora `tool_run` + `skill_resource_unavailable` + `routed`, botón **Escalar**. Un solo comando, el exacto. `durationMs` queda en `null` (el agente no mide el tiempo en modo Copilot). Script restaurado. |
+
+## E2E con LM Studio (antes de `aprobado fase 3`)
+
+2026-09-23 · api compilado (`feat/phase-3-sse`, `26ab764`) con el chat model de LM Studio `qwen/qwen3.5-9b` (conector de prueba fuera del repo, DC-80), `LLM_TIMEOUT_MS=120000` y un puerto TCP local como gateway VPN. Siete tickets sintéticos por `POST /tickets`, cada uno seguido por `GET /tickets/:id/events` hasta `done`.
+
+| Caso | Clasificación | Estado final | Motivo / equipo | Observaciones |
+| --- | --- | --- | --- | --- |
+| VPN (con correo) | `infra/vpn` ✓ | `RESOLVED` ✓ | — | El borrador del mensaje agotó el timeout; salió la plantilla |
+| Bloqueo (con teléfono) | `access/lockout` ✓ | `RESOLVED` ✓ | — | 18 s |
+| Contraseña en el texto | `access/password_reset` ✓ | `ESCALATED` ✓ | `requires_identity_action` → Identidad y Accesos | La guarda de jerga reemplazó el mensaje |
+| MFA | `access/mfa` ✓ | `ESCALATED` ✓ | `critical_severity` → Identidad y Accesos | El LLM estimó P1 |
+| Carpeta compartida | `provisioning` ✓ | `ESCALATED` ✓ | `approval_required` → Gestión de Accesos | El borrador agotó el timeout |
+| Caída general | `P1` ✓ | `ESCALATED` ✓ | `critical_severity` | El borrador agotó el timeout |
+| Impresora | `infra/app` ✗ (se esperaba `unknown`) | `ESCALATED` ✓ | `no_diagnostic_skill` → Infraestructura y Redes | Clasificación discutible, ruta correcta |
+
+- SSE: en los 7 casos, los eventos `audit` coinciden con `GET /tickets/:id/audit` (14–18 entradas, con `node_started`/`node_finished`) y el último evento es `done` con el estado guardado.
+- PII: ni el correo, ni el teléfono, ni la contraseña sintéticos aparecen en `data/tickets` ni en `data/audit`.
+- Hallazgos: DA-04 (7/7 tickets daban 404 en el detalle durante los 7–9 s de la clasificación) → T-90; 3 de 11 borradores sin `maxTokens` se quedaron generando hasta el timeout → design §12.3.

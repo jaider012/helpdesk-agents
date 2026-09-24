@@ -656,8 +656,11 @@ Satisface: REQ-2.1-05..11, 2.2-19..26, 2.3-31..32, 2.4-13..15, ESC-04..10, AUD-0
 
 1. Si `NODE_ENV=test` → `FakeChatModel` (LLM-04).
 2. Si están `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` y `AZURE_OPENAI_DEPLOYMENT` → `AzureChatOpenAI` (LLM-01).
-3. Si está `ANTHROPIC_API_KEY` → `ChatAnthropic` con `ANTHROPIC_MODEL` (LLM-02).
-4. Si no → `FakeChatModel` + aviso (LLM-03).
+3. Si está `DEEPSEEK_API_KEY` → `ChatOpenAI` con `baseURL` `https://api.deepseek.com` y `DEEPSEEK_MODEL` (LLM-02). Salida estructurada por *function calling*, porque DeepSeek no acepta `json_schema`.
+4. Si están `LMSTUDIO_BASE_URL` y `LMSTUDIO_MODEL` → `ChatOpenAI` con esa `baseURL` (LLM-05). Salida estructurada con `json_schema` (decodificación restringida por gramática) y `reasoning_effort: none`, porque los modelos con razonamiento (qwen3.5) dejan vacía la respuesta.
+5. Si no → `FakeChatModel` + aviso (LLM-03).
+
+Todo cliente real lleva `maxTokens` 1024 y `temperature` 0: en el E2E con LM Studio, 3 de 11 borradores sin límite se quedaron generando hasta el timeout.
 
 El `FakeChatModel` implementa la interfaz de chat model de `@langchain/core`:
 - Triage: clasifica por palabras clave (`vpn` → infra/vpn; `bloquead`/`intentos` → access/lockout; `contraseña` → access/password_reset; `mfa`/`autenticador` → access/mfa; `carpeta`/`repositorio`/`licencia` → provisioning).
@@ -667,7 +670,7 @@ Salida estructurada con `withStructuredOutput(zod)`. Timeout con `AbortSignal.ti
 
 ### 12.4 Persistencia (ADR-03)
 
-- `data/tickets/<ticketId>.json`: `TicketState` sin `audit`. Escritura atómica (archivo temporal + `rename`) al terminar cada nodo.
+- `data/tickets/<ticketId>.json`: `TicketState` sin `audit`. Escritura atómica (archivo temporal + `rename`) al terminar cada nodo. Un ticket nuevo se guarda ya en el redact node, en `NEW` y solo con `redactedText`, con la entrada `ticket_created` (API-12).
 - `data/audit/<ticketId>.jsonl`: `fs.appendFile`. El módulo solo expone `append` y `read` (AUD-01).
 - `data/` está en `.gitignore`, salvo `data/.gitkeep`.
 
@@ -683,8 +686,10 @@ Salida estructurada con `withStructuredOutput(zod)`. Timeout con `AbortSignal.ti
 | `AZURE_OPENAI_API_KEY` | *(vacío)* | LLM-01 |
 | `AZURE_OPENAI_DEPLOYMENT` | `gpt-deployment-name` | LLM-01 |
 | `AZURE_OPENAI_API_VERSION` | `2024-10-21` | LLM-01 |
-| `ANTHROPIC_API_KEY` | *(vacío)* | LLM-02 |
-| `ANTHROPIC_MODEL` | `claude-sonnet-5` | LLM-02 |
+| `DEEPSEEK_API_KEY` | *(vacío)* | LLM-02 |
+| `DEEPSEEK_MODEL` | `deepseek-chat` | LLM-02 |
+| `LMSTUDIO_BASE_URL` | `http://localhost:1234/v1` | LLM-05 |
+| `LMSTUDIO_MODEL` | `qwen/qwen3.5-9b` | LLM-05 |
 | `VPN_GATEWAY_TARGET` | `vpn-gw.example.internal:443` | R-D (target por defecto) |
 | `VPN_ALLOWED_TARGETS` | `vpn-gw.example.internal:443,localhost:8443` | SEC-14 |
 
@@ -760,7 +765,7 @@ tests/             # proyecto vitest de la raíz
 - *Consecuencias:* auditable con `cat`/`grep`, sin infraestructura. No sirve para escritura concurrente ni para alto volumen; migrar sería reemplazar `ticketStore` y `auditLog`.
 
 **ADR-04 · Proveedor de LLM por variables de entorno**
-- *Decisión:* orden Azure OpenAI → Anthropic → fake, y fake siempre en tests.
+- *Decisión:* orden Azure OpenAI → DeepSeek → LM Studio → fake, y fake siempre en tests. DeepSeek y LM Studio usan `ChatOpenAI` con su `baseURL`, porque exponen la API de OpenAI (cambio aprobado el 2026-09-23, DA-01: reemplazan a Anthropic).
 - *Consecuencias:* la demo arranca sin secretos. Nunca se instancia un cliente sin sus variables.
 
 **ADR-05 · El LLM clasifica y redacta; el código decide**

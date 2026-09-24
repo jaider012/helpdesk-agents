@@ -26,7 +26,7 @@
 | 1 | T-01 … T-16 | `check-vpn.js` con tests + `.github/` probado en Copilot Chat | `aprobado fase 0` |
 | 2 | T-17 … T-72 | `packages/agent-spec` (validador, routing, trazabilidad) + grafo LangGraph + API NestJS | `aprobado fase 1` |
 | 3 | T-73 … T-81, T-87, T-88 | SSE + Angular (bandeja, timeline, bitácora, formulario) + eventos de nodo y versión de Node | `aprobado fase 2` |
-| 4 | T-82 … T-86 | Azure OpenAI / Anthropic, `azure-pipelines.yml`, README | `aprobado fase 3` |
+| 4 | T-82 … T-86, T-89, T-90 | Azure OpenAI / DeepSeek / LM Studio, ticket guardado en `NEW`, `azure-pipelines.yml`, README | `aprobado fase 3` |
 
 ---
 
@@ -478,10 +478,20 @@ Gate de entrada: `aprobado fase 3`.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red)
   Bloqueada por: T-33
 
-- [ ] T-83 · Usar `ChatAnthropic` cuando solo existe `ANTHROPIC_API_KEY` · Satisface: REQ-LLM-02
-  Hecho cuando: Where the Azure OpenAI variables are absent and `ANTHROPIC_API_KEY` is set, the runtime shall use `ChatAnthropic` as the LLM provider.
+- [ ] T-83 · Usar DeepSeek (`ChatOpenAI` con la URL de DeepSeek) cuando no hay Azure y existe `DEEPSEEK_API_KEY` · Satisface: REQ-LLM-02
+  Hecho cuando: Where the Azure OpenAI variables are absent and `DEEPSEEK_API_KEY` is set, the runtime shall use DeepSeek through `ChatOpenAI` as the LLM provider.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red)
   Bloqueada por: T-82
+
+- [ ] T-89 · Usar LM Studio (`ChatOpenAI` con `LMSTUDIO_BASE_URL`) cuando no hay Azure ni DeepSeek · Satisface: REQ-LLM-05
+  Hecho cuando: Where the Azure OpenAI variables and `DEEPSEEK_API_KEY` are absent and `LMSTUDIO_BASE_URL` and `LMSTUDIO_MODEL` are set, the runtime shall use LM Studio through `ChatOpenAI` as the LLM provider.
+  Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red) + E2E con LM Studio registrado en `docs/manual-tests.md`
+  Bloqueada por: T-83
+
+- [ ] T-90 · Guardar el ticket nuevo en `NEW` desde el redact node (DA-04) · Satisface: REQ-API-12
+  Hecho cuando: When the redact node processes a new ticket, the redact node shall store the ticket with status `NEW` and only its redacted text before the triage agent runs.
+  Verifica: `pnpm -F api test -- tickets.created-early`
+  Bloqueada por: T-66
 
 - [ ] T-84 · Crear `azure-pipelines.yml` (design §12.6) · Satisface: REQ-CI-01, REQ-CI-02, REQ-CI-03
   Hecho cuando: When a commit is pushed, the ci pipeline shall run `pnpm spec:validate`, `pnpm lint` and `pnpm test`.
@@ -513,7 +523,7 @@ Gate de entrada: `aprobado fase 3`.
 ## Trazabilidad REQ → tareas
 
 <!-- TRACE:START -->
-Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 88 tareas.
+Cobertura: **136/136 MUST** y **35/35 SHOULD** con al menos una tarea. 90 tareas.
 
 | REQ | Prioridad | Tareas |
 | --- | --- | --- |
@@ -662,10 +672,12 @@ Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 88 tareas
 | REQ-API-09 | SHOULD | T-67 |
 | REQ-API-10 | SHOULD | T-69 |
 | REQ-API-11 | SHOULD | T-70 |
+| REQ-API-12 | SHOULD | T-90 |
 | REQ-LLM-01 | SHOULD | T-82 |
 | REQ-LLM-02 | SHOULD | T-83 |
 | REQ-LLM-03 | SHOULD | T-33 |
 | REQ-LLM-04 | MUST | T-31 |
+| REQ-LLM-05 | SHOULD | T-89 |
 | REQ-WEB-01 | SHOULD | T-75 |
 | REQ-WEB-02 | SHOULD | T-76, T-87 |
 | REQ-WEB-03 | SHOULD | T-77 |

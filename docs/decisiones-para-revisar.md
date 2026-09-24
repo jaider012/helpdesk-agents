@@ -6,14 +6,14 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 
 ---
 
-## Preguntas para ti
+## Preguntas para ti (todas respondidas)
 
 | ID | Pregunta | Estado |
 | --- | --- | --- |
 | DA-01 | Proveedor LLM de la Fase 4: la spec dice Azure OpenAI → Anthropic → fake (ADR-04, REQ-LLM-01/02). Mencionaste DeepSeek (créditos pagos, sin OpenAI) y LM Studio local. Cambiarlo toca ADR-04, REQ-LLM-01/02 y T-82/T-83. | ✅ Decidida 2026-09-23: **los dos**, DeepSeek y LM Studio. Ambos exponen una API compatible con OpenAI, así que bastaría `ChatOpenAI` de `@langchain/openai` (dependencia ya permitida) con otra `baseURL`, sin paquetes nuevos. Se reescriben ADR-04, REQ-LLM-01/02 y T-82/T-83 al empezar la Fase 4. |
 | DA-02 | Versión de Node: Angular CLI 22 exige Node ≥ 22.22.3 (o ≥ 24.15, ≥ 26), pero el `engines` de la raíz dice `>=22.18` y el `node` por defecto de esta Mac es 22.19.0, así que `pnpm test` falla en el test puente de la web salvo con `PATH=/opt/homebrew/bin:$PATH` (Node 26.9.0). Propuesta: subir `engines` a `^22.22.3 \|\| >=24.15`, añadir `.nvmrc` y fijar la versión en `azure-pipelines.yml` (T-84). | ✅ Decidida 2026-09-23: fijar Node. Tarea nueva T-88 (Fase 3): `.nvmrc` con 22.23.3 (último 22 LTS, ya instalado con nvm) y `engines` con el rango de Angular CLI. |
 | DA-03 | El timeline de la web (design §12.1) se deriva de `node_started`/`node_finished`, pero ninguna tarea los emite (hoy solo provisioning escribe `node_finished`). Sin ellos la web no muestra cada paso con su duración. Propuesta: que `withRouting` y el nodo escalation los escriban, como tarea nueva junto a T-73 (SSE). | ✅ Decidida 2026-09-23: sí. Tarea nueva T-87 (Fase 3): cada nodo del grafo registra `node_started` y `node_finished` con `durationMs`. |
-| DA-04 | `GET /tickets/:id` responde 404 mientras triage espera al LLM, porque el ticket se guarda por primera vez en `NEW → TRIAGED`. La web abre el detalle justo después del 202 y, con un LLM real (varios segundos), mostraría «no existe» y no abriría el SSE. Con el modelo fake no se nota (milisegundos). Propuesta: que el nodo redact guarde el ticket en `NEW` con `redactedText` y registre `ticket_created` (la decisión ya existe en design §4), como tarea nueva de la Fase 3. | Abierta |
+| DA-04 | `GET /tickets/:id` responde 404 mientras triage espera al LLM, porque el ticket se guarda por primera vez en `NEW → TRIAGED`. La web abre el detalle justo después del 202 y, con un LLM real (varios segundos), mostraría «no existe» y no abriría el SSE. Con el modelo fake no se nota (milisegundos). Propuesta: que el nodo redact guarde el ticket en `NEW` con `redactedText` y registre `ticket_created` (la decisión ya existe en design §4), como tarea nueva de la Fase 3. | ✅ Decidida 2026-09-23: sí, como tarea T-90 de la Fase 4 (REQ-API-12). El E2E con LM Studio lo confirmó: 7 de 7 tickets nuevos daban 404 en el detalle justo después del 202. |
 
 ## Fase 1 · `check-vpn.js` y `.github/`
 
@@ -109,8 +109,17 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | DC-78 | Los cinco nodos del grafo (redact, triage, diagnostics, provisioning y escalation) quedan envueltos por `withNodeEvents`, por fuera de `withRouting`, así la entrada `routed` cae dentro del paso del nodo. `durationMs` se mide con `performance.now()` y se redondea, como en `tool_run`. Si el nodo falla, `node_finished` se escribe igual con `data.error` (el nombre del error) y el error sigue; si lo que falló fue la bitácora (`AuditWriteError`), no se reintenta. | Tu respuesta a DA-03; la web ya calcula la duración de cada paso de `node_started` a `node_finished` (DW-09) y, sin `node_finished` tras un error, mostraría el paso «En curso» para siempre. | Quitar el envoltorio en `graph/nodes/index.ts`. | T-87 | |
 | DC-79 | Provisioning ya no escribe su propio `node_finished`: sus datos `{ resource, accessLevel }` pasan a su entrada `transition` (`TRIAGED → IN_PROGRESS`). Se ajustaron los tests que comparaban la secuencia exacta de la bitácora. | Evita dos `node_finished` en el mismo paso sin perder esos datos de la bitácora. | Volver a escribir la entrada en `provisioning.node.ts`. | T-87 | |
 
+## Fase 4 · Proveedores LLM, CI y documentación
+
+| ID | Decisión | Por qué | Cómo revertir | Commit | Revisión |
+| --- | --- | --- | --- | --- | --- |
+| DC-80 | El E2E previo a `aprobado fase 3` usó un conector de prueba fuera del repo (en el scratchpad de la sesión): el api compilado con su chat model reemplazado por LM Studio (`qwen/qwen3.5-9b`), con `json_schema` y `reasoning_effort: none`. Sus hallazgos (razonamiento que deja vacía la respuesta, borradores sin límite de tokens) pasaron a design §12.3. | Probar la Fase 3 con un LLM real sin adelantar código de la Fase 4 antes del gate. | — (no quedó código en el repo). | — | |
+
 ## Aprobadas explícitamente por ti (referencia)
 
 - Dependencias de tooling de T-01: `typescript-eslint`, `@eslint/js`, `globals`, `eslint-config-prettier`, `@types/node`.
 - D-12 · plan B de R-02: los tres agentes destino con `user-invocable: true` y `disable-model-invocation: true`.
 - Ejecutar yo las pruebas manuales de la Fase 1 («hazlo tú»).
+- DA-01 ampliada (2026-09-23): proveedores Azure OpenAI → DeepSeek → LM Studio → fake; Anthropic sale.
+- Dependencia `@vitest/coverage-v8` para T-85 (2026-09-23).
+- DA-04: guardar el ticket nuevo en `NEW` como tarea T-90 (2026-09-23).

@@ -43,13 +43,13 @@
 | 5 · REQ-SEC Seguridad y PII | 12 | 3 |
 | 6 · REQ-AUD / REQ-ESC Bitácora y escalamiento | 17 | 1 |
 | 7 · REQ-COM Comunicación | 5 | 1 |
-| 8 · REQ-API Runtime y API | 1 | 10 |
-| 9 · REQ-LLM Proveedor LLM | 1 | 3 |
+| 8 · REQ-API Runtime y API | 1 | 11 |
+| 9 · REQ-LLM Proveedor LLM | 1 | 4 |
 | 10 · REQ-WEB Frontend | 0 | 8 |
 | 11 · REQ-VAL Validador de la spec | 6 | 1 |
 | 12 · REQ-CI Integración continua | 0 | 4 |
 | 13 · REQ-DOC Documentación | 0 | 1 |
-| **Total** | **136** | **33** |
+| **Total** | **136** | **35** |
 
 ---
 
@@ -853,6 +853,12 @@ If a request body fails schema validation, then the api shall respond `400` with
 - Patrón: No deseado
 - Verifica: `pnpm -F api test -- validation.body`
 
+
+#### REQ-API-12 · SHOULD
+When the redact node processes a new ticket, the redact node shall store the ticket with status `NEW` and only its redacted text before the triage agent runs.
+- Patrón: Evento
+- Verifica: `pnpm -F api test -- tickets.created-early`
+- Nota: DA-04. Sin esto, `GET /tickets/:id` responde 404 mientras triage espera al LLM (7–9 s en el E2E con LM Studio).
 ---
 
 ## 9. REQ-LLM · Proveedor LLM
@@ -865,9 +871,10 @@ Where `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` and `AZURE_OPENAI_DEPLOYME
 - Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas; no se hace ninguna llamada de red)
 
 #### REQ-LLM-02 · SHOULD
-Where the Azure OpenAI variables are absent and `ANTHROPIC_API_KEY` is set, the runtime shall use `ChatAnthropic` as the LLM provider.
+Where the Azure OpenAI variables are absent and `DEEPSEEK_API_KEY` is set, the runtime shall use DeepSeek through `ChatOpenAI` as the LLM provider.
 - Patrón: Opcional
 - Verifica: `pnpm -F api test -- llm.provider`
+- Nota: cambio aprobado el 2026-09-23 (DA-01): DeepSeek y LM Studio reemplazan a Anthropic.
 
 #### REQ-LLM-03 · SHOULD
 If no LLM provider variables are set, then the runtime shall start with the deterministic fake model.
@@ -878,6 +885,11 @@ If no LLM provider variables are set, then the runtime shall start with the dete
 While `NODE_ENV` is `test`, the runtime shall use the deterministic fake model.
 - Patrón: Estado
 - Verifica: `pnpm -F api test -- llm.test-mode`
+
+#### REQ-LLM-05 · SHOULD
+Where the Azure OpenAI variables and `DEEPSEEK_API_KEY` are absent and `LMSTUDIO_BASE_URL` and `LMSTUDIO_MODEL` are set, the runtime shall use LM Studio through `ChatOpenAI` as the LLM provider.
+- Patrón: Opcional
+- Verifica: `pnpm -F api test -- llm.provider` + E2E con LM Studio (`docs/manual-tests.md`)
 
 ---
 

@@ -182,7 +182,7 @@ Angular (última estable, componentes standalone, signals). Tres vistas: bandeja
 
 ### 3.5 LLM
 
-`@langchain/openai` con `AzureChatOpenAI` cuando existan `AZURE_OPENAI_*`; fallback a `@langchain/anthropic` con `ANTHROPIC_API_KEY`. Nunca instanciar un cliente sin variables; los tests usan un modelo fake/determinista.
+`@langchain/openai` con `AzureChatOpenAI` cuando existan `AZURE_OPENAI_*`; si no, DeepSeek (`DEEPSEEK_API_KEY`) y luego LM Studio (`LMSTUDIO_BASE_URL` + `LMSTUDIO_MODEL`), ambos con `ChatOpenAI` y su `baseURL` (cambio aprobado el 2026-09-23: reemplazan a Anthropic). Nunca instanciar un cliente sin variables; los tests usan un modelo fake/determinista.
 
 ---
 
