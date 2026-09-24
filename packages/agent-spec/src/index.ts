@@ -1,6 +1,7 @@
 export { ALLOWLIST_HEADING, compileAllowlist, type AllowlistAction } from './allowlist.ts';
 export { agentName } from './agents.ts';
 export { buildHandoffGraph, type HandoffEdge, type HandoffGraph } from './graph.ts';
+export { handoffGraphMermaid, replaceReadmeGraph } from './mermaid.ts';
 export { parseFrontmatter, type FrontmatterKind, type ParsedFrontmatter } from './frontmatter.ts';
 export {
   compileLifecycle,

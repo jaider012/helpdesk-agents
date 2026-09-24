@@ -8,6 +8,7 @@
   },
   "scripts": {
     "spec:validate": "node scripts/trace.mjs --check && node packages/agent-spec/src/cli.ts",
+    "spec:graph": "node packages/agent-spec/src/graph-cli.ts",
     "test": "vitest run",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
