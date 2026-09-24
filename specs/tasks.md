@@ -284,7 +284,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- graph.handoff-context`
   Bloqueada por: T-44
 
-- [ ] T-49 · Envolver `check-vpn.js` como tool del registry con el timeout del `SKILL.md` (design §6.3) · Satisface: REQ-2.2-23, REQ-2.2-24, REQ-AUD-05
+- [x] T-49 · Envolver `check-vpn.js` como tool del registry con el timeout del `SKILL.md` (design §6.3) · Satisface: REQ-2.2-23, REQ-2.2-24, REQ-AUD-05
   Hecho cuando: If the check-vpn process runs longer than the 10 s timeout declared in `SKILL.md`, then the runtime shall terminate the process with `SIGKILL` and append a `tool_run` entry with the tool name, the result status and the duration to the audit log.
   Verifica: `pnpm -F api test -- vpn-tool.run vpn-tool.timeout audit.tool`
   Bloqueada por: T-41
