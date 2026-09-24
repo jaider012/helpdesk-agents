@@ -28,6 +28,12 @@ export const triageRouteInput: RouteInputOf<'triage'> = (state, update): TriageR
     : { kind: 'error', error: 'internal' };
 };
 
+/** Diagnostics routes on the outcome of its procedure; without one, on an internal error (R-X3). */
+export const diagnosticsRouteInput: RouteInputOf<'diagnostics'> = (_, update) =>
+  update.diagnosticsOutcome
+    ? { kind: 'outcome', outcome: update.diagnosticsOutcome }
+    : { kind: 'error', error: 'internal' };
+
 /**
  * Applies `routing.ts` when the node finishes: resolves the target, records the decision with its
  * rule in the audit log (REQ-AUD-04) and stores it in `lastRoute` and `nextAgent`.

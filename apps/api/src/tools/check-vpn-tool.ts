@@ -4,6 +4,9 @@ import type { AuditLog } from '../audit/audit-log.js';
 import type { DiagnosticFinding } from '../tickets/ticket-state.js';
 import type { ScriptRun, SkillRunner, SkillScript } from './skill-runner.js';
 
+/** Gateway that the vpn-diagnostics skill checks when `VPN_GATEWAY_TARGET` is not set. */
+export const DEFAULT_VPN_TARGET = 'vpn-gw.example.internal:443';
+
 /** The part of the check-vpn.js output that the runtime reads (design §6.1). */
 const CheckVpnOutput = z.object({
   ok: z.boolean(),

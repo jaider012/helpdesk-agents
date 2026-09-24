@@ -294,7 +294,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- vpn-tool.failure vpn-tool.finding`
   Bloqueada por: T-49
 
-- [ ] T-51 · Implementar la rama VPN del nodo diagnostics (design §2.2) · Satisface: REQ-2.2-09, REQ-2.2-28, REQ-2.2-29
+- [x] T-51 · Implementar la rama VPN del nodo diagnostics (design §2.2) · Satisface: REQ-2.2-09, REQ-2.2-28, REQ-2.2-29
   Hecho cuando: While a ticket has category `infra`, when `entities.issueType` is `vpn`, the diagnostics agent shall apply the `vpn-diagnostics` skill, execute `instruct_vpn_reconnect` on exit code `0` and hand off to the escalation agent with reason `vpn_gateway_unhealthy` on exit code `1`.
   Verifica: `pnpm -F api test -- graph.vpn-route graph.vpn-ok graph.vpn-unhealthy`
   Bloqueada por: T-40, T-48, T-50

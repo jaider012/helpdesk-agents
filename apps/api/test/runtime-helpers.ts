@@ -21,6 +21,8 @@ export interface RuntimeOptions {
   override?: Partial<GraphNodes>;
   audit?: (dataDir: string, clock: () => Date) => AuditLog;
   llmTimeoutMs?: number;
+  /** `VPN_GATEWAY_TARGET`; by default a closed local port, so check-vpn exits 1 at once. */
+  vpnTarget?: string;
 }
 
 /** The runtime graph over the real spec, a temporary data folder and the fake model. */
@@ -39,6 +41,7 @@ export async function runtime(options: RuntimeOptions = {}) {
     salt: 'synthetic-test-salt',
     clock,
     llmTimeoutMs: options.llmTimeoutMs ?? 30_000,
+    vpnTarget: options.vpnTarget ?? 'localhost:1',
   });
   const graph = buildGraph(bundle, compileAgents(bundle), { ...nodes, ...options.override });
   return { graph, audit, store, dataDir };

@@ -31,3 +31,10 @@ export async function startTcpServer(): Promise<{ port: number; close: () => Pro
     close: () => new Promise((resolve) => server.close(() => resolve())),
   };
 }
+
+/** A local port with nothing listening on it. */
+export async function closedPort(): Promise<number> {
+  const server = await startTcpServer();
+  await server.close();
+  return server.port;
+}

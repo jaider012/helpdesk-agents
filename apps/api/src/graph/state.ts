@@ -1,5 +1,12 @@
 import { Annotation } from '@langchain/langgraph';
-import type { AgentName, Category, RouteDecision, Severity, TicketStatus } from 'agent-spec';
+import type {
+  AgentName,
+  Category,
+  DiagnosticsOutcome,
+  RouteDecision,
+  Severity,
+  TicketStatus,
+} from 'agent-spec';
 import type { AuditEntry } from '../audit/audit-entry.js';
 import type {
   Channel,
@@ -39,6 +46,8 @@ export const TicketGraphState = Annotation.Root({
   lastRoute: Annotation<RouteDecision | undefined>(),
   // Transient: the LLM failure the triage node routes on (R-X1, R-X2); never persisted (DC-51).
   llmFailure: Annotation<LlmFailure | undefined>(),
+  // Transient: the outcome of the diagnostics procedure that R-D1..R-D8 route on (design §2.2).
+  diagnosticsOutcome: Annotation<DiagnosticsOutcome | undefined>(),
   // TicketState.escalation: LangGraph forbids a channel named like the `escalation` node (DC-42).
   escalationPackage: Annotation<EscalationPackage | undefined>(),
   userMessage: Annotation<string | undefined>(),
@@ -67,6 +76,7 @@ export function toTicketState(state: GraphState): TicketState {
   const ticket: Record<string, unknown> = { ...state, escalation: state.escalationPackage };
   delete ticket.rawText;
   delete ticket.llmFailure;
+  delete ticket.diagnosticsOutcome;
   delete ticket.escalationPackage;
   return ticket as unknown as TicketState;
 }

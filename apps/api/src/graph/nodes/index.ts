@@ -5,10 +5,14 @@ import { templatesFromBundle } from '../../messages/templates.js';
 import type { TicketStateMachine } from '../../tickets/state-machine.js';
 import { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { TicketStore } from '../../tickets/ticket-store.js';
+import { ActionService } from '../../tools/actions.js';
+import { CheckVpnTool } from '../../tools/check-vpn-tool.js';
+import { compileSkillScripts, SkillRunner } from '../../tools/skill-runner.js';
 import type { GraphNodes } from '../build.js';
 import { compileAgents } from '../compile-agents.js';
-import { triageRouteInput, withRouting } from '../routing.js';
+import { diagnosticsRouteInput, triageRouteInput, withRouting } from '../routing.js';
 import { compileSeverityMatrix } from '../severity-matrix.js';
+import { createDiagnosticsNode } from './diagnostics.node.js';
 import { createEscalationNode } from './escalation.node.js';
 import { createRedactNode } from './redact.node.js';
 import { createTriageNode } from './triage.node.js';
@@ -22,6 +26,8 @@ export interface NodeDeps {
   salt: string;
   clock: () => Date;
   llmTimeoutMs: number;
+  /** `VPN_GATEWAY_TARGET` (design §2.2). */
+  vpnTarget: string;
 }
 
 // Nodes whose behaviour is not implemented yet leave the state unchanged (decision DC-43).
@@ -37,6 +43,7 @@ export function createNodes({
   salt,
   clock,
   llmTimeoutMs,
+  vpnTarget,
 }: NodeDeps): GraphNodes {
   const agents = compileAgents(bundle);
   const systemPrompt = (name: string) => {
@@ -45,6 +52,9 @@ export function createNodes({
     return agent.systemPrompt;
   };
   const lifecycle = new TicketLifecycle(machine, audit, store);
+  const templates = templatesFromBundle(bundle);
+  const vpnScript = compileSkillScripts(bundle).find(({ skill }) => skill === 'vpn-diagnostics');
+  if (!vpnScript) throw new Error('the spec has no vpn-diagnostics script');
   return {
     redact: createRedactNode({ audit, salt }),
     triage: withRouting(
@@ -60,14 +70,25 @@ export function createNodes({
       triageRouteInput,
       audit,
     ),
-    diagnostics: keepState,
+    diagnostics: withRouting(
+      'diagnostics',
+      createDiagnosticsNode({
+        lifecycle,
+        actions: ActionService.fromBundle(bundle, audit, clock),
+        checkVpn: new CheckVpnTool(new SkillRunner(audit), vpnScript, audit, clock),
+        templates,
+        vpnTarget,
+      }),
+      diagnosticsRouteInput,
+      audit,
+    ),
     provisioning: keepState,
     escalation: createEscalationNode({
       model,
       systemPrompt: systemPrompt('escalation'),
       audit,
       lifecycle,
-      templates: templatesFromBundle(bundle),
+      templates,
       clock,
       handoffs: agents.flatMap(({ handoffs }) => handoffs),
     }),
