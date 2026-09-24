@@ -6,3 +6,5 @@ dist/
 coverage/
 .DS_Store
 *.tsbuildinfo
+# Git worktrees of parallel Claude Code agents
+.claude/worktrees/
