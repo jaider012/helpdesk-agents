@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuditEntry, TicketDetail, TicketSummary } from './contracts';
+import { AuditEntry, PromptRunAccepted, TicketDetail, TicketSummary } from './contracts';
 
 /** Prefix of the api routes; the dev server proxies `/api/*` to the NestJS api (`proxy.conf.json`). */
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL', {
@@ -26,6 +26,14 @@ export class ApiService {
   /** Audit entries in write order (REQ-API-06). */
   getAudit(ticketId: string): Observable<AuditEntry[]> {
     return this.http.get<AuditEntry[]>(`${this.ticketUrl(ticketId)}/audit`);
+  }
+
+  /** Runs a prompt file with its `${input:…}` variables (`POST /prompts/:name/run`). */
+  runPrompt(name: string, variables: Record<string, string>): Observable<PromptRunAccepted> {
+    return this.http.post<PromptRunAccepted>(
+      `${this.baseUrl}/prompts/${encodeURIComponent(name)}/run`,
+      { variables },
+    );
   }
 
   private ticketUrl(ticketId: string): string {

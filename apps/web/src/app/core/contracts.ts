@@ -171,3 +171,8 @@ export type TicketSummary = Pick<
   TicketState,
   'ticketId' | 'category' | 'severity' | 'status' | 'slaDueAt'
 >;
+
+/** `202` answer of `POST /prompts/:name/run`: the run goes on in the background (SSE). */
+export interface PromptRunAccepted {
+  ticketId: string;
+}

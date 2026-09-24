@@ -452,7 +452,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web test -- timeline.reconnect`
   Bloqueada por: T-79
 
-- [ ] T-81 · Crear el formulario de nuevo ticket · Satisface: REQ-WEB-07
+- [x] T-81 · Crear el formulario de nuevo ticket · Satisface: REQ-WEB-07
   Hecho cuando: When the operator submits the new-ticket form, the web app shall send the text to `POST /prompts/triage-ticket/run`.
   Verifica: `pnpm -F web test -- new-ticket`
   Bloqueada por: T-75

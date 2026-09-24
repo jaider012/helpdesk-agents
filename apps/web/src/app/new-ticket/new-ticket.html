@@ -1,0 +1,30 @@
+<h1>Nuevo ticket</h1>
+
+<form class="new-ticket" [formRoot]="ticketForm">
+  <label for="ticket-text">Describe el problema</label>
+  <textarea id="ticket-text" rows="6" [formField]="ticketForm.ticket"></textarea>
+  <p class="hint">
+    No escribas contraseñas ni códigos de verificación: soporte nunca los pide. Los datos personales
+    se ocultan antes de guardar el ticket.
+  </p>
+  @if (ticketForm.ticket().touched()) {
+    @for (error of ticketForm.ticket().errors(); track error.kind) {
+      <p class="error" role="alert">{{ error.message }}</p>
+    }
+  }
+
+  <label for="ticket-channel">Canal por el que llegó</label>
+  <select id="ticket-channel" [formField]="ticketForm.channel">
+    <option value="email">Correo electrónico</option>
+    <option value="chat">Chat</option>
+    <option value="portal">Portal de autoservicio</option>
+    <option value="phone">Teléfono</option>
+  </select>
+
+  @if (failed()) {
+    <p class="error" role="alert">
+      No se pudo crear el ticket. Vuelve a intentarlo en unos segundos.
+    </p>
+  }
+  <button type="submit" [disabled]="ticketForm().submitting()">Crear ticket</button>
+</form>
