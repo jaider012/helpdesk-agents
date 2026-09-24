@@ -371,7 +371,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- tickets.create`
   Bloqueada por: T-61
 
-- [ ] T-66 · Exponer `GET /tickets`, `GET /tickets/:id` y `GET /tickets/:id/audit` · Satisface: REQ-API-04, REQ-API-05, REQ-API-06
+- [x] T-66 · Exponer `GET /tickets`, `GET /tickets/:id` y `GET /tickets/:id/audit` · Satisface: REQ-API-04, REQ-API-05, REQ-API-06
   Hecho cuando: When the api receives `GET /tickets`, `GET /tickets/:id` or `GET /tickets/:id/audit`, the api shall return the ticket summaries with `slaDueAt`, the `TicketState` or the audit entries in write order, respectively.
   Verifica: `pnpm -F api test -- tickets.list tickets.detail tickets.audit`
   Bloqueada por: T-64, T-65

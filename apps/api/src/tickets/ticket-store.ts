@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { assertTicketId } from './ticket-id.js';
+import { assertTicketId, TICKET_ID_PATTERN } from './ticket-id.js';
 import type { TicketState } from './ticket-state.js';
 
 /** The ticket store could not write the ticket state: the run stops (REQ-AUD-08). */
@@ -42,6 +42,27 @@ export class TicketStore {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
       throw error;
     }
+  }
+
+  /** Every stored ticket, newest first; a folder that does not exist yet means no tickets. */
+  async list(): Promise<TicketState[]> {
+    let names: string[];
+    try {
+      names = await readdir(join(this.dataDir, 'tickets'));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw error;
+    }
+    const ids = names
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => name.slice(0, -'.json'.length))
+      .filter((id) => TICKET_ID_PATTERN.test(id));
+    const tickets = (await Promise.all(ids.map((id) => this.read(id)))).filter(
+      (ticket): ticket is TicketState => ticket !== undefined,
+    );
+    return tickets.sort(
+      (a, b) => b.createdAt.localeCompare(a.createdAt) || b.ticketId.localeCompare(a.ticketId),
+    );
   }
 
   /**

@@ -63,3 +63,9 @@ export async function postRun(
   });
   return { status: response.status, body: (await response.json()) as Record<string, unknown> };
 }
+
+/** GETs `path` on a listening app. */
+export async function getJson(app: Awaited<ReturnType<typeof promptApp>>['app'], path: string) {
+  const response = await fetch(`${await app.getUrl()}${path}`);
+  return { status: response.status, body: (await response.json()) as unknown };
+}
