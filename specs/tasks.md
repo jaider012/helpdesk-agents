@@ -254,7 +254,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- triage.category triage.entities triage.severity-matrix`
   Bloqueada por: T-35, T-41
 
-- [ ] T-43 · Aplicar `routing.ts` al terminar cada nodo y registrar la decisión · Satisface: REQ-AUD-04
+- [x] T-43 · Aplicar `routing.ts` al terminar cada nodo y registrar la decisión · Satisface: REQ-AUD-04
   Hecho cuando: When an agent takes a routing decision, the audit log shall record an entry with the chosen target and the matched rule.
   Verifica: `pnpm -F api test -- audit.routing`
   Bloqueada por: T-27, T-42

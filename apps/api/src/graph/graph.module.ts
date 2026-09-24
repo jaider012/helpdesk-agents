@@ -10,6 +10,7 @@ import { buildGraph } from './build.js';
 import { compileAgents } from './compile-agents.js';
 import { createRedactNode } from './nodes/redact.node.js';
 import { createTriageNode } from './nodes/triage.node.js';
+import { triageRouteInput, withRouting } from './routing.js';
 import { compileSeverityMatrix } from './severity-matrix.js';
 
 /** Injection token of the compiled LangGraph graph. */
@@ -38,12 +39,17 @@ const keepState = () => ({});
         if (!triage) throw new Error('the spec has no triage agent');
         return buildGraph(bundle, agents, {
           redact: createRedactNode({ audit, salt }),
-          triage: createTriageNode({
-            model,
-            systemPrompt: triage.systemPrompt,
-            severity: compileSeverityMatrix(triage.systemPrompt),
+          triage: withRouting(
+            'triage',
+            createTriageNode({
+              model,
+              systemPrompt: triage.systemPrompt,
+              severity: compileSeverityMatrix(triage.systemPrompt),
+              audit,
+            }),
+            triageRouteInput,
             audit,
-          }),
+          ),
           diagnostics: keepState,
           provisioning: keepState,
           escalation: keepState,

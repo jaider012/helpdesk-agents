@@ -23,10 +23,15 @@ function canEnd(agent: AgentName): boolean {
   return rules ? rules.some(({ to }) => to === 'END') : true;
 }
 
-/** The target chosen by the last routing decision of the node that just ran. */
-function routeTarget(state: GraphState): string {
-  const to = state.lastRoute?.to;
-  return !to || to === 'END' ? END : to;
+/**
+ * Router of an agent node: follows the routing decision that this node took (T-43 wrapper) and ends
+ * the run otherwise, so a node never reuses the decision of the previous one.
+ */
+function routerFor(agent: AgentName) {
+  return (state: GraphState): string => {
+    const route = state.lastRoute;
+    return route?.from === agent && route.to !== 'END' ? route.to : END;
+  };
 }
 
 /**
@@ -65,7 +70,7 @@ export function buildGraph(
     const targets: string[] = agent.handoffs.map(({ to }) => to);
     graph.addConditionalEdges(
       agent.name,
-      routeTarget,
+      routerFor(agent.name),
       canEnd(agent.name) ? [...targets, END] : targets,
     );
   }
