@@ -1,0 +1,90 @@
+.topbar .btn {
+  height: 1.75rem;
+  padding: 0 0.625rem;
+}
+
+.list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.group th {
+  padding: 0.4375rem 1.25rem;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+  text-align: left;
+}
+
+tbody:first-of-type .group th {
+  border-top: 0;
+}
+
+.group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row {
+  position: relative;
+}
+
+.row td {
+  height: 2.625rem;
+  padding: 0 0.5rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.row:hover {
+  background: var(--bg-hover);
+}
+
+.row td:first-child {
+  width: 1.75rem;
+  padding-left: 1.25rem;
+}
+
+.severity,
+.status {
+  line-height: 0;
+}
+
+.status {
+  width: 1.5rem;
+}
+
+.ticket-id {
+  width: 1%;
+  color: var(--text-secondary);
+}
+
+/* The whole row opens the ticket: the link of the id covers it. */
+.ticket-id a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.title {
+  overflow: hidden;
+  max-width: 0;
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+
+.due {
+  width: 1%;
+  padding-right: 1.25rem !important;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .ticket-id {
+    display: none;
+  }
+}

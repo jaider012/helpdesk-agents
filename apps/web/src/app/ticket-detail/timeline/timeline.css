@@ -1,0 +1,121 @@
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  column-gap: 0.75rem;
+  align-items: start;
+  padding: 0.4375rem 0;
+}
+
+/* A faint line joins the markers, as in an activity feed. */
+.marker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.item:not(:last-child) .marker::after {
+  content: '';
+  position: absolute;
+  top: 1.25rem;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 1.125rem;
+  background: var(--border-strong);
+}
+
+.marker svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.running .dot {
+  animation: pulse 1.6s ease-out infinite;
+}
+
+@keyframes pulse {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 0.4375rem transparent;
+  }
+}
+
+.body {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+  padding-top: 0.0625rem;
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.375rem;
+}
+
+.title {
+  font-weight: 500;
+}
+
+.kind,
+.duration {
+  color: var(--text-secondary);
+}
+
+.kind::before,
+.duration::before {
+  content: '·';
+  margin-right: 0.375rem;
+  color: var(--text-tertiary);
+}
+
+.duration {
+  font-variant-numeric: tabular-nums;
+}
+
+.running .duration {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.reason {
+  overflow-wrap: anywhere;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.time {
+  padding-top: 0.0625rem;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+/* On a phone the marker already tells the kind of event. */
+@media (max-width: 640px) {
+  .kind {
+    display: none;
+  }
+}

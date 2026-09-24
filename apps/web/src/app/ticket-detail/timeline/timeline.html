@@ -1,0 +1,44 @@
+@if (items().length === 0) {
+  <p class="empty">El recorrido todavía no tiene pasos.</p>
+} @else {
+  <ol class="timeline">
+    @for (item of items(); track item.seq) {
+      <li class="item" [attr.data-kind]="item.kind" [class.running]="item.running">
+        <span class="marker" aria-hidden="true">
+          @switch (item.kind) {
+            @case ('transition') {
+              <app-status-icon [status]="item.status" />
+            }
+            @case ('handoff') {
+              <svg viewBox="0 0 16 16"><path d="M3 8h9.5M9 4.5 12.5 8 9 11.5" /></svg>
+            }
+            @case ('tool') {
+              <svg viewBox="0 0 16 16">
+                <rect x="2" y="3" width="12" height="10" rx="2" />
+                <path d="m5 7 1.6 1.4L5 9.8M8.5 10h2.5" />
+              </svg>
+            }
+            @default {
+              <span class="dot"></span>
+            }
+          }
+        </span>
+        <div class="body">
+          <span class="line">
+            <span class="title">{{ item.title }}</span>
+            <span class="kind">{{ kindLabels[item.kind] }}</span>
+            @if (item.running) {
+              <span class="duration">En curso</span>
+            } @else if (item.durationMs !== undefined) {
+              <span class="duration">Duración: {{ formatDuration(item.durationMs) }}</span>
+            }
+          </span>
+          @if (item.reason) {
+            <span class="reason">Motivo: {{ item.reason }}</span>
+          }
+        </div>
+        <time class="time num" [attr.datetime]="item.ts">{{ item.ts | date: 'HH:mm:ss' }}</time>
+      </li>
+    }
+  </ol>
+}

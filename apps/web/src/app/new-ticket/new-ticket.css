@@ -1,0 +1,98 @@
+.page-body {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-top: 2.5rem;
+}
+
+.composer {
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.06);
+}
+
+.composer:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border-strong));
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 11rem;
+  padding: 1.25rem 1.25rem 0.5rem;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+
+textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.error {
+  margin: 0 1.25rem;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.hint {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.5rem 1.25rem 0.875rem;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.hint svg {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: 0.125rem;
+  fill: currentColor;
+}
+
+.alert {
+  margin: 0 1.25rem 0.875rem;
+}
+
+.composer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem 0.625rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+
+.composer-bar label {
+  color: var(--text-secondary);
+}
+
+select {
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.note {
+  margin: 1rem 0.25rem 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}

@@ -1,0 +1,35 @@
+<aside class="sidebar">
+  <div class="workspace">
+    <a class="ws" routerLink="/tickets">
+      <span class="ws-logo" aria-hidden="true">MA</span>
+      <span class="ws-name">Mesa de ayuda</span>
+    </a>
+    <a class="compose" routerLink="/tickets/new" aria-label="Nuevo ticket" title="Nuevo ticket">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M7.5 2.5h-3a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-3" />
+        <path d="m11.8 2.2 2 2-5.6 5.6-2.7.7.7-2.7Z" />
+      </svg>
+    </a>
+  </div>
+  <nav aria-label="Secciones">
+    <a routerLink="/tickets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M2 9.5 3.8 3.6A1.5 1.5 0 0 1 5.2 2.5h5.6a1.5 1.5 0 0 1 1.4 1.1L14 9.5v3a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5Z"
+        />
+        <path d="M2 9.5h3.5l1 1.5h3l1-1.5H14" />
+      </svg>
+      Bandeja
+    </a>
+    <a routerLink="/tickets/new" routerLinkActive="active">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <circle cx="8" cy="8" r="6" />
+        <path d="M8 5.5v5M5.5 8h5" />
+      </svg>
+      Nuevo ticket
+    </a>
+  </nav>
+</aside>
+<main class="main-panel">
+  <router-outlet />
+</main>

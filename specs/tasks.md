@@ -417,42 +417,42 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F api test -- tickets.sse`
   Bloqueada por: T-66
 
-- [ ] T-74 · Crear `apps/web` (Angular CLI, componentes standalone, signals, runner de tests) con la ruta raíz y un test de humo · Satisface: REQ-WEB-08
+- [x] T-74 · Crear `apps/web` (Angular CLI, componentes standalone, signals, runner de tests) con la ruta raíz y un test de humo · Satisface: REQ-WEB-08
   Hecho cuando: When the operator opens the root path `/`, the web app shall redirect to the inbox view `/tickets`.
   Verifica: `pnpm -F web build` y `pnpm -F web test -- app.smoke`
   Bloqueada por: T-01
 
-- [ ] T-75 · Crear `ApiService` (`HttpClient`) y la vista de bandeja · Satisface: REQ-WEB-01
+- [x] T-75 · Crear `ApiService` (`HttpClient`) y la vista de bandeja · Satisface: REQ-WEB-01
   Hecho cuando: When the operator opens the inbox view, the web app shall list tickets with `ticketId`, `category`, `severity`, `status` and SLA.
   Verifica: `pnpm -F web test -- inbox`
   Bloqueada por: T-66, T-74
 
-- [ ] T-76 · Crear el detalle del ticket con el timeline del grafo · Satisface: REQ-WEB-02
+- [x] T-76 · Crear el detalle del ticket con el timeline del grafo · Satisface: REQ-WEB-02
   Hecho cuando: When the operator opens a ticket, the web app shall display a timeline with visited nodes, handoffs, decisions and durations.
   Verifica: `pnpm -F web test -- timeline`
   Bloqueada por: T-75
 
-- [ ] T-77 · Crear la pestaña de bitácora del ticket · Satisface: REQ-WEB-03
+- [x] T-77 · Crear la pestaña de bitácora del ticket · Satisface: REQ-WEB-03
   Hecho cuando: When the operator opens the audit view of a ticket, the web app shall display the audit entries in write order.
   Verifica: `pnpm -F web test -- audit-view`
   Bloqueada por: T-76
 
-- [ ] T-78 · Mostrar solo `redactedText` en el detalle del ticket · Satisface: REQ-WEB-06
+- [x] T-78 · Mostrar solo `redactedText` en el detalle del ticket · Satisface: REQ-WEB-06
   Hecho cuando: The web app shall display only the redacted ticket text.
   Verifica: `pnpm -F web test -- redacted-only`
   Bloqueada por: T-76
 
-- [ ] T-79 · Añadir al timeline los eventos SSE en vivo (`EventsService`) · Satisface: REQ-WEB-04
+- [x] T-79 · Añadir al timeline los eventos SSE en vivo (`EventsService`) · Satisface: REQ-WEB-04
   Hecho cuando: While a ticket graph is running, the web app shall append the events received over SSE to the timeline without a page reload.
   Verifica: `pnpm -F web test -- timeline.sse`
   Bloqueada por: T-73, T-76
 
-- [ ] T-80 · Reintentar la conexión SSE cada 5 s · Satisface: REQ-WEB-05
+- [x] T-80 · Reintentar la conexión SSE cada 5 s · Satisface: REQ-WEB-05
   Hecho cuando: If the SSE connection drops, then the web app shall retry the connection every 5 s.
   Verifica: `pnpm -F web test -- timeline.reconnect`
   Bloqueada por: T-79
 
-- [ ] T-81 · Crear el formulario de nuevo ticket · Satisface: REQ-WEB-07
+- [x] T-81 · Crear el formulario de nuevo ticket · Satisface: REQ-WEB-07
   Hecho cuando: When the operator submits the new-ticket form, the web app shall send the text to `POST /prompts/triage-ticket/run`.
   Verifica: `pnpm -F web test -- new-ticket`
   Bloqueada por: T-75

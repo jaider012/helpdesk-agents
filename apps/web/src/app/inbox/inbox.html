@@ -1,0 +1,85 @@
+<header class="topbar">
+  <h1 class="view-title">Bandeja de tickets</h1>
+  @if (tickets.hasValue() && tickets.value().length > 0) {
+    <span class="count-badge">{{ tickets.value().length }}</span>
+  }
+  <span class="spacer"></span>
+  <a class="btn btn-primary" routerLink="/tickets/new">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" /></svg>
+    Nuevo ticket
+  </a>
+</header>
+
+@if (tickets.error()) {
+  <div class="page-body">
+    <p class="alert" role="alert">
+      No se pudo cargar la bandeja. Vuelve a intentarlo en unos segundos.
+    </p>
+  </div>
+} @else if (tickets.isLoading()) {
+  <p class="empty">Cargando tickets…</p>
+} @else if (tickets.value().length === 0) {
+  <p class="empty">No hay tickets todavía.</p>
+} @else {
+  <table class="list">
+    <caption class="sr-only">
+      Tickets agrupados por estado
+    </caption>
+    <thead class="sr-only">
+      <tr>
+        <th scope="col">Severidad</th>
+        <th scope="col">Caso</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Categoría</th>
+        <th scope="col">Plazo de atención</th>
+      </tr>
+    </thead>
+    @for (group of groups(); track group.status) {
+      <tbody>
+        <tr class="group">
+          <th colspan="5" scope="colgroup">
+            <span class="group-label">
+              <app-status-icon [status]="group.status" />
+              {{ statusLabels[group.status] }}
+              <span class="count-badge">{{ group.tickets.length }}</span>
+            </span>
+          </th>
+        </tr>
+        @for (ticket of group.tickets; track ticket.ticketId) {
+          <tr class="row">
+            <td
+              class="severity"
+              [attr.title]="ticket.severity ? severityLabels[ticket.severity] : null"
+            >
+              <app-severity-icon [severity]="ticket.severity" />
+              <span class="sr-only">{{ ticket.severity ?? pendingLabel }}</span>
+            </td>
+            <td class="ticket-id">
+              <a class="num" [routerLink]="['/tickets', ticket.ticketId]">{{ ticket.ticketId }}</a>
+            </td>
+            <td class="status" [attr.title]="statusLabels[ticket.status]">
+              <app-status-icon [status]="ticket.status" />
+              <span class="sr-only">{{ statusLabels[ticket.status] }}</span>
+            </td>
+            <td class="title">
+              @if (ticket.category) {
+                {{ categoryLabels[ticket.category] }}
+              } @else {
+                <span class="pending">{{ pendingLabel }}</span>
+              }
+            </td>
+            <td class="due">
+              @if (ticket.slaDueAt) {
+                <time class="num" [attr.datetime]="ticket.slaDueAt">{{
+                  ticket.slaDueAt | date: 'dd/MM HH:mm'
+                }}</time>
+              } @else {
+                <span class="pending">{{ pendingLabel }}</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    }
+  </table>
+}

@@ -1,0 +1,56 @@
+.audit {
+  width: 100%;
+  min-width: 60rem;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.audit th {
+  padding: 0.375rem 0.625rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.audit td {
+  padding: 0.4375rem 0.625rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.audit tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.seq {
+  color: var(--text-tertiary);
+  text-align: right;
+}
+
+.audit .mono {
+  font-size: var(--text-xs);
+}
+
+.code {
+  display: block;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.reason {
+  max-width: 18rem;
+}
+
+.states {
+  white-space: nowrap;
+}
+
+.data {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-secondary);
+}

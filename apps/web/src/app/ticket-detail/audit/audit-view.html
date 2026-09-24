@@ -1,0 +1,49 @@
+@if (entries().length === 0) {
+  <p class="empty">La bitácora todavía no tiene entradas.</p>
+} @else {
+  <table class="audit">
+    <thead>
+      <tr>
+        <th scope="col">N.º</th>
+        <th scope="col">Hora</th>
+        <th scope="col">Responsable</th>
+        <th scope="col">Decisión</th>
+        <th scope="col">Motivo</th>
+        <th scope="col">Desde → hacia</th>
+        <th scope="col">Datos</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (entry of entries(); track entry.seq) {
+        <tr>
+          <td class="seq mono">{{ entry.seq }}</td>
+          <td>
+            <time class="mono" [attr.datetime]="entry.ts">{{
+              entry.ts | date: 'dd/MM/yyyy HH:mm:ss.SSS'
+            }}</time>
+          </td>
+          <td>{{ actorLabel(entry.agent) }}</td>
+          <td>
+            {{ decisionLabel(entry.decision) }}
+            <code class="code">{{ entry.decision }}</code>
+          </td>
+          <td class="reason">{{ entry.reason }}</td>
+          <td>
+            @if (entry.from || entry.to) {
+              <span class="mono states">{{ entry.from ?? '—' }} → {{ entry.to ?? '—' }}</span>
+            }
+          </td>
+          <td>
+            @if (entry.data) {
+              <ul class="data mono">
+                @for (item of entry.data | keyvalue: keepOrder; track item.key) {
+                  <li>{{ item.key }}: {{ item.value }}</li>
+                }
+              </ul>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
