@@ -269,7 +269,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- escalation.llm-down escalation.fallback escalation.user-message`
   Bloqueada por: T-44
 
-- [ ] T-46 · Derivar `approvalRequest` en el paquete de escalamiento de `provisioning` · Satisface: REQ-ESC-09
+- [x] T-46 · Derivar `approvalRequest` en el paquete de escalamiento de `provisioning` · Satisface: REQ-ESC-09
   Hecho cuando: While a ticket has category `provisioning`, when the escalation agent builds the escalation package, the escalation agent shall derive `approvalRequest` from `entities.request` and `entities.userRef`.
   Verifica: `pnpm -F api test -- escalation.approval-request`
   Bloqueada por: T-44

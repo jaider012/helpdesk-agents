@@ -6,7 +6,7 @@ import type { AuditLog } from '../../audit/audit-log.js';
 import { DRAFT_TOOL } from '../../llm/fake-responder.js';
 import type { MessageTemplates } from '../../messages/templates.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
-import type { Entities, EscalationPackage } from '../../tickets/ticket-state.js';
+import type { ApprovalRequest, Entities, EscalationPackage } from '../../tickets/ticket-state.js';
 import { toTicketState, type GraphState, type GraphUpdate } from '../state.js';
 
 /** The texts the LLM drafts in escalation (design §5.1). */
@@ -28,6 +28,22 @@ export interface EscalationNodeDeps {
 function escalationReason(state: GraphState): EscalationReason {
   const route = state.lastRoute;
   return route?.to === 'escalation' && route.reason ? route.reason : 'operator_request';
+}
+
+/**
+ * The approval request of a provisioning ticket, derived without LLM from `entities.request` and
+ * `entities.userRef` (REQ-ESC-09).
+ */
+function approvalRequestFor(state: GraphState, templates: MessageTemplates): ApprovalRequest {
+  const { resource = '', accessLevel = '', justification = '' } = state.entities?.request ?? {};
+  return {
+    resource,
+    accessLevel,
+    requesterRef: state.entities?.userRef ?? 'usr_unknown',
+    justification,
+    complete: [resource, accessLevel, justification].every((field) => field.trim() !== ''),
+    summary: templates.render('internal.approval', { ticketId: state.ticketId }),
+  };
 }
 
 /** Write failures of the audit log or the ticket store stop the run (REQ-AUD-06, REQ-AUD-08). */
@@ -98,6 +114,9 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
       ...(state.entities && { entities: state.entities as Entities }),
       findings: state.findings,
       reason,
+      ...(state.category === 'provisioning' && {
+        approvalRequest: approvalRequestFor(state, templates),
+      }),
       createdAt: clock().toISOString(),
     };
     const { summary, userMessage } = withLlm
