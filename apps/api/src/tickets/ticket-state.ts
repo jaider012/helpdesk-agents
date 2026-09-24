@@ -10,22 +10,25 @@ import type { AuditEntry } from '../audit/audit-entry.js';
 
 // Data contracts of design §4.
 
-export type Level = 'low' | 'medium' | 'high';
+export const LEVELS = ['low', 'medium', 'high'] as const;
+export type Level = (typeof LEVELS)[number];
 export type Channel = 'email' | 'chat' | 'portal' | 'phone';
 
-export type IssueType =
-  | 'lockout'
-  | 'password_reset'
-  | 'mfa'
-  | 'disabled_account'
-  | 'vpn'
-  | 'performance'
-  | 'app'
-  | 'folder_access'
-  | 'repo_access'
-  | 'license'
-  | 'profile_change'
-  | 'unknown';
+export const ISSUE_TYPES = [
+  'lockout',
+  'password_reset',
+  'mfa',
+  'disabled_account',
+  'vpn',
+  'performance',
+  'app',
+  'folder_access',
+  'repo_access',
+  'license',
+  'profile_change',
+  'unknown',
+] as const;
+export type IssueType = (typeof ISSUE_TYPES)[number];
 
 export interface AccessRequest {
   resource: string;

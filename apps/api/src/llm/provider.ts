@@ -1,5 +1,6 @@
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { FakeChatModel } from './fake-chat-model.js';
+import { fakeResponder } from './fake-responder.js';
 
 export type LlmProvider = 'fake';
 
@@ -16,7 +17,11 @@ export const NO_PROVIDER_WARNING =
 /** Chooses the chat model from the environment variables, in the order of design §12.3. */
 export function selectChatModel(env: Record<string, string | undefined>): ChatModelSelection {
   // Tests always run on the deterministic fake model, whatever else is configured (REQ-LLM-04).
-  if (env.NODE_ENV === 'test') return { provider: 'fake', model: new FakeChatModel() };
+  if (env.NODE_ENV === 'test') return { provider: 'fake', model: new FakeChatModel(fakeResponder) };
   // Without a complete provider configuration the demo still starts, without secrets (REQ-LLM-03).
-  return { provider: 'fake', model: new FakeChatModel(), warning: NO_PROVIDER_WARNING };
+  return {
+    provider: 'fake',
+    model: new FakeChatModel(fakeResponder),
+    warning: NO_PROVIDER_WARNING,
+  };
 }

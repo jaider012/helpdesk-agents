@@ -20,13 +20,16 @@ const appended = <T>() =>
  */
 export const TicketGraphState = Annotation.Root({
   ticketId: Annotation<string>(),
+  // Transient: the raw ticket text, cleared by the redact node and never persisted (design §8.1).
+  rawText: Annotation<string | undefined>(),
   channel: Annotation<Channel>(),
   createdAt: Annotation<string>(),
   redactedText: Annotation<string>(),
   category: Annotation<Category | undefined>(),
   severity: Annotation<Severity | undefined>(),
   urgency: Annotation<Level | undefined>(),
-  entities: Annotation<Entities | undefined>(),
+  // Partial until triage fills issueType and businessImpact after the redact node set userRef.
+  entities: Annotation<Partial<Entities> | undefined>(),
   findings: appended<DiagnosticFinding>(),
   actions: appended<ExecutedAction>(),
   status: Annotation<TicketStatus>(),

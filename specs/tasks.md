@@ -249,7 +249,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- graph.compile graph.system-prompt`
   Bloqueada por: T-31, T-39
 
-- [ ] T-42 · Implementar el nodo triage detrás del redact node (salida zod, matriz de severidad, clasificación por palabras clave del `FakeChatModel`, design §12.3) · Satisface: REQ-2.3-18, REQ-2.3-19, REQ-2.3-20
+- [x] T-42 · Implementar el nodo triage detrás del redact node (salida zod, matriz de severidad, clasificación por palabras clave del `FakeChatModel`, design §12.3) · Satisface: REQ-2.3-18, REQ-2.3-19, REQ-2.3-20
   Hecho cuando: When the triage agent receives a ticket from the redact node, the triage agent shall assign one `category`, extract `entities.service`, `entities.issueType` and `entities.businessImpact` and derive `severity` from the impact × urgency matrix in `triage.agent.md`.
   Verifica: `pnpm -F api test -- triage.category triage.entities triage.severity-matrix`
   Bloqueada por: T-35, T-41
