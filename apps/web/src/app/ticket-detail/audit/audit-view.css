@@ -1,24 +1,61 @@
 .audit {
   width: 100%;
+  min-width: 60rem;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
-.audit th,
-.audit td {
-  padding: 0.375rem 0.5rem;
+.audit th {
+  padding: 0.5rem 0.625rem;
   border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.audit td {
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--color-border);
   vertical-align: top;
+}
+
+.audit tbody tr:hover {
+  background: var(--color-surface-muted);
+}
+
+.seq {
+  color: var(--color-muted);
+  text-align: right;
+}
+
+.audit time,
+.audit td .mono,
+.data {
+  font-size: var(--text-xs);
 }
 
 .code {
   display: block;
   color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.reason {
+  max-width: 18rem;
+}
+
+.states {
+  white-space: nowrap;
 }
 
 .data {
   margin: 0;
   padding: 0;
   list-style: none;
+  color: var(--color-muted);
 }

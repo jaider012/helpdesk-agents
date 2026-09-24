@@ -1,25 +1,135 @@
 .timeline {
+  max-width: 52rem;
   list-style: none;
   margin: 0;
   padding: 0;
-  border-left: 2px solid var(--color-border);
 }
 
 .item {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 0.75rem;
-  align-items: baseline;
-  padding: 0.5rem 0 0.5rem 1rem;
+  display: grid;
+  grid-template-columns: 4.75rem 1rem minmax(0, 1fr) auto;
+  grid-template-areas: 'time marker body duration';
+  column-gap: 0.875rem;
+  padding: 0.5rem 0;
 }
 
-.time,
-.reason,
-.duration {
+.time {
+  grid-area: time;
   color: var(--color-muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
+}
+
+/* The rail joins the markers; each kind of event has its own marker. */
+.marker {
+  grid-area: marker;
+  position: relative;
+}
+
+.marker::before {
+  content: '';
+  position: absolute;
+  top: -0.5rem;
+  bottom: -0.5rem;
+  left: calc(50% - 1px);
+  width: 2px;
+  background: var(--color-border);
+}
+
+.item:first-child .marker::before {
+  top: 0.75rem;
+}
+
+.item:last-child .marker::before {
+  bottom: calc(100% - 0.75rem);
+}
+
+.marker::after {
+  content: '';
+  position: absolute;
+  top: 0.375rem;
+  left: calc(50% - 0.375rem);
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid var(--color-muted);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+
+[data-kind='node'] .marker::after {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+[data-kind='handoff'] .marker::after {
+  border-color: var(--color-accent);
+  border-radius: 2px;
+  transform: scale(0.8) rotate(45deg);
+}
+
+[data-kind='tool'] .marker::after {
+  border-radius: 3px;
+  background: var(--color-surface-muted);
+}
+
+.running .marker::after {
+  animation: pulse 1.6s ease-out infinite;
+}
+
+@keyframes pulse {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 50%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 0.5rem transparent;
+  }
+}
+
+.body {
+  grid-area: body;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.125rem 0.625rem;
 }
 
 .kind {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.reason {
+  width: 100%;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.duration {
+  grid-area: duration;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.running .duration {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .item {
+    grid-template-columns: 1rem minmax(0, 1fr);
+    grid-template-areas:
+      'marker time'
+      'marker body'
+      'marker duration';
+  }
 }

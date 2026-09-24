@@ -1,15 +1,58 @@
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.count {
+  margin: 0.25rem 0 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
 table {
   width: 100%;
+  min-width: 44rem;
   border-collapse: collapse;
 }
 
-th,
-td {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--color-border);
+th {
+  padding: 0.625rem 1rem;
+  background: var(--color-surface-muted);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-align: left;
+  text-transform: uppercase;
 }
 
-.ticket-id {
-  font-family: ui-monospace, monospace;
+td {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* The whole row opens the ticket: the link of the first cell covers it. */
+tbody tr {
+  position: relative;
+}
+
+tbody tr:hover {
+  background: var(--color-accent-soft);
+}
+
+.ticket-id a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ticket-id a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }

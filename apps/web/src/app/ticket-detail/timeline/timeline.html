@@ -1,15 +1,18 @@
 @if (items().length === 0) {
-  <p>El recorrido todavía no tiene pasos.</p>
+  <p class="empty">El recorrido todavía no tiene pasos.</p>
 } @else {
   <ol class="timeline">
     @for (item of items(); track item.seq) {
-      <li class="item" [attr.data-kind]="item.kind">
-        <time class="time" [attr.datetime]="item.ts">{{ item.ts | date: 'HH:mm:ss' }}</time>
-        <span class="kind">{{ kindLabels[item.kind] }}</span>
-        <span class="title">{{ item.title }}</span>
-        @if (item.reason) {
-          <span class="reason">Motivo: {{ item.reason }}</span>
-        }
+      <li class="item" [attr.data-kind]="item.kind" [class.running]="item.running">
+        <time class="time mono" [attr.datetime]="item.ts">{{ item.ts | date: 'HH:mm:ss' }}</time>
+        <span class="marker" aria-hidden="true"></span>
+        <div class="body">
+          <span class="kind">{{ kindLabels[item.kind] }}</span>
+          <span class="title">{{ item.title }}</span>
+          @if (item.reason) {
+            <span class="reason">Motivo: {{ item.reason }}</span>
+          }
+        </div>
         @if (item.running) {
           <span class="duration">En curso</span>
         } @else if (item.durationMs !== undefined) {

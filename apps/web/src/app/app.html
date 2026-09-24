@@ -1,12 +1,22 @@
 <header class="app-header">
-  <span class="brand">Mesa de ayuda</span>
-  <nav aria-label="Secciones">
-    <a routerLink="/tickets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-      >Bandeja</a
-    >
-    <a routerLink="/tickets/new" routerLinkActive="active">Nuevo ticket</a>
-  </nav>
+  <div class="bar">
+    <a class="brand" routerLink="/tickets">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M3 6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5V9a3 3 0 0 0 0 6v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5V15a3 3 0 0 0 0-6Z"
+        />
+        <path class="perforation" d="M15 7v2m0 3v1m0 3v2" />
+      </svg>
+      Mesa de ayuda
+    </a>
+    <nav aria-label="Secciones">
+      <a routerLink="/tickets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Bandeja</a
+      >
+      <a routerLink="/tickets/new" routerLinkActive="active">Nuevo ticket</a>
+    </nav>
+  </div>
 </header>
-<main>
+<main class="page">
   <router-outlet />
 </main>

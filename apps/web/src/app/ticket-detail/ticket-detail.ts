@@ -10,6 +10,7 @@ import { EventsService } from '../core/events.service';
 import { CATEGORY_LABELS, PENDING_LABEL, STATUS_LABELS } from '../core/labels';
 import { AuditView } from './audit/audit-view';
 import { mergeAudit } from './merge-audit';
+import { redactionParts } from './redaction';
 import { Timeline } from './timeline/timeline';
 
 @Component({
@@ -63,6 +64,11 @@ export class TicketDetail {
   /** The audit log shown by both tabs: the GET plus the live entries, in write order. */
   protected readonly entries = computed(() =>
     mergeAudit(this.audit.hasValue() ? this.audit.value() : [], this.live.value()),
+  );
+
+  /** The redacted text split around its placeholders, which the view marks as hidden data. */
+  protected readonly textParts = computed(() =>
+    this.ticket.hasValue() ? redactionParts(this.ticket.value().redactedText) : [],
   );
 
   protected readonly tab = signal<'timeline' | 'audit'>('timeline');

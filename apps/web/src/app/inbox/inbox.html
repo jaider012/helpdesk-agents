@@ -1,42 +1,74 @@
-<h1>Bandeja de tickets</h1>
+<header class="page-header">
+  <div>
+    <h1>Bandeja de tickets</h1>
+    @if (tickets.hasValue() && tickets.value().length > 0) {
+      <p class="count muted">
+        {{ tickets.value().length }} {{ tickets.value().length === 1 ? 'ticket' : 'tickets' }}
+      </p>
+    }
+  </div>
+  <a class="btn" routerLink="/tickets/new">Nuevo ticket</a>
+</header>
 
 @if (tickets.error()) {
-  <p role="alert">No se pudo cargar la bandeja. Vuelve a intentarlo en unos segundos.</p>
+  <p class="alert" role="alert">
+    No se pudo cargar la bandeja. Vuelve a intentarlo en unos segundos.
+  </p>
 } @else if (tickets.isLoading()) {
-  <p>Cargando tickets…</p>
+  <p class="panel empty">Cargando tickets…</p>
 } @else if (tickets.value().length === 0) {
-  <p>No hay tickets todavía.</p>
+  <p class="panel empty">No hay tickets todavía.</p>
 } @else {
-  <table>
-    <thead>
-      <tr>
-        <th scope="col">Caso</th>
-        <th scope="col">Categoría</th>
-        <th scope="col">Severidad</th>
-        <th scope="col">Estado</th>
-        <th scope="col">Plazo de atención</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (ticket of tickets.value(); track ticket.ticketId) {
+  <div class="panel table-wrap">
+    <table>
+      <thead>
         <tr>
-          <td class="ticket-id">
-            <a [routerLink]="['/tickets', ticket.ticketId]">{{ ticket.ticketId }}</a>
-          </td>
-          <td>{{ ticket.category ? categoryLabels[ticket.category] : pendingLabel }}</td>
-          <td>{{ ticket.severity ?? pendingLabel }}</td>
-          <td>{{ statusLabels[ticket.status] }}</td>
-          <td>
-            @if (ticket.slaDueAt) {
-              <time [attr.datetime]="ticket.slaDueAt">{{
-                ticket.slaDueAt | date: 'dd/MM/yyyy HH:mm'
-              }}</time>
-            } @else {
-              {{ pendingLabel }}
-            }
-          </td>
+          <th scope="col">Caso</th>
+          <th scope="col">Categoría</th>
+          <th scope="col">Severidad</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Plazo de atención</th>
         </tr>
-      }
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        @for (ticket of tickets.value(); track ticket.ticketId) {
+          <tr>
+            <td class="ticket-id">
+              <a class="mono" [routerLink]="['/tickets', ticket.ticketId]">{{ ticket.ticketId }}</a>
+            </td>
+            <td>
+              @if (ticket.category) {
+                {{ categoryLabels[ticket.category] }}
+              } @else {
+                <span class="pending">{{ pendingLabel }}</span>
+              }
+            </td>
+            <td>
+              @if (ticket.severity) {
+                <span class="sev" [attr.data-severity]="ticket.severity">{{
+                  ticket.severity
+                }}</span>
+              } @else {
+                <span class="pending">{{ pendingLabel }}</span>
+              }
+            </td>
+            <td>
+              <span class="pill" [attr.data-status]="ticket.status">{{
+                statusLabels[ticket.status]
+              }}</span>
+            </td>
+            <td>
+              @if (ticket.slaDueAt) {
+                <time class="mono" [attr.datetime]="ticket.slaDueAt">{{
+                  ticket.slaDueAt | date: 'dd/MM/yyyy HH:mm'
+                }}</time>
+              } @else {
+                <span class="pending">{{ pendingLabel }}</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 }

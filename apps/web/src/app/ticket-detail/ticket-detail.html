@@ -1,77 +1,116 @@
-<p><a routerLink="/tickets">← Volver a la bandeja</a></p>
+<a class="back" routerLink="/tickets">← Volver a la bandeja</a>
 
 @if (notFound()) {
-  <p role="alert">No encontramos el ticket {{ id() }}.</p>
+  <p class="alert" role="alert">No encontramos el ticket {{ id() }}.</p>
 } @else if (ticket.error()) {
-  <p role="alert">No se pudo cargar el ticket. Vuelve a intentarlo en unos segundos.</p>
+  <p class="alert" role="alert">
+    No se pudo cargar el ticket. Vuelve a intentarlo en unos segundos.
+  </p>
 } @else if (ticket.value(); as detail) {
-  <h1>Ticket {{ detail.ticketId }}</h1>
-  <dl class="summary">
+  <h1>
+    Ticket <span class="mono">{{ detail.ticketId }}</span>
+  </h1>
+
+  <dl class="summary panel">
     <div>
-      <dt>Estado</dt>
-      <dd>{{ statusLabels[detail.status] }}</dd>
+      <dt class="eyebrow">Estado</dt>
+      <dd>
+        <span class="pill" [attr.data-status]="detail.status">{{
+          statusLabels[detail.status]
+        }}</span>
+      </dd>
     </div>
     <div>
-      <dt>Categoría</dt>
-      <dd>{{ detail.category ? categoryLabels[detail.category] : pendingLabel }}</dd>
+      <dt class="eyebrow">Categoría</dt>
+      <dd>
+        @if (detail.category) {
+          {{ categoryLabels[detail.category] }}
+        } @else {
+          <span class="pending">{{ pendingLabel }}</span>
+        }
+      </dd>
     </div>
     <div>
-      <dt>Severidad</dt>
-      <dd>{{ detail.severity ?? pendingLabel }}</dd>
+      <dt class="eyebrow">Severidad</dt>
+      <dd>
+        @if (detail.severity) {
+          <span class="sev" [attr.data-severity]="detail.severity">{{ detail.severity }}</span>
+        } @else {
+          <span class="pending">{{ pendingLabel }}</span>
+        }
+      </dd>
     </div>
     <div>
-      <dt>Plazo de atención</dt>
+      <dt class="eyebrow">Plazo de atención</dt>
       <dd>
         @if (detail.slaDueAt) {
-          <time [attr.datetime]="detail.slaDueAt">{{
+          <time class="mono" [attr.datetime]="detail.slaDueAt">{{
             detail.slaDueAt | date: 'dd/MM/yyyy HH:mm'
           }}</time>
         } @else {
-          {{ pendingLabel }}
+          <span class="pending">{{ pendingLabel }}</span>
         }
       </dd>
     </div>
   </dl>
 
-  <section class="ticket-text" aria-labelledby="ticket-text-heading">
+  <section class="ticket-text panel" aria-labelledby="ticket-text-heading">
     <h2 id="ticket-text-heading">Descripción del problema</h2>
-    <p class="hint">Los datos personales aparecen ocultos, por ejemplo [EMAIL] o [PHONE].</p>
+    <p class="hint muted">
+      Los datos personales aparecen ocultos, por ejemplo
+      <span class="redaction">[EMAIL]</span> o <span class="redaction">[PHONE]</span>.
+    </p>
     <!-- Only the redacted text: the raw text of the user never reaches the web app (REQ-WEB-06). -->
-    <blockquote>{{ detail.redactedText }}</blockquote>
+    <blockquote>
+      @for (part of textParts(); track $index) {
+        <span
+          [class.redaction]="part.redacted"
+          [attr.title]="part.redacted ? 'Dato personal oculto' : null"
+          >{{ part.text }}</span
+        >
+      }
+    </blockquote>
   </section>
 
-  <div class="tabs" role="tablist" aria-label="Vistas del ticket">
-    <button
-      type="button"
-      role="tab"
-      id="tab-timeline"
-      aria-controls="ticket-panel"
-      [attr.aria-selected]="tab() === 'timeline'"
-      (click)="tab.set('timeline')"
+  <div class="views">
+    <div class="tabs" role="tablist" aria-label="Vistas del ticket">
+      <button
+        type="button"
+        role="tab"
+        id="tab-timeline"
+        aria-controls="ticket-panel"
+        [attr.aria-selected]="tab() === 'timeline'"
+        (click)="tab.set('timeline')"
+      >
+        Recorrido
+      </button>
+      <button
+        type="button"
+        role="tab"
+        id="tab-audit"
+        aria-controls="ticket-panel"
+        [attr.aria-selected]="tab() === 'audit'"
+        (click)="tab.set('audit')"
+      >
+        Bitácora
+      </button>
+    </div>
+
+    <section
+      id="ticket-panel"
+      class="panel tab-panel"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-' + tab()"
     >
-      Recorrido
-    </button>
-    <button
-      type="button"
-      role="tab"
-      id="tab-audit"
-      aria-controls="ticket-panel"
-      [attr.aria-selected]="tab() === 'audit'"
-      (click)="tab.set('audit')"
-    >
-      Bitácora
-    </button>
+      @if (audit.error()) {
+        <p class="alert" role="alert">No se pudo cargar la bitácora del ticket.</p>
+      } @else if (tab() === 'timeline') {
+        <app-timeline [entries]="entries()" />
+      } @else {
+        <app-audit-view [entries]="entries()" />
+      }
+    </section>
   </div>
-
-  <section id="ticket-panel" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
-    @if (audit.error()) {
-      <p role="alert">No se pudo cargar la bitácora del ticket.</p>
-    } @else if (tab() === 'timeline') {
-      <app-timeline [entries]="entries()" />
-    } @else {
-      <app-audit-view [entries]="entries()" />
-    }
-  </section>
 } @else {
-  <p>Cargando ticket…</p>
+  <p class="panel empty">Cargando ticket…</p>
 }
