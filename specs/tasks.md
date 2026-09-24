@@ -447,7 +447,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web test -- timeline.sse`
   Bloqueada por: T-73, T-76
 
-- [ ] T-80 · Reintentar la conexión SSE cada 5 s · Satisface: REQ-WEB-05
+- [x] T-80 · Reintentar la conexión SSE cada 5 s · Satisface: REQ-WEB-05
   Hecho cuando: If the SSE connection drops, then the web app shall retry the connection every 5 s.
   Verifica: `pnpm -F web test -- timeline.reconnect`
   Bloqueada por: T-79
