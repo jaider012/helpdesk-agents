@@ -78,6 +78,7 @@ export function createNodes({
         checkVpn: new CheckVpnTool(new SkillRunner(audit), vpnScript, audit, clock),
         templates,
         vpnTarget,
+        clock,
       }),
       diagnosticsRouteInput,
       audit,

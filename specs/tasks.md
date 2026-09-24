@@ -299,7 +299,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- graph.vpn-route graph.vpn-ok graph.vpn-unhealthy`
   Bloqueada por: T-40, T-48, T-50
 
-- [ ] T-52 · Implementar la rama de bloqueo de cuenta del nodo diagnostics · Satisface: REQ-2.3-27
+- [x] T-52 · Implementar la rama de bloqueo de cuenta del nodo diagnostics · Satisface: REQ-2.3-27
   Hecho cuando: While a ticket has category `access`, when `entities.issueType` is `lockout`, the diagnostics agent shall execute the allowlisted action `instruct_self_service_unlock`.
   Verifica: `pnpm -F api test -- graph.access-lockout`
   Bloqueada por: T-51
