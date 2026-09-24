@@ -34,6 +34,12 @@ export const diagnosticsRouteInput: RouteInputOf<'diagnostics'> = (_, update) =>
     ? { kind: 'outcome', outcome: update.diagnosticsOutcome }
     : { kind: 'error', error: 'internal' };
 
+/** Provisioning routes to approval once it normalized the request; otherwise, an internal error. */
+export const provisioningRouteInput: RouteInputOf<'provisioning'> = (state, update) =>
+  state.category === 'provisioning' && update.entities?.request
+    ? { kind: 'ok' }
+    : { kind: 'error', error: 'internal' };
+
 /**
  * Applies `routing.ts` when the node finishes: resolves the target, records the decision with its
  * rule in the audit log (REQ-AUD-04) and stores it in `lastRoute` and `nextAgent`.

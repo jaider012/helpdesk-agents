@@ -10,10 +10,16 @@ import { CheckVpnTool } from '../../tools/check-vpn-tool.js';
 import { compileSkillScripts, SkillRunner } from '../../tools/skill-runner.js';
 import type { GraphNodes } from '../build.js';
 import { compileAgents } from '../compile-agents.js';
-import { diagnosticsRouteInput, triageRouteInput, withRouting } from '../routing.js';
+import {
+  diagnosticsRouteInput,
+  provisioningRouteInput,
+  triageRouteInput,
+  withRouting,
+} from '../routing.js';
 import { compileSeverityMatrix } from '../severity-matrix.js';
 import { createDiagnosticsNode } from './diagnostics.node.js';
 import { createEscalationNode } from './escalation.node.js';
+import { createProvisioningNode } from './provisioning.node.js';
 import { createRedactNode } from './redact.node.js';
 import { createTriageNode } from './triage.node.js';
 
@@ -29,9 +35,6 @@ export interface NodeDeps {
   /** `VPN_GATEWAY_TARGET` (design §2.2). */
   vpnTarget: string;
 }
-
-// Nodes whose behaviour is not implemented yet leave the state unchanged (decision DC-43).
-const keepState = () => ({});
 
 /** The nodes of the runtime graph, wired with their dependencies (design §2, §5). */
 export function createNodes({
@@ -83,7 +86,12 @@ export function createNodes({
       diagnosticsRouteInput,
       audit,
     ),
-    provisioning: keepState,
+    provisioning: withRouting(
+      'provisioning',
+      createProvisioningNode({ audit, lifecycle }),
+      provisioningRouteInput,
+      audit,
+    ),
     escalation: createEscalationNode({
       model,
       systemPrompt: systemPrompt('escalation'),

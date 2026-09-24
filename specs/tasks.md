@@ -314,7 +314,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- allowlist.escalate`
   Bloqueada por: T-52
 
-- [ ] T-55 · Implementar el nodo provisioning (normalización determinista de `entities.request`) · Satisface: REQ-2.3-35
+- [x] T-55 · Implementar el nodo provisioning (normalización determinista de `entities.request`) · Satisface: REQ-2.3-35
   Hecho cuando: When the provisioning agent receives a ticket, the provisioning agent shall normalize `entities.request` with `resource`, `accessLevel` and `justification`.
   Verifica: `pnpm -F api test -- provisioning.request`
   Bloqueada por: T-48
