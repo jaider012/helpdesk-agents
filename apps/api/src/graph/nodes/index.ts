@@ -10,8 +10,9 @@ import type { TicketStore } from '../../tickets/ticket-store.js';
 import { ActionService } from '../../tools/actions.js';
 import { CheckVpnTool } from '../../tools/check-vpn-tool.js';
 import { compileSkillScripts, SkillRunner } from '../../tools/skill-runner.js';
-import type { GraphNodes } from '../build.js';
+import type { GraphNodeName, GraphNodes } from '../build.js';
 import { compileAgents } from '../compile-agents.js';
+import { withNodeEvents } from '../node-events.js';
 import {
   diagnosticsRouteInput,
   provisioningRouteInput,
@@ -63,7 +64,7 @@ export function createNodes({
   const handoffs = agents.flatMap((agent) => agent.handoffs);
   const vpnScript = compileSkillScripts(bundle).find(({ skill }) => skill === 'vpn-diagnostics');
   if (!vpnScript) throw new Error('the spec has no vpn-diagnostics script');
-  return {
+  const nodes: GraphNodes = {
     redact: createRedactNode({ audit, salt }),
     triage: withRouting(
       'triage',
@@ -102,7 +103,7 @@ export function createNodes({
     ),
     provisioning: withRouting(
       'provisioning',
-      createProvisioningNode({ audit, lifecycle }),
+      createProvisioningNode({ lifecycle }),
       provisioningRouteInput,
       audit,
       store,
@@ -120,4 +121,11 @@ export function createNodes({
       teams: compileTeams(systemPrompt('escalation')),
     }),
   };
+  // Outside withRouting, so each node's `routed` entry falls inside its step (design §12.1).
+  return Object.fromEntries(
+    Object.entries(nodes).map(([name, node]) => [
+      name,
+      withNodeEvents(name as GraphNodeName, node, audit),
+    ]),
+  ) as GraphNodes;
 }

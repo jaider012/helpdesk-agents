@@ -417,7 +417,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F api test -- tickets.sse`
   Bloqueada por: T-66
 
-- [ ] T-87 · Registrar `node_started` y `node_finished` en cada nodo del grafo (design §4, §12.1) · Satisface: REQ-API-07, REQ-WEB-02
+- [x] T-87 · Registrar `node_started` y `node_finished` en cada nodo del grafo (design §4, §12.1) · Satisface: REQ-API-07, REQ-WEB-02
   Hecho cuando: While the runtime runs a ticket graph, the runtime shall append a `node_started` entry before each node and a `node_finished` entry with `durationMs` after it.
   Verifica: `pnpm -F api test -- graph.node-events`
   Bloqueada por: T-43

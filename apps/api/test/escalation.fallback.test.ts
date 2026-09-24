@@ -27,10 +27,11 @@ describe('escalation.fallback', () => {
       reason: 'unknown_category',
       summary: `Caso ${ticketId} escalado. Consulta los hallazgos adjuntos.`,
     });
-    expect((await audit.read(ticketId)).map(({ decision }) => decision).slice(-3)).toEqual([
+    expect((await audit.read(ticketId)).map(({ decision }) => decision).slice(-4)).toEqual([
       'error',
       'escalated',
       'transition',
+      'node_finished',
     ]);
   });
 

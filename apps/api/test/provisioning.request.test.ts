@@ -42,10 +42,18 @@ describe('provisioning.request', () => {
       reason: 'approval_required',
     });
     const entries = await audit.read(ticketId);
-    expect(entries.find(({ decision }) => decision === 'node_finished')).toMatchObject({
-      agent: 'provisioning',
+    expect(
+      entries.find(({ agent, decision }) => agent === 'provisioning' && decision === 'transition'),
+    ).toMatchObject({
+      from: 'TRIAGED',
+      to: 'IN_PROGRESS',
       data: { resource: 'carpeta finanzas-2026', accessLevel: 'read' },
     });
+    expect(
+      entries.filter(
+        ({ agent, decision }) => agent === 'provisioning' && decision === 'node_finished',
+      ),
+    ).toHaveLength(1);
     expect(
       entries
         .filter(({ decision }) => decision === 'transition')

@@ -3,10 +3,11 @@ import { promptApp } from './prompt-helpers.js';
 import { startTcpServer } from './skill-helpers.js';
 import { ticket } from './ticket-helpers.js';
 
-/** Agent and decision of each audit entry after the operator and redact entries. */
+/** Agent and decision of each audit entry after the operator and redact entries, without the node brackets. */
 const agentSteps = (entries: Array<{ agent: string; decision: string }>) =>
   entries
     .filter(({ agent }) => agent !== 'operator' && agent !== 'redact')
+    .filter(({ decision }) => decision !== 'node_started' && decision !== 'node_finished')
     .map(({ agent, decision }) => `${agent}:${decision}`);
 
 describe('prompts.entry-agent', () => {

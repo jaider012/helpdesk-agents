@@ -15,11 +15,16 @@ describe.skipIf(process.getuid?.() === 0)('store.write-failure', () => {
     });
     const entries = await audit.read(ticketId);
     expect(entries.map(({ decision }) => decision)).toEqual([
+      'node_started',
       'redacted',
+      'node_finished',
+      'node_started',
       'classified',
       'transition',
       'error',
+      'node_finished',
     ]);
-    expect(entries.at(-1)).toMatchObject({ agent: 'triage', data: { code: 'STORE_WRITE_FAILED' } });
+    expect(entries.at(-2)).toMatchObject({ agent: 'triage', data: { code: 'STORE_WRITE_FAILED' } });
+    expect(entries.at(-1)).toMatchObject({ agent: 'triage', data: { error: 'StoreWriteError' } });
   });
 });

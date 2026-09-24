@@ -15,14 +15,25 @@ describe('escalation.status', () => {
     expect((await store.read(ticketId))?.status).toBe('ESCALATED');
     expect((await store.read(ticketId))?.escalation?.reason).toBe('unknown_category');
     expect(
-      (await audit.read(ticketId)).map(({ decision, from, to }) => [decision, from, to]),
+      (await audit.read(ticketId)).map(({ agent, decision, from, to }) => [
+        agent,
+        decision,
+        from,
+        to,
+      ]),
     ).toEqual([
-      ['redacted', undefined, undefined],
-      ['classified', undefined, undefined],
-      ['transition', 'NEW', 'TRIAGED'],
-      ['routed', 'triage', 'escalation'],
-      ['escalated', undefined, undefined],
-      ['transition', 'TRIAGED', 'ESCALATED'],
+      ['redact', 'node_started', undefined, undefined],
+      ['redact', 'redacted', undefined, undefined],
+      ['redact', 'node_finished', undefined, undefined],
+      ['triage', 'node_started', undefined, undefined],
+      ['triage', 'classified', undefined, undefined],
+      ['triage', 'transition', 'NEW', 'TRIAGED'],
+      ['triage', 'routed', 'triage', 'escalation'],
+      ['triage', 'node_finished', undefined, undefined],
+      ['escalation', 'node_started', undefined, undefined],
+      ['escalation', 'escalated', undefined, undefined],
+      ['escalation', 'transition', 'TRIAGED', 'ESCALATED'],
+      ['escalation', 'node_finished', undefined, undefined],
     ]);
   });
 });

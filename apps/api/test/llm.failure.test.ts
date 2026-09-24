@@ -23,11 +23,17 @@ describe('llm.failure', () => {
         data?.rule ?? data?.cause,
       ]),
     ).toEqual([
+      ['node_started', undefined, undefined, undefined],
       ['redacted', undefined, undefined, undefined],
+      ['node_finished', undefined, undefined, undefined],
+      ['node_started', undefined, undefined, undefined],
       ['llm_unavailable', undefined, undefined, 'error'],
       ['routed', 'triage', 'escalation', 'R-X1'],
+      ['node_finished', undefined, undefined, undefined],
+      ['node_started', undefined, undefined, undefined],
       ['escalated', undefined, undefined, undefined],
       ['transition', 'NEW', 'ESCALATED', undefined],
+      ['node_finished', undefined, undefined, undefined],
     ]);
   });
 

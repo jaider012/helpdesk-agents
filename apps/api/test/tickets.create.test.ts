@@ -29,9 +29,12 @@ describe('tickets.create', () => {
     }
     expect(status).toBe('RESOLVED');
     const entries = await audit.read(ticketId);
-    expect(entries.slice(0, 3).map(({ agent, decision }) => `${agent}:${decision}`)).toEqual([
+    expect(entries.slice(0, 6).map(({ agent, decision }) => `${agent}:${decision}`)).toEqual([
       'operator:prompt_run',
+      'redact:node_started',
       'redact:redacted',
+      'redact:node_finished',
+      'triage:node_started',
       'triage:classified',
     ]);
     expect(entries[0]?.data).toMatchObject({ prompt: 'triage-ticket' });

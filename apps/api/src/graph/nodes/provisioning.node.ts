@@ -1,10 +1,8 @@
-import type { AuditLog } from '../../audit/audit-log.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { AccessRequest, Entities } from '../../tickets/ticket-state.js';
 import { mergeUpdate, toTicketState, type GraphState, type GraphUpdate } from '../state.js';
 
 export interface ProvisioningNodeDeps {
-  audit: AuditLog;
   lifecycle: TicketLifecycle;
 }
 
@@ -37,7 +35,7 @@ export function normalizeRequest(entities: Partial<Entities> | undefined): Acces
  * The provisioning node (design §5.1): without LLM, normalizes the access request and takes the
  * case (T3). It never grants anything: R-P1 sends the request to escalation for approval.
  */
-export function createProvisioningNode({ audit, lifecycle }: ProvisioningNodeDeps) {
+export function createProvisioningNode({ lifecycle }: ProvisioningNodeDeps) {
   return async (state: GraphState): Promise<GraphUpdate> => {
     // Another category here is an internal error: without a request, the route is R-X3.
     if (state.category !== 'provisioning') return {};
@@ -46,15 +44,12 @@ export function createProvisioningNode({ audit, lifecycle }: ProvisioningNodeDep
     const saved = await lifecycle.applyTransition(
       toTicketState(mergeUpdate(state, { entities })),
       'IN_PROGRESS',
-      { agent: 'provisioning', reason: 'provisioning structures the access request' },
+      {
+        agent: 'provisioning',
+        reason: 'provisioning structures the access request',
+        data: { resource: request.resource, accessLevel: request.accessLevel },
+      },
     );
-    await audit.append({
-      ticketId: state.ticketId,
-      agent: 'provisioning',
-      decision: 'node_finished',
-      reason: 'access request normalized for approval',
-      data: { resource: request.resource, accessLevel: request.accessLevel },
-    });
     return { entities, status: saved.status };
   };
 }
