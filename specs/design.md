@@ -695,7 +695,7 @@ Salida estructurada con `withStructuredOutput(zod)`. Timeout con `AbortSignal.ti
 
 ### 12.6 CI (`azure-pipelines.yml`, SHOULD)
 
-Trigger en todas las ramas · `ubuntu-latest` · Node LTS · `corepack enable` · `pnpm install --frozen-lockfile` · `pnpm spec:validate` (CI-01; incluye `scripts/trace.mjs --check`, así que falla si una MUST queda sin tarea, VAL-07) · `pnpm lint` (CI-03) · `pnpm test -- --coverage` con umbral del 90 % en `agent-spec` (CI-02, CI-04) · `pnpm -r build` · publica los resultados JUnit y la cobertura Cobertura.
+Trigger en todas las ramas · `ubuntu-latest` · Node de `.nvmrc` (`NodeTool@0`) · `corepack enable` · `pnpm install --frozen-lockfile` · `pnpm spec:validate` (CI-01; incluye `scripts/trace.mjs --check`, así que falla si una MUST queda sin tarea, VAL-07) · `pnpm lint` (CI-03) · `pnpm test` con salida JUnit (CI-02) · `pnpm -F agent-spec test -- --coverage` con umbral del 90 % (CI-04; con `projects`, vitest ignora la cobertura de cada proyecto si se corre desde la raíz) · `pnpm -r build` · publica los resultados JUnit y la cobertura Cobertura.
 
 ---
 

@@ -493,17 +493,17 @@ Gate de entrada: `aprobado fase 3`.
   Verifica: `pnpm -F api test -- tickets.created-early`
   Bloqueada por: T-66
 
-- [ ] T-84 · Crear `azure-pipelines.yml` (design §12.6) · Satisface: REQ-CI-01, REQ-CI-02, REQ-CI-03
+- [x] T-84 · Crear `azure-pipelines.yml` (design §12.6) · Satisface: REQ-CI-01, REQ-CI-02, REQ-CI-03
   Hecho cuando: When a commit is pushed, the ci pipeline shall run `pnpm spec:validate`, `pnpm lint` and `pnpm test`.
   Verifica: `pnpm test -- ci.pipeline` (parsea `azure-pipelines.yml` con `yaml` y comprueba los tres pasos) + ejecución verde en Azure DevOps. Como `spec:validate` incluye `trace.mjs --check` (T-19), el pipeline falla si una MUST queda sin tarea
   Bloqueada por: T-30
 
-- [ ] T-85 · Fijar el umbral de cobertura del 90 % en `packages/agent-spec` · Satisface: REQ-CI-04
+- [x] T-85 · Fijar el umbral de cobertura del 90 % en `packages/agent-spec` · Satisface: REQ-CI-04
   Hecho cuando: If the line coverage of `packages/agent-spec` is below 90 %, then the ci pipeline shall fail the build.
   Verifica: `pnpm -F agent-spec test -- --coverage` (umbral en `vitest.config.ts`; bajarlo a 100 % hace fallar el comando)
   Bloqueada por: T-84
 
-- [ ] T-86 · Generar el diagrama Mermaid del grafo con `pnpm spec:graph` y escribir el README con el guion de demo · Satisface: REQ-DOC-01
+- [x] T-86 · Generar el diagrama Mermaid del grafo con `pnpm spec:graph` y escribir el README con el guion de demo · Satisface: REQ-DOC-01
   Hecho cuando: When `pnpm spec:graph` runs, the spec validator shall print a Mermaid flowchart of the compiled handoff graph.
   Verifica: `pnpm -F agent-spec test -- docs.readme-graph` (la salida coincide con el diagrama incrustado en `README.md`)
   Bloqueada por: T-30
