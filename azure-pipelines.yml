@@ -1,0 +1,50 @@
+# Azure DevOps pipeline (design §12.6): spec validation, lint, tests and the agent-spec coverage
+# gate. Any failing step fails the build; the results are published either way.
+trigger:
+  branches:
+    include:
+      - '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: NodeTool@0
+    displayName: Node from .nvmrc
+    inputs:
+      versionSource: fromFile
+      versionFilePath: .nvmrc
+
+  - script: corepack enable
+    displayName: Enable pnpm (packageManager of package.json)
+
+  - script: pnpm install --frozen-lockfile
+    displayName: Install the locked dependencies
+
+  - script: pnpm spec:validate
+    displayName: Validate .github/ and the REQ → task traceability (REQ-CI-01)
+
+  - script: pnpm lint
+    displayName: ESLint and Prettier (REQ-CI-03)
+
+  - script: pnpm test -- --reporter=default --reporter=junit --outputFile.junit=test-results/junit.xml
+    displayName: Tests of the monorepo (REQ-CI-02)
+
+  - script: pnpm -F agent-spec test -- --coverage
+    displayName: agent-spec coverage, at least 90 % of lines (REQ-CI-04)
+
+  - script: pnpm -r build
+    displayName: Build every package
+
+  - task: PublishTestResults@2
+    displayName: Publish the test results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: test-results/junit.xml
+
+  - task: PublishCodeCoverageResults@2
+    displayName: Publish the agent-spec coverage
+    condition: succeededOrFailed()
+    inputs:
+      summaryFileLocation: packages/agent-spec/coverage/cobertura-coverage.xml
