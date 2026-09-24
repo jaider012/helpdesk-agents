@@ -366,7 +366,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- lifecycle.sla`
   Bloqueada por: T-42
 
-- [ ] T-65 · Exponer `POST /tickets` como alias de `triage-ticket` · Satisface: REQ-API-02, REQ-API-03
+- [x] T-65 · Exponer `POST /tickets` como alias de `triage-ticket` · Satisface: REQ-API-02, REQ-API-03
   Hecho cuando: When the api receives `POST /tickets`, the api shall respond `202` with the new `ticketId` and start the graph at the redact node.
   Verifica: `pnpm -F api test -- tickets.create`
   Bloqueada por: T-61
