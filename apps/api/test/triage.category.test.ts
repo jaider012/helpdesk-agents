@@ -29,7 +29,7 @@ describe('triage.category', () => {
     expect(JSON.stringify(classified)).not.toContain('ana.demo');
   });
 
-  it('records the redaction counts and the classification in the audit log', async () => {
+  it('records the redaction counts, the classification and the NEW → TRIAGED transition', async () => {
     const { audit } = await triage('Soy ana.demo@example.com y la VPN no conecta.');
 
     expect(audit).toMatchObject([
@@ -39,6 +39,7 @@ describe('triage.category', () => {
         decision: 'classified',
         data: { category: 'infra', issueType: 'vpn', severity: 'P3' },
       },
+      { agent: 'triage', decision: 'transition', from: 'NEW', to: 'TRIAGED' },
     ]);
   });
 });

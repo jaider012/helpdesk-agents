@@ -13,6 +13,9 @@ import { compileSeverityMatrix } from '../src/graph/severity-matrix.js';
 import type { GraphState } from '../src/graph/state.js';
 import { FakeChatModel } from '../src/llm/fake-chat-model.js';
 import { fakeResponder } from '../src/llm/fake-responder.js';
+import { TicketStateMachine } from '../src/tickets/state-machine.js';
+import { TicketLifecycle } from '../src/tickets/ticket-lifecycle.js';
+import { TicketStore } from '../src/tickets/ticket-store.js';
 import { REPO_ROOT } from './lifecycle-helpers.js';
 
 const TICKET_ID = 'TCK-20260923-101500-rtg';
@@ -22,9 +25,12 @@ async function setup() {
   const agents = compileAgents(bundle);
   const triageAgent = agents.find(({ name }) => name === 'triage');
   if (!triageAgent) throw new Error('triage agent not found');
-  const audit = new AuditLog(
-    await mkdtemp(join(tmpdir(), 'helpdesk-routing-')),
-    () => new Date('2026-09-23T10:15:00.000Z'),
+  const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-routing-'));
+  const audit = new AuditLog(dataDir, () => new Date('2026-09-23T10:15:00.000Z'));
+  const lifecycle = new TicketLifecycle(
+    TicketStateMachine.fromBundle(bundle),
+    audit,
+    new TicketStore(dataDir),
   );
   const triage = withRouting(
     'triage',
@@ -33,6 +39,7 @@ async function setup() {
       systemPrompt: triageAgent.systemPrompt,
       severity: compileSeverityMatrix(triageAgent.systemPrompt),
       audit,
+      lifecycle,
     }),
     triageRouteInput,
     audit,
@@ -104,6 +111,7 @@ describe('audit.routing', () => {
     expect((await audit.read(TICKET_ID)).map(({ decision }) => decision)).toEqual([
       'redacted',
       'classified',
+      'transition',
       'routed',
     ]);
   });

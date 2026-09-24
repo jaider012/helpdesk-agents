@@ -68,6 +68,7 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | DC-45 | El `FakeChatModel` implementa `bindTools` y responde con un `AIMessageChunk` que lleva la llamada a la tool; el nodo triage valida él mismo los argumentos con zod. | El `withStructuredOutput` base de `@langchain/core` solo acepta chunks y no valida el esquema. | Ninguno práctico. | T-42 | |
 | DC-46 | Reglas del modelo fake: además de las palabras clave de design §12.3, «nadie», «todos», «sede» o «detenid…» dan impacto y urgencia `high`; provisioning da impacto `low`; el resto, `medium`. | Design §12.3 no fija impacto ni urgencia, y los tests necesitan casos P1 y P4 deterministas. | Ajustar `fake-responder.ts`. | T-42 | |
 | DC-47 | Los motivos (`reason`) que escribe el runtime en la bitácora van en inglés; los del modo Copilot van en español. | Son texto técnico generado por código (código en inglés, CLAUDE.md §0). | Traducirlos en el código si la bitácora se va a mostrar tal cual. | T-36 a T-42 | |
+| DC-48 | El nodo triage aplica `NEW → TRIAGED` (T1) al clasificar con éxito; el nodo escalation toma el motivo de la decisión de enrutamiento o, si llega sin ella (prompt `escalate-ticket`), usa `operator_request`. | Es el camino del diagrama de design §3 y permite a escalation hacer `TRIAGED → ESCALATED` (T4). Ninguna tarea asignaba T1 explícitamente. | Mover T1 a otro punto del grafo. | T-44 | |
 
 ## Aprobadas explícitamente por ti (referencia)
 

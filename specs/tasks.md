@@ -259,7 +259,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- audit.routing`
   Bloqueada por: T-27, T-42
 
-- [ ] T-44 · Implementar el nodo escalation (paquete, estado `ESCALATED`, fin del recorrido) · Satisface: REQ-ESC-01, REQ-ESC-02, REQ-ESC-03
+- [x] T-44 · Implementar el nodo escalation (paquete, estado `ESCALATED`, fin del recorrido) · Satisface: REQ-ESC-01, REQ-ESC-02, REQ-ESC-03
   Hecho cuando: When the escalation agent completes the escalation package with `ticketId`, `category`, `severity`, `entities`, `findings` and `reason`, the runtime shall set the ticket status to `ESCALATED` and end the graph execution for that ticket.
   Verifica: `pnpm -F api test -- escalation.package escalation.status escalation.terminal`
   Bloqueada por: T-43

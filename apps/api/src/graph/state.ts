@@ -46,3 +46,22 @@ export const TicketGraphState = Annotation.Root({
 
 export type GraphState = typeof TicketGraphState.State;
 export type GraphUpdate = typeof TicketGraphState.Update;
+
+/** The state after a node update, with the append reducers of findings, actions and audit. */
+export function mergeUpdate(state: GraphState, update: GraphUpdate): GraphState {
+  return {
+    ...state,
+    ...update,
+    findings: [...state.findings, ...((update.findings as DiagnosticFinding[] | undefined) ?? [])],
+    actions: [...state.actions, ...((update.actions as ExecutedAction[] | undefined) ?? [])],
+    audit: [...state.audit, ...((update.audit as AuditEntry[] | undefined) ?? [])],
+  } as GraphState;
+}
+
+/** The TicketState that the lifecycle validates and the ticket store persists (without rawText). */
+export function toTicketState(state: GraphState): TicketState {
+  const ticket: Record<string, unknown> = { ...state, escalation: state.escalationPackage };
+  delete ticket.rawText;
+  delete ticket.escalationPackage;
+  return ticket as unknown as TicketState;
+}

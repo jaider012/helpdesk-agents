@@ -10,6 +10,9 @@ import { createTriageNode } from '../src/graph/nodes/triage.node.js';
 import { compileSeverityMatrix } from '../src/graph/severity-matrix.js';
 import { FakeChatModel } from '../src/llm/fake-chat-model.js';
 import { fakeResponder } from '../src/llm/fake-responder.js';
+import { TicketStateMachine } from '../src/tickets/state-machine.js';
+import { TicketLifecycle } from '../src/tickets/ticket-lifecycle.js';
+import { TicketStore } from '../src/tickets/ticket-store.js';
 import { REPO_ROOT } from './lifecycle-helpers.js';
 
 export const SALT = 'synthetic-test-salt';
@@ -24,16 +27,17 @@ export async function triage(rawText: string) {
     seen.push(messages);
     return fakeResponder(messages, tools);
   });
-  const audit = new AuditLog(
-    await mkdtemp(join(tmpdir(), 'helpdesk-triage-')),
-    () => new Date('2026-09-23T10:15:00.000Z'),
-  );
+  const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-triage-'));
+  const audit = new AuditLog(dataDir, () => new Date('2026-09-23T10:15:00.000Z'));
+  const machine = TicketStateMachine.fromBundle(bundle);
+  const lifecycle = new TicketLifecycle(machine, audit, new TicketStore(dataDir));
   const redactNode = createRedactNode({ audit, salt: SALT });
   const triageNode = createTriageNode({
     model,
     systemPrompt: agent.systemPrompt,
     severity: compileSeverityMatrix(agent.systemPrompt),
     audit,
+    lifecycle,
   });
   const base = {
     ticketId: 'TCK-20260923-101500-abc',
