@@ -1,10 +1,26 @@
-import { Body, Controller, HttpCode, Inject, Logger, Param, Post } from '@nestjs/common';
-import type { PromptRunner } from './prompt-runner.js';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  HttpCode,
+  Inject,
+  Logger,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { z } from 'zod';
+import {
+  MissingVariablesError,
+  PromptNotFoundError,
+  TicketNotFoundError,
+  type PromptRunner,
+  type StartedRun,
+} from './prompt-runner.js';
 import { PROMPT_RUNNER } from './tokens.js';
 
-interface RunBody {
-  variables?: Record<string, string>;
-}
+/** Body of a prompt run: the variable values, all text (design §7, step 2). */
+const RunBody = z.object({ variables: z.record(z.string(), z.string()).optional() });
 
 @Controller('prompts')
 export class PromptsController {
@@ -15,8 +31,12 @@ export class PromptsController {
   /** Starts the graph at the agent of the prompt; progress arrives through the audit log (SSE). */
   @Post(':name/run')
   @HttpCode(202)
-  async run(@Param('name') name: string, @Body() body: RunBody): Promise<{ ticketId: string }> {
-    const { ticketId, done } = await this.runner.start(name, body?.variables ?? {});
+  async run(@Param('name') name: string, @Body() body: unknown): Promise<{ ticketId: string }> {
+    const parsed = RunBody.safeParse(body ?? {});
+    if (!parsed.success) {
+      throw new BadRequestException({ message: 'variables must be an object of text values' });
+    }
+    const { ticketId, done } = await this.start(name, parsed.data.variables ?? {});
     // Only the error name is logged: the ticket text never reaches the logs (REQ-SEC-08).
     done.catch((error: unknown) =>
       this.logger.error(
@@ -24,5 +44,20 @@ export class PromptsController {
       ),
     );
     return { ticketId };
+  }
+
+  /** Starts the run, with 404 for an unknown prompt or ticket and 400 for missing variables. */
+  private async start(name: string, variables: Record<string, string>): Promise<StartedRun> {
+    try {
+      return await this.runner.start(name, variables);
+    } catch (error) {
+      if (error instanceof PromptNotFoundError || error instanceof TicketNotFoundError) {
+        throw new NotFoundException(error.message);
+      }
+      if (error instanceof MissingVariablesError) {
+        throw new BadRequestException({ message: error.message, missing: error.missing });
+      }
+      throw error;
+    }
   }
 }

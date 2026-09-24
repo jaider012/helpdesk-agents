@@ -49,3 +49,17 @@ export async function promptApp(model?: BaseChatModel) {
     store: app.get<TicketStore>(TICKET_STORE),
   };
 }
+
+/** POSTs `variables` to `/prompts/<name>/run` on a listening app. */
+export async function postRun(
+  app: Awaited<ReturnType<typeof promptApp>>['app'],
+  name: string,
+  variables: Record<string, string> | undefined,
+) {
+  const response = await fetch(`${await app.getUrl()}/prompts/${name}/run`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(variables === undefined ? {} : { variables }),
+  });
+  return { status: response.status, body: (await response.json()) as Record<string, unknown> };
+}

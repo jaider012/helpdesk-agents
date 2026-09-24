@@ -4,6 +4,7 @@ import type { AuditLog } from '../audit/audit-log.js';
 import type { buildGraph } from '../graph/build.js';
 import { fromTicketState, type GraphState } from '../graph/state.js';
 import type { Channel } from '../tickets/ticket-state.js';
+import { TICKET_ID_PATTERN } from '../tickets/ticket-id.js';
 import type { TicketStore } from '../tickets/ticket-store.js';
 
 export type CompiledGraph = ReturnType<typeof buildGraph>;
@@ -41,6 +42,31 @@ export function newTicketId(now: Date): string {
     .padStart(3, '0')}`;
 }
 
+/** `:name` matches no prompt file (REQ-2.4-14). */
+export class PromptNotFoundError extends Error {
+  constructor() {
+    super('no prompt file with that name');
+    this.name = 'PromptNotFoundError';
+  }
+}
+
+/** The request lacks variables that the template declares (REQ-2.4-13). */
+export class MissingVariablesError extends Error {
+  constructor(readonly missing: string[]) {
+    super(`missing variables: ${missing.join(', ')}`);
+    this.name = 'MissingVariablesError';
+  }
+}
+
+/** The `ticketId` of the request matches no stored ticket (REQ-2.4-15). */
+export class TicketNotFoundError extends Error {
+  constructor() {
+    // The value is not echoed: it comes from the request.
+    super('no ticket with that ticketId');
+    this.name = 'TicketNotFoundError';
+  }
+}
+
 export interface StartedRun {
   ticketId: string;
   /** Settles when the graph run ends. */
@@ -66,7 +92,9 @@ export class PromptRunner {
 
   async start(name: string, variables: Record<string, string>): Promise<StartedRun> {
     const definition = this.prompts.get(name);
-    if (!definition) throw new Error(`unknown prompt \`${name}\``);
+    if (!definition) throw new PromptNotFoundError();
+    const missing = definition.variables.filter((variable) => !variables[variable]?.trim());
+    if (missing.length > 0) throw new MissingVariablesError(missing);
     const prompt = { name, template: definition.template, variables };
     const input = await this.initialState(definition, prompt);
     await this.audit.append({
@@ -96,8 +124,10 @@ export class PromptRunner {
         prompt,
       };
     }
-    const stored = await this.store.read(prompt.variables.ticketId ?? '');
-    if (!stored) throw new Error('unknown ticket');
+    const { ticketId = '' } = prompt.variables;
+    // A malformed id cannot name a stored ticket, and it never reaches a file path.
+    const stored = TICKET_ID_PATTERN.test(ticketId) ? await this.store.read(ticketId) : undefined;
+    if (!stored) throw new TicketNotFoundError();
     const state = fromTicketState(stored);
     // A new run: the routing decision of an earlier run does not apply.
     delete (state as Partial<GraphState>).lastRoute;

@@ -349,7 +349,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- prompts.render prompts.entry-agent redact.prompt-variables`
   Bloqueada por: T-51, T-55
 
-- [ ] T-62 · Rechazar prompt runs con variables ausentes, prompt inexistente o ticket inexistente · Satisface: REQ-2.4-13, REQ-2.4-14, REQ-2.4-15
+- [x] T-62 · Rechazar prompt runs con variables ausentes, prompt inexistente o ticket inexistente · Satisface: REQ-2.4-13, REQ-2.4-14, REQ-2.4-15
   Hecho cuando: If a `POST /prompts/:name/run` request omits a template variable, names an unknown prompt or references an unknown `ticketId`, then the api shall respond `400` with the missing variable names in the first case and `404` in the other two.
   Verifica: `pnpm -F api test -- prompts.missing-variable prompts.not-found prompts.unknown-ticket`
   Bloqueada por: T-61
