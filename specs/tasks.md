@@ -478,7 +478,7 @@ Gate de entrada: `aprobado fase 3`.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red)
   Bloqueada por: T-33
 
-- [ ] T-83 · Usar DeepSeek (`ChatOpenAI` con la URL de DeepSeek) cuando no hay Azure y existe `DEEPSEEK_API_KEY` · Satisface: REQ-LLM-02
+- [x] T-83 · Usar DeepSeek (`ChatOpenAI` con la URL de DeepSeek) cuando no hay Azure y existe `DEEPSEEK_API_KEY` · Satisface: REQ-LLM-02
   Hecho cuando: Where the Azure OpenAI variables are absent and `DEEPSEEK_API_KEY` is set, the runtime shall use DeepSeek through `ChatOpenAI` as the LLM provider.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red)
   Bloqueada por: T-82
