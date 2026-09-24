@@ -1,9 +1,10 @@
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { AzureChatOpenAI } from '@langchain/openai';
 import { FakeChatModel } from './fake-chat-model.js';
 import type { FakeResponder } from './fake-chat-model.js';
 import { fakeResponder } from './fake-responder.js';
 
-export type LlmProvider = 'fake';
+export type LlmProvider = 'azure' | 'fake';
 
 export interface ChatModelSelection {
   provider: LlmProvider;
@@ -16,6 +17,11 @@ export const NO_PROVIDER_WARNING =
   'No LLM provider variables are set: the api runs on the deterministic fake model';
 
 export const DEFAULT_LLM_TIMEOUT_MS = 30_000;
+
+/** Upper bound of each answer of a real model: a draft never generates until the timeout. */
+export const LLM_MAX_TOKENS = 1024;
+
+export const DEFAULT_AZURE_OPENAI_API_VERSION = '2024-10-21';
 
 /** The timeout of each LLM call: `LLM_TIMEOUT_MS` when it is a positive integer, 30 s otherwise. */
 export function resolveLlmTimeoutMs(env: Record<string, string | undefined>): number {
@@ -30,6 +36,20 @@ export function selectChatModel(
 ): ChatModelSelection {
   // Tests always run on the deterministic fake model, whatever else is configured (REQ-LLM-04).
   if (env.NODE_ENV === 'test') return { provider: 'fake', model: new FakeChatModel(responder) };
+  // A client is only built with all of its variables (REQ-LLM-01).
+  if (env.AZURE_OPENAI_ENDPOINT && env.AZURE_OPENAI_API_KEY && env.AZURE_OPENAI_DEPLOYMENT) {
+    return {
+      provider: 'azure',
+      model: new AzureChatOpenAI({
+        azureOpenAIEndpoint: env.AZURE_OPENAI_ENDPOINT,
+        azureOpenAIApiKey: env.AZURE_OPENAI_API_KEY,
+        azureOpenAIApiDeploymentName: env.AZURE_OPENAI_DEPLOYMENT,
+        azureOpenAIApiVersion: env.AZURE_OPENAI_API_VERSION || DEFAULT_AZURE_OPENAI_API_VERSION,
+        temperature: 0,
+        maxTokens: LLM_MAX_TOKENS,
+      }),
+    };
+  }
   // Without a complete provider configuration the demo still starts, without secrets (REQ-LLM-03).
   return {
     provider: 'fake',

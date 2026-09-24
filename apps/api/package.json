@@ -13,6 +13,7 @@
   "dependencies": {
     "@langchain/core": "^1.2.12",
     "@langchain/langgraph": "^1.4.17",
+    "@langchain/openai": "^1.5.13",
     "@nestjs/common": "^12.1.0",
     "@nestjs/core": "^12.1.0",
     "@nestjs/platform-express": "^12.1.0",

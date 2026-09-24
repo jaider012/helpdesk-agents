@@ -473,7 +473,7 @@ Gate de entrada: `aprobado fase 2`.
 
 Gate de entrada: `aprobado fase 3`.
 
-- [ ] T-82 · Usar `AzureChatOpenAI` cuando existen las variables de Azure OpenAI · Satisface: REQ-LLM-01
+- [x] T-82 · Usar `AzureChatOpenAI` cuando existen las variables de Azure OpenAI · Satisface: REQ-LLM-01
   Hecho cuando: Where `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` and `AZURE_OPENAI_DEPLOYMENT` are set, the runtime shall use `AzureChatOpenAI` as the LLM provider.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red)
   Bloqueada por: T-33

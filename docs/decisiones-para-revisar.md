@@ -114,6 +114,8 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | ID | Decisión | Por qué | Cómo revertir | Commit | Revisión |
 | --- | --- | --- | --- | --- | --- |
 | DC-80 | El E2E previo a `aprobado fase 3` usó un conector de prueba fuera del repo (en el scratchpad de la sesión): el api compilado con su chat model reemplazado por LM Studio (`qwen/qwen3.5-9b`), con `json_schema` y `reasoning_effort: none`. Sus hallazgos (razonamiento que deja vacía la respuesta, borradores sin límite de tokens) pasaron a design §12.3. | Probar la Fase 3 con un LLM real sin adelantar código de la Fase 4 antes del gate. | — (no quedó código en el repo). | — | |
+| DC-81 | `.claude/worktrees/` queda en `.gitignore` y en los `ignores` de ESLint (Prettier ya respeta `.gitignore`). | Los agentes en paralelo trabajan en worktrees dentro del repo, y `pnpm lint` revisaba su código a medio hacer. | Quitar las dos líneas. | T-82 | |
+| DC-82 | Azure OpenAI usa `AZURE_OPENAI_API_VERSION` o, si falta, `2024-10-21` (el valor de `.env.example`), con `temperature` 0 y `maxTokens` 1024. `@langchain/openai` 1.5.13 comparte la misma copia de `@langchain/core` que el api y `langgraph`. | Design §12.3/§12.5. | Cambiar las constantes de `llm/provider.ts`. | T-82 | |
 
 ## Aprobadas explícitamente por ti (referencia)
 
