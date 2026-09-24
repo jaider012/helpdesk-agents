@@ -25,7 +25,7 @@
 | --- | --- | --- | --- |
 | 1 | T-01 … T-16 | `check-vpn.js` con tests + `.github/` probado en Copilot Chat | `aprobado fase 0` |
 | 2 | T-17 … T-72 | `packages/agent-spec` (validador, routing, trazabilidad) + grafo LangGraph + API NestJS | `aprobado fase 1` |
-| 3 | T-73 … T-81 | SSE + Angular (bandeja, timeline, bitácora, formulario) | `aprobado fase 2` |
+| 3 | T-73 … T-81, T-87, T-88 | SSE + Angular (bandeja, timeline, bitácora, formulario) + eventos de nodo y versión de Node | `aprobado fase 2` |
 | 4 | T-82 … T-86 | Azure OpenAI / Anthropic, `azure-pipelines.yml`, README | `aprobado fase 3` |
 
 ---
@@ -417,6 +417,16 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F api test -- tickets.sse`
   Bloqueada por: T-66
 
+- [ ] T-87 · Registrar `node_started` y `node_finished` en cada nodo del grafo (design §4, §12.1) · Satisface: REQ-API-07, REQ-WEB-02
+  Hecho cuando: While the runtime runs a ticket graph, the runtime shall append a `node_started` entry before each node and a `node_finished` entry with `durationMs` after it.
+  Verifica: `pnpm -F api test -- graph.node-events`
+  Bloqueada por: T-43
+
+- [ ] T-88 · Fijar la versión de Node en `.nvmrc` y el rango de Angular CLI en `engines` · Satisface: REQ-WEB-08, REQ-CI-02
+  Hecho cuando: If the active Node version is outside the range that Angular CLI supports, then the web app shall stop `pnpm install` with `ERR_PNPM_UNSUPPORTED_ENGINE`.
+  Verifica: `pnpm test -- node.version` (`.nvmrc` dentro del rango de `engines`, que es el de Angular CLI) + `pnpm install` con Node 22.19 falla con `ERR_PNPM_UNSUPPORTED_ENGINE`
+  Bloqueada por: T-74
+
 - [x] T-74 · Crear `apps/web` (Angular CLI, componentes standalone, signals, runner de tests) con la ruta raíz y un test de humo · Satisface: REQ-WEB-08
   Hecho cuando: When the operator opens the root path `/`, the web app shall redirect to the inbox view `/tickets`.
   Verifica: `pnpm -F web build` y `pnpm -F web test -- app.smoke`
@@ -503,7 +513,7 @@ Gate de entrada: `aprobado fase 3`.
 ## Trazabilidad REQ → tareas
 
 <!-- TRACE:START -->
-Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 86 tareas.
+Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 88 tareas.
 
 | REQ | Prioridad | Tareas |
 | --- | --- | --- |
@@ -647,7 +657,7 @@ Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 86 tareas
 | REQ-API-04 | SHOULD | T-66 |
 | REQ-API-05 | SHOULD | T-66 |
 | REQ-API-06 | SHOULD | T-66 |
-| REQ-API-07 | SHOULD | T-73 |
+| REQ-API-07 | SHOULD | T-73, T-87 |
 | REQ-API-08 | SHOULD | T-68 |
 | REQ-API-09 | SHOULD | T-67 |
 | REQ-API-10 | SHOULD | T-69 |
@@ -657,13 +667,13 @@ Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 86 tareas
 | REQ-LLM-03 | SHOULD | T-33 |
 | REQ-LLM-04 | MUST | T-31 |
 | REQ-WEB-01 | SHOULD | T-75 |
-| REQ-WEB-02 | SHOULD | T-76 |
+| REQ-WEB-02 | SHOULD | T-76, T-87 |
 | REQ-WEB-03 | SHOULD | T-77 |
 | REQ-WEB-04 | SHOULD | T-79 |
 | REQ-WEB-05 | SHOULD | T-80 |
 | REQ-WEB-06 | SHOULD | T-78 |
 | REQ-WEB-07 | SHOULD | T-81 |
-| REQ-WEB-08 | SHOULD | T-74 |
+| REQ-WEB-08 | SHOULD | T-74, T-88 |
 | REQ-VAL-01 | MUST | T-18 |
 | REQ-VAL-02 | MUST | T-17 |
 | REQ-VAL-03 | MUST | T-17 |
@@ -672,7 +682,7 @@ Cobertura: **136/136 MUST** y **33/33 SHOULD** con al menos una tarea. 86 tareas
 | REQ-VAL-06 | MUST | T-18 |
 | REQ-VAL-07 | SHOULD | T-19 |
 | REQ-CI-01 | SHOULD | T-84 |
-| REQ-CI-02 | SHOULD | T-84 |
+| REQ-CI-02 | SHOULD | T-84, T-88 |
 | REQ-CI-03 | SHOULD | T-84 |
 | REQ-CI-04 | SHOULD | T-85 |
 | REQ-DOC-01 | SHOULD | T-86 |

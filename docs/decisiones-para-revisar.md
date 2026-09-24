@@ -6,13 +6,13 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 
 ---
 
-## Abiertas: esperan tu decisión
+## Preguntas para ti (todas respondidas)
 
 | ID | Pregunta | Estado |
 | --- | --- | --- |
-| DA-01 | Proveedor LLM de la Fase 4: la spec dice Azure OpenAI → Anthropic → fake (ADR-04, REQ-LLM-01/02). Mencionaste DeepSeek (créditos pagos, sin OpenAI) y LM Studio local. Cambiarlo toca ADR-04, REQ-LLM-01/02 y T-82/T-83. | Sin decidir. Se plantea al llegar a T-82; hasta entonces los tests usan el modelo fake. |
-| DA-02 | Versión de Node: Angular CLI 22 exige Node ≥ 22.22.3 (o ≥ 24.15, ≥ 26), pero el `engines` de la raíz dice `>=22.18` y el `node` por defecto de esta Mac es 22.19.0, así que `pnpm test` falla en el test puente de la web salvo con `PATH=/opt/homebrew/bin:$PATH` (Node 26.9.0). Propuesta: subir `engines` a `^22.22.3 \|\| >=24.15`, añadir `.nvmrc` y fijar la versión en `azure-pipelines.yml` (T-84). | Abierta |
-| DA-03 | El timeline de la web (design §12.1) se deriva de `node_started`/`node_finished`, pero ninguna tarea los emite (hoy solo provisioning escribe `node_finished`). Sin ellos la web no muestra cada paso con su duración. Propuesta: que `withRouting` y el nodo escalation los escriban, como tarea nueva junto a T-73 (SSE). | Abierta |
+| DA-01 | Proveedor LLM de la Fase 4: la spec dice Azure OpenAI → Anthropic → fake (ADR-04, REQ-LLM-01/02). Mencionaste DeepSeek (créditos pagos, sin OpenAI) y LM Studio local. Cambiarlo toca ADR-04, REQ-LLM-01/02 y T-82/T-83. | ✅ Decidida 2026-09-23: **los dos**, DeepSeek y LM Studio. Ambos exponen una API compatible con OpenAI, así que bastaría `ChatOpenAI` de `@langchain/openai` (dependencia ya permitida) con otra `baseURL`, sin paquetes nuevos. Se reescriben ADR-04, REQ-LLM-01/02 y T-82/T-83 al empezar la Fase 4. |
+| DA-02 | Versión de Node: Angular CLI 22 exige Node ≥ 22.22.3 (o ≥ 24.15, ≥ 26), pero el `engines` de la raíz dice `>=22.18` y el `node` por defecto de esta Mac es 22.19.0, así que `pnpm test` falla en el test puente de la web salvo con `PATH=/opt/homebrew/bin:$PATH` (Node 26.9.0). Propuesta: subir `engines` a `^22.22.3 \|\| >=24.15`, añadir `.nvmrc` y fijar la versión en `azure-pipelines.yml` (T-84). | ✅ Decidida 2026-09-23: fijar Node. Tarea nueva T-88 (Fase 3): `.nvmrc` con 22.23.3 (último 22 LTS, ya instalado con nvm) y `engines` con el rango de Angular CLI. |
+| DA-03 | El timeline de la web (design §12.1) se deriva de `node_started`/`node_finished`, pero ninguna tarea los emite (hoy solo provisioning escribe `node_finished`). Sin ellos la web no muestra cada paso con su duración. Propuesta: que `withRouting` y el nodo escalation los escriban, como tarea nueva junto a T-73 (SSE). | ✅ Decidida 2026-09-23: sí. Tarea nueva T-87 (Fase 3): cada nodo del grafo registra `node_started` y `node_finished` con `durationMs`. |
 
 ## Fase 1 · `check-vpn.js` y `.github/`
 
@@ -95,6 +95,12 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | DC-70 | Todos los `POST` validan el body con zod mediante `http/parse-body.ts`; el 400 lleva `errors: [{ path, message }]` con la ruta del campo (p. ej. `variables.ticket`, `channel`) y el mensaje de zod. `POST /tickets` exige `text` no vacío y `channel` del enum (`email`, `chat`, `portal`, `phone`). Las variables ausentes de un prompt run siguen respondiendo con `missing` (REQ-2.4-13), porque dependen del template y no del esquema del body. | Design §11 («Variable de prompt ausente o body inválido → 400 con detalle») y REQ-API-11. | Ajustar `parseBody`. | T-70 | |
 | DC-71 | `targetTeam` sale de la tabla `## Equipos de escalamiento` del cuerpo de `escalation.agent.md` (el mismo texto que es su system prompt), por la categoría del ticket (`unknown` si no tiene). Si la tabla no está o la categoría no tiene fila, el paquete va sin `targetTeam`. El test de T-44 que compara el paquete completo ahora incluye `targetTeam`. | Design §5.6 y §10; REQ-ESC-07. | Ajustar `graph/teams.ts`. | T-71 | |
 | DC-72 | La búsqueda de correos reales está en `pnpm spec:validate` (el CLI) y no en `validateSpec`, porque necesita leer archivos que el bundle no carga: todo `.github/` y cada archivo bajo una carpeta `fixtures` dentro de `test/` o `tests/`, sin entrar en `node_modules`, `.git`, `dist`, `coverage` ni `data`. Se aceptan `example.com`, `example.internal` y sus subdominios. El error da la línea, nunca la dirección, para no repetirla en el reporte. El api no lo ejecuta al arrancar (es un control de CI). El test arma la dirección de prueba en tiempo de ejecución para que el propio archivo no la contenga. | REQ-SEC-13 y design §8 («Fixtures: solo dominios example.com y example.internal»). | Mover el escaneo a `validateSpec` cargando el contenido crudo en el bundle. | T-72 | |
+
+## Fase 3 · SSE y eventos de nodo
+
+| ID | Decisión | Por qué | Cómo revertir | Commit | Revisión |
+| --- | --- | --- | --- | --- | --- |
+| DC-73 | Tomé tu mensaje «Fase 2 aprobada» como el gate `aprobado fase 2`, aunque no es el texto literal. | La intención es inequívoca y pedirte el texto exacto solo te hacía repetirlo. | Escribe `aprobado fase 2` literal si prefieres que los gates sean exactos. | — | |
 
 ## Aprobadas explícitamente por ti (referencia)
 
