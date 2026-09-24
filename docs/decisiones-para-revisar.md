@@ -6,13 +6,14 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 
 ---
 
-## Preguntas para ti (todas respondidas)
+## Preguntas para ti
 
 | ID | Pregunta | Estado |
 | --- | --- | --- |
 | DA-01 | Proveedor LLM de la Fase 4: la spec dice Azure OpenAI → Anthropic → fake (ADR-04, REQ-LLM-01/02). Mencionaste DeepSeek (créditos pagos, sin OpenAI) y LM Studio local. Cambiarlo toca ADR-04, REQ-LLM-01/02 y T-82/T-83. | ✅ Decidida 2026-09-23: **los dos**, DeepSeek y LM Studio. Ambos exponen una API compatible con OpenAI, así que bastaría `ChatOpenAI` de `@langchain/openai` (dependencia ya permitida) con otra `baseURL`, sin paquetes nuevos. Se reescriben ADR-04, REQ-LLM-01/02 y T-82/T-83 al empezar la Fase 4. |
 | DA-02 | Versión de Node: Angular CLI 22 exige Node ≥ 22.22.3 (o ≥ 24.15, ≥ 26), pero el `engines` de la raíz dice `>=22.18` y el `node` por defecto de esta Mac es 22.19.0, así que `pnpm test` falla en el test puente de la web salvo con `PATH=/opt/homebrew/bin:$PATH` (Node 26.9.0). Propuesta: subir `engines` a `^22.22.3 \|\| >=24.15`, añadir `.nvmrc` y fijar la versión en `azure-pipelines.yml` (T-84). | ✅ Decidida 2026-09-23: fijar Node. Tarea nueva T-88 (Fase 3): `.nvmrc` con 22.23.3 (último 22 LTS, ya instalado con nvm) y `engines` con el rango de Angular CLI. |
 | DA-03 | El timeline de la web (design §12.1) se deriva de `node_started`/`node_finished`, pero ninguna tarea los emite (hoy solo provisioning escribe `node_finished`). Sin ellos la web no muestra cada paso con su duración. Propuesta: que `withRouting` y el nodo escalation los escriban, como tarea nueva junto a T-73 (SSE). | ✅ Decidida 2026-09-23: sí. Tarea nueva T-87 (Fase 3): cada nodo del grafo registra `node_started` y `node_finished` con `durationMs`. |
+| DA-04 | `GET /tickets/:id` responde 404 mientras triage espera al LLM, porque el ticket se guarda por primera vez en `NEW → TRIAGED`. La web abre el detalle justo después del 202 y, con un LLM real (varios segundos), mostraría «no existe» y no abriría el SSE. Con el modelo fake no se nota (milisegundos). Propuesta: que el nodo redact guarde el ticket en `NEW` con `redactedText` y registre `ticket_created` (la decisión ya existe en design §4), como tarea nueva de la Fase 3. | Abierta |
 
 ## Fase 1 · `check-vpn.js` y `.github/`
 
@@ -101,6 +102,8 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | ID | Decisión | Por qué | Cómo revertir | Commit | Revisión |
 | --- | --- | --- | --- | --- | --- |
 | DC-73 | Tomé tu mensaje «Fase 2 aprobada» como el gate `aprobado fase 2`, aunque no es el texto literal. | La intención es inequívoca y pedirte el texto exacto solo te hacía repetirlo. | Escribe `aprobado fase 2` literal si prefieres que los gates sean exactos. | — | |
+| DC-74 | Al conectarse, el SSE reenvía primero todas las entradas ya escritas (con `seq` como id del evento) y después las nuevas; cada `seq` sale una sola vez. Si no hay un recorrido en marcha, manda `done` enseguida con el estado guardado. | La web abre el SSE en paralelo con `GET /audit` y ya quita duplicados por `seq` (DW-11): así no se pierde ninguna entrada escrita entre las dos peticiones ni al reconectar cada 5 s. | Enviar solo las entradas nuevas y usar `Last-Event-ID`. | T-73 | |
+| DC-75 | El api sabe qué tickets tienen un recorrido en marcha (`PromptRunner.runOf`), y el SSE acepta un ticket nuevo aunque todavía no esté guardado. El `done` lleva el estado guardado al terminar, o `NEW` si el recorrido se cortó antes de guardarlo. | El ticket se guarda por primera vez en `NEW → TRIAGED`, después de la llamada al LLM; sin esto, el SSE de un ticket recién creado respondería 404. | Guardar el ticket en `NEW` antes de triage (ver DA-04). | T-73 | |
 
 ## Aprobadas explícitamente por ti (referencia)
 

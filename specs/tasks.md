@@ -412,7 +412,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
 
 Gate de entrada: `aprobado fase 2`.
 
-- [ ] T-73 · Exponer `GET /tickets/:id/events` como SSE derivado de la bitácora (design §12.1) · Satisface: REQ-API-07
+- [x] T-73 · Exponer `GET /tickets/:id/events` como SSE derivado de la bitácora (design §12.1) · Satisface: REQ-API-07
   Hecho cuando: When a client connects to `GET /tickets/:id/events`, the api shall stream node, handoff and transition events as Server-Sent Events.
   Verifica: `pnpm -F api test -- tickets.sse`
   Bloqueada por: T-66

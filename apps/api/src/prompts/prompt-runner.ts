@@ -110,6 +110,8 @@ export interface StartedRun {
  */
 export class PromptRunner {
   readonly prompts: Map<string, PromptDefinition>;
+  /** The graph runs in progress, by ticketId: each settles when its run ends. */
+  private readonly running = new Map<string, Promise<void>>();
 
   constructor(
     bundle: SpecBundle,
@@ -141,7 +143,7 @@ export class PromptRunner {
       reason: `operator ran the ${name} prompt`,
       data: { prompt: name, agent: definition.agent, variables: Object.keys(variables) },
     });
-    return { ticketId: input.ticketId, done: this.graph.invoke(input) as Promise<GraphState> };
+    return { ticketId: input.ticketId, done: this.track(input.ticketId, input) };
   }
 
   /**
@@ -150,7 +152,26 @@ export class PromptRunner {
    */
   resume(ticket: TicketState, agent: AgentName): StartedRun {
     const input = runOver(ticket, agent);
-    return { ticketId: ticket.ticketId, done: this.graph.invoke(input) as Promise<GraphState> };
+    return { ticketId: ticket.ticketId, done: this.track(ticket.ticketId, input) };
+  }
+
+  /** Settles when the graph run of the ticket ends; `undefined` when none is running. */
+  runOf(ticketId: string): Promise<void> | undefined {
+    return this.running.get(ticketId);
+  }
+
+  /** Invokes the graph and keeps the run in `running` until it ends, with or without an error. */
+  private track(ticketId: string, input: Partial<GraphState>): Promise<GraphState> {
+    const done = this.graph.invoke(input) as Promise<GraphState>;
+    const settled = done.then(
+      () => undefined,
+      () => undefined,
+    );
+    this.running.set(ticketId, settled);
+    void settled.then(() => {
+      if (this.running.get(ticketId) === settled) this.running.delete(ticketId);
+    });
+    return done;
   }
 
   /** A new ticket for triage-ticket; the stored ticket for the other prompts. */

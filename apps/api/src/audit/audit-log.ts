@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { redact } from '../redact/redact.js';
 import { assertTicketId } from '../tickets/ticket-id.js';
 import type { AuditEntry, NewAuditEntry } from './audit-entry.js';
+import type { AuditFeed } from './audit-feed.js';
 
 function auditFile(dataDir: string, ticketId: string): string {
   assertTicketId(ticketId);
@@ -42,32 +43,38 @@ export class AuditWriteError extends Error {
 
 /**
  * Append-only audit log, one JSON line per entry in `<dataDir>/audit/<ticketId>.jsonl`
- * (REQ-AUD-01, REQ-AUD-02). It exposes only `append` and `read`.
+ * (REQ-AUD-01, REQ-AUD-02). It exposes only `append` and `read`; with a `feed`, it publishes each
+ * written entry for the SSE streams.
  */
 export class AuditLog {
   private readonly dataDir: string;
   private readonly clock: () => Date;
+  private readonly feed?: AuditFeed;
 
-  constructor(dataDir: string, clock: () => Date = () => new Date()) {
+  constructor(dataDir: string, clock: () => Date = () => new Date(), feed?: AuditFeed) {
     this.dataDir = dataDir;
     this.clock = clock;
+    this.feed = feed;
   }
 
   async append(entry: NewAuditEntry): Promise<AuditEntry> {
     const file = auditFile(this.dataDir, entry.ticketId);
+    let written: AuditEntry;
     try {
       await mkdir(dirname(file), { recursive: true });
       const seq = (await readLines(file)).length + 1;
-      const written = redactStrings({
+      written = redactStrings({
         ts: this.clock().toISOString(),
         seq,
         ...entry,
       }) as AuditEntry;
       await appendFile(file, `${JSON.stringify(written)}\n`, { flag: 'a' });
-      return written;
     } catch (error) {
       throw new AuditWriteError(error);
     }
+    // Only once the line is on disk, so a stream never shows an entry that the log lacks.
+    this.feed?.publish(written);
+    return written;
   }
 
   async read(ticketId: string): Promise<AuditEntry[]> {
