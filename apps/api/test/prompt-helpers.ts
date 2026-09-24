@@ -69,3 +69,17 @@ export async function getJson(app: Awaited<ReturnType<typeof promptApp>>['app'],
   const response = await fetch(`${await app.getUrl()}${path}`);
   return { status: response.status, body: (await response.json()) as unknown };
 }
+
+/** POSTs a JSON body to `path` on a listening app. */
+export async function postJson(
+  app: Awaited<ReturnType<typeof promptApp>>['app'],
+  path: string,
+  body: unknown,
+) {
+  const response = await fetch(`${await app.getUrl()}${path}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return { status: response.status, body: (await response.json()) as Record<string, unknown> };
+}

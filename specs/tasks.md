@@ -376,7 +376,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- tickets.list tickets.detail tickets.audit`
   Bloqueada por: T-64, T-65
 
-- [ ] T-67 · Exponer `POST /tickets/:id/close` · Satisface: REQ-API-09
+- [x] T-67 · Exponer `POST /tickets/:id/close` · Satisface: REQ-API-09
   Hecho cuando: When the api receives `POST /tickets/:id/close` for a ticket in `RESOLVED` or `ESCALATED`, the runtime shall set the ticket status to `CLOSED`.
   Verifica: `pnpm -F api test -- tickets.close`
   Bloqueada por: T-66
