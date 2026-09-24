@@ -442,7 +442,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web test -- redacted-only`
   Bloqueada por: T-76
 
-- [ ] T-79 · Añadir al timeline los eventos SSE en vivo (`EventsService`) · Satisface: REQ-WEB-04
+- [x] T-79 · Añadir al timeline los eventos SSE en vivo (`EventsService`) · Satisface: REQ-WEB-04
   Hecho cuando: While a ticket graph is running, the web app shall append the events received over SSE to the timeline without a page reload.
   Verifica: `pnpm -F web test -- timeline.sse`
   Bloqueada por: T-73, T-76

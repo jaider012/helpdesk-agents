@@ -3,9 +3,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { filter, scan, startWith, tap } from 'rxjs';
 import { ApiService } from '../core/api.service';
+import { AuditEntry } from '../core/contracts';
+import { EventsService } from '../core/events.service';
 import { CATEGORY_LABELS, PENDING_LABEL, STATUS_LABELS } from '../core/labels';
 import { AuditView } from './audit/audit-view';
+import { mergeAudit } from './merge-audit';
 import { Timeline } from './timeline/timeline';
 
 @Component({
@@ -17,6 +21,7 @@ import { Timeline } from './timeline/timeline';
 })
 export class TicketDetail {
   private readonly api = inject(ApiService);
+  private readonly events = inject(EventsService);
 
   /** Route parameter `:id` (component input binding). */
   readonly id = input.required<string>();
@@ -30,12 +35,37 @@ export class TicketDetail {
     stream: ({ params }) => this.api.getAudit(params),
     defaultValue: [],
   });
-  protected readonly tab = signal<'timeline' | 'audit'>('timeline');
   protected readonly notFound = computed(() => {
     const error = this.ticket.error();
     return error instanceof HttpErrorResponse && error.status === 404;
   });
 
+  /**
+   * Audit entries received over SSE while the detail is open (REQ-WEB-04). The stream opens with
+   * the page, in parallel with the GETs, and stops when the run ends or the ticket does not exist.
+   */
+  private readonly live = rxResource({
+    params: () => (this.notFound() ? undefined : this.id()),
+    stream: ({ params }) =>
+      this.events.ticketEvents(params).pipe(
+        tap((event) => {
+          // The run ended: reload the ticket to show its final status and fields.
+          if (event.type === 'done') {
+            this.ticket.reload();
+          }
+        }),
+        filter((event) => event.type === 'audit'),
+        scan((entries, event) => [...entries, event.entry], [] as AuditEntry[]),
+        startWith([] as AuditEntry[]),
+      ),
+    defaultValue: [],
+  });
+  /** The audit log shown by both tabs: the GET plus the live entries, in write order. */
+  protected readonly entries = computed(() =>
+    mergeAudit(this.audit.hasValue() ? this.audit.value() : [], this.live.value()),
+  );
+
+  protected readonly tab = signal<'timeline' | 'audit'>('timeline');
   protected readonly categoryLabels = CATEGORY_LABELS;
   protected readonly statusLabels = STATUS_LABELS;
   protected readonly pendingLabel = PENDING_LABEL;

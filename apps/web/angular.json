@@ -73,7 +73,8 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "include": ["src/**/*.test.ts"],
-            "watch": false
+            "watch": false,
+            "setupFiles": ["src/testing/setup.ts"]
           }
         }
       }

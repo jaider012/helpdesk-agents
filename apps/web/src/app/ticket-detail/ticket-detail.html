@@ -67,9 +67,9 @@
     @if (audit.error()) {
       <p role="alert">No se pudo cargar la bitácora del ticket.</p>
     } @else if (tab() === 'timeline') {
-      <app-timeline [entries]="audit.value()" />
+      <app-timeline [entries]="entries()" />
     } @else {
-      <app-audit-view [entries]="audit.value()" />
+      <app-audit-view [entries]="entries()" />
     }
   </section>
 } @else {
