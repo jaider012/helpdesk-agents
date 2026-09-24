@@ -304,7 +304,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- graph.access-lockout`
   Bloqueada por: T-51
 
-- [ ] T-53 · Pasar a `WAITING_USER` cuando falta el tipo de incidencia · Satisface: REQ-2.3-30
+- [x] T-53 · Pasar a `WAITING_USER` cuando falta el tipo de incidencia · Satisface: REQ-2.3-30
   Hecho cuando: While a ticket has category `infra` or `access`, when `entities.issueType` is `unknown`, the diagnostics agent shall set the ticket to `WAITING_USER` with a `userMessage` that asks for the missing detail.
   Verifica: `pnpm -F api test -- graph.waiting-user`
   Bloqueada por: T-51

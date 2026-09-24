@@ -22,12 +22,13 @@ const IDENTITY_ISSUES: ReadonlySet<IssueType> = new Set([
   'disabled_account',
 ]);
 
-type Procedure = 'vpn' | 'lockout' | 'identity_action' | 'no_skill';
+type Procedure = 'vpn' | 'lockout' | 'ask_user' | 'identity_action' | 'no_skill';
 
 /** The deterministic procedure of design §2.2 for a category and an issue type. */
 function procedureFor(category: Category | undefined, issueType: IssueType | undefined): Procedure {
   if (category === 'infra' && issueType === 'vpn') return 'vpn';
   if (category === 'access' && issueType === 'lockout') return 'lockout';
+  if ((category === 'infra' || category === 'access') && issueType === 'unknown') return 'ask_user';
   if (category === 'access' && issueType && IDENTITY_ISSUES.has(issueType)) {
     return 'identity_action';
   }
@@ -114,10 +115,23 @@ export function createDiagnosticsNode({
     return resolveWith(current, finding, 'instruct_self_service_unlock', 'lockout_instructed');
   }
 
+  /** Without an issue type there is no procedure: ask the user for it (T6, REQ-2.3-30). */
+  async function askUser(state: GraphState): Promise<GraphUpdate> {
+    const current = await takeCase(state);
+    const userMessage = templates.render('waiting_user', { ticketId: current.ticketId });
+    const saved = await lifecycle.applyTransition(
+      toTicketState({ ...current, userMessage }),
+      'WAITING_USER',
+      { agent: 'diagnostics', reason: 'the ticket lacks the issue type' },
+    );
+    return { status: saved.status, userMessage, diagnosticsOutcome: 'needs_user_input' };
+  }
+
   return async (state: GraphState): Promise<GraphUpdate> => {
     const procedure = procedureFor(state.category, state.entities?.issueType);
     if (procedure === 'vpn') return diagnoseVpn(state);
     if (procedure === 'lockout') return instructUnlock(state);
+    if (procedure === 'ask_user') return askUser(state);
     return { diagnosticsOutcome: procedure };
   };
 }
