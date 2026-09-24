@@ -69,6 +69,7 @@ export function createNodes({
       lifecycle,
       templates: templatesFromBundle(bundle),
       clock,
+      handoffs: agents.flatMap(({ handoffs }) => handoffs),
     }),
   };
 }

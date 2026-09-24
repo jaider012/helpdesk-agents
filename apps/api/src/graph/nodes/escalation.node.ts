@@ -1,12 +1,12 @@
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import type { EscalationReason } from 'agent-spec';
+import type { EscalationReason, HandoffEdge } from 'agent-spec';
 import { z } from 'zod';
 import type { AuditLog } from '../../audit/audit-log.js';
 import { DRAFT_TOOL } from '../../llm/fake-responder.js';
 import type { MessageTemplates } from '../../messages/templates.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { ApprovalRequest, Entities, EscalationPackage } from '../../tickets/ticket-state.js';
+import { handoffEnvelope, handoffMessages } from '../handoff.js';
 import { toTicketState, type GraphState, type GraphUpdate } from '../state.js';
 
 /** The texts the LLM drafts in escalation (design §5.1). */
@@ -22,6 +22,8 @@ export interface EscalationNodeDeps {
   lifecycle: TicketLifecycle;
   templates: MessageTemplates;
   clock: () => Date;
+  /** The handoffs of the spec, for the prompt of the envelope (REQ-2.3-17). */
+  handoffs: readonly HandoffEdge[];
 }
 
 /** The reason that the routing decision carried, or an operator request when there is none. */
@@ -59,7 +61,7 @@ function isIoError(error: unknown): boolean {
  * without it, or when the node fails for any reason other than I/O, the templates are used.
  */
 export function createEscalationNode(deps: EscalationNodeDeps) {
-  const { model, systemPrompt, audit, lifecycle, templates, clock } = deps;
+  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs } = deps;
   const draft = model.withStructuredOutput(EscalationDraft, { name: DRAFT_TOOL });
 
   const replaced = (ticketId: string, cause: string) =>
@@ -72,7 +74,7 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
     });
 
   /** The drafted texts, or the templates with the cause of the replacement. */
-  async function texts(state: GraphState, base: Omit<EscalationPackage, 'summary'>) {
+  async function texts(state: GraphState) {
     const { ticketId } = state;
     const template = {
       summary: templates.render('internal.summary', { ticketId }),
@@ -80,12 +82,10 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
     };
     let drafted: z.infer<typeof EscalationDraft>;
     try {
-      // Only the handoff context travels to the LLM, never the ticket text (REQ-2.3-17).
+      // Only the handoff envelope travels to the LLM, never the ticket text (REQ-2.3-17).
+      const envelope = handoffEnvelope(state, 'escalation', handoffs);
       const result = EscalationDraft.safeParse(
-        await draft.invoke([
-          new SystemMessage(systemPrompt),
-          new HumanMessage(JSON.stringify(base)),
-        ]),
+        await draft.invoke(handoffMessages(systemPrompt, envelope)),
       );
       if (!result.success) {
         await replaced(ticketId, 'invalid_llm_output');
@@ -120,7 +120,7 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
       createdAt: clock().toISOString(),
     };
     const { summary, userMessage } = withLlm
-      ? await texts(state, base)
+      ? await texts(state)
       : {
           summary: templates.render('internal.summary', { ticketId }),
           userMessage: templates.render('escalated', { ticketId }),

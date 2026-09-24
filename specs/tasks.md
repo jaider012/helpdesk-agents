@@ -279,7 +279,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- llm.failure llm.invalid-output`
   Bloqueada por: T-44
 
-- [ ] T-48 · Pasar solo el contexto permitido en cada handoff (`HandoffEnvelope`, design §4) · Satisface: REQ-2.3-17
+- [x] T-48 · Pasar solo el contexto permitido en cada handoff (`HandoffEnvelope`, design §4) · Satisface: REQ-2.3-17
   Hecho cuando: When the runtime executes a handoff, the runtime shall pass to the target agent only `ticketId`, `category`, `severity`, `entities` and `findings`.
   Verifica: `pnpm -F api test -- graph.handoff-context`
   Bloqueada por: T-44
