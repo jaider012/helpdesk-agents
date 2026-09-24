@@ -427,7 +427,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web test -- inbox`
   Bloqueada por: T-66, T-74
 
-- [ ] T-76 · Crear el detalle del ticket con el timeline del grafo · Satisface: REQ-WEB-02
+- [x] T-76 · Crear el detalle del ticket con el timeline del grafo · Satisface: REQ-WEB-02
   Hecho cuando: When the operator opens a ticket, the web app shall display a timeline with visited nodes, handoffs, decisions and durations.
   Verifica: `pnpm -F web test -- timeline`
   Bloqueada por: T-75

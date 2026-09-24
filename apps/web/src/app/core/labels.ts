@@ -1,4 +1,4 @@
-import { Category, TicketStatus } from './contracts';
+import { AuditEntry, Category, TicketStatus } from './contracts';
 
 // Operator-facing texts in Spanish, without the jargon listed in .github/copilot-instructions.md.
 
@@ -21,3 +21,27 @@ export const STATUS_LABELS: Record<TicketStatus, string> = {
 
 /** Shown while a field is not known yet (for example, before triage). */
 export const PENDING_LABEL = 'Pendiente';
+
+/** Steps of the graph as the operator sees them in the timeline. */
+export const ACTOR_LABELS: Record<AuditEntry['agent'], string> = {
+  redact: 'Protección de datos',
+  triage: 'Clasificación',
+  diagnostics: 'Diagnóstico',
+  provisioning: 'Aprovisionamiento',
+  escalation: 'Escalamiento',
+  runtime: 'Sistema',
+  operator: 'Operador',
+};
+
+/** Label of a route target or source, including the end of the run (`END`). */
+export function actorLabel(name: string | undefined): string {
+  if (name === 'END') {
+    return 'Fin del recorrido';
+  }
+  return (name && ACTOR_LABELS[name as AuditEntry['agent']]) || (name ?? PENDING_LABEL);
+}
+
+/** Label of a ticket status, falling back to the raw value if the api sends an unknown one. */
+export function statusLabel(status: string | undefined): string {
+  return (status && STATUS_LABELS[status as TicketStatus]) || (status ?? PENDING_LABEL);
+}

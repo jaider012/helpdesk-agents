@@ -1,0 +1,16 @@
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin: 0 0 1.5rem;
+}
+
+.summary dt {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.summary dd {
+  margin: 0;
+  font-weight: 600;
+}
