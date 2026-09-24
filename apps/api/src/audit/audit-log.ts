@@ -30,6 +30,16 @@ function redactStrings(value: unknown): unknown {
   return value;
 }
 
+/** The audit log could not write an entry: the run stops (REQ-AUD-06). */
+export class AuditWriteError extends Error {
+  readonly code = 'AUDIT_WRITE_FAILED';
+
+  constructor(cause: unknown) {
+    super('AUDIT_WRITE_FAILED: the audit log could not write the entry', { cause });
+    this.name = 'AuditWriteError';
+  }
+}
+
 /**
  * Append-only audit log, one JSON line per entry in `<dataDir>/audit/<ticketId>.jsonl`
  * (REQ-AUD-01, REQ-AUD-02). It exposes only `append` and `read`.
@@ -45,11 +55,19 @@ export class AuditLog {
 
   async append(entry: NewAuditEntry): Promise<AuditEntry> {
     const file = auditFile(this.dataDir, entry.ticketId);
-    await mkdir(dirname(file), { recursive: true });
-    const seq = (await readLines(file)).length + 1;
-    const written = redactStrings({ ts: this.clock().toISOString(), seq, ...entry }) as AuditEntry;
-    await appendFile(file, `${JSON.stringify(written)}\n`, { flag: 'a' });
-    return written;
+    try {
+      await mkdir(dirname(file), { recursive: true });
+      const seq = (await readLines(file)).length + 1;
+      const written = redactStrings({
+        ts: this.clock().toISOString(),
+        seq,
+        ...entry,
+      }) as AuditEntry;
+      await appendFile(file, `${JSON.stringify(written)}\n`, { flag: 'a' });
+      return written;
+    } catch (error) {
+      throw new AuditWriteError(error);
+    }
   }
 
   async read(ticketId: string): Promise<AuditEntry[]> {

@@ -4,6 +4,16 @@ import { dirname, join } from 'node:path';
 import { assertTicketId } from './ticket-id.js';
 import type { TicketState } from './ticket-state.js';
 
+/** The ticket store could not write the ticket state: the run stops (REQ-AUD-08). */
+export class StoreWriteError extends Error {
+  readonly code = 'STORE_WRITE_FAILED';
+
+  constructor(cause: unknown) {
+    super('STORE_WRITE_FAILED: the ticket store could not write the ticket', { cause });
+    this.name = 'StoreWriteError';
+  }
+}
+
 function ticketFile(dataDir: string, ticketId: string): string {
   assertTicketId(ticketId);
   return join(dataDir, 'tickets', `${ticketId}.json`);
@@ -34,17 +44,20 @@ export class TicketStore {
     }
   }
 
-  /** Atomic write: a temporary file in the same folder, then a rename over the ticket file. */
+  /**
+   * Atomic write: a temporary file in the same folder, then a rename over the ticket file. Any
+   * failure is a `StoreWriteError` (REQ-AUD-08).
+   */
   async save(ticket: TicketState): Promise<void> {
     const file = ticketFile(this.dataDir, ticket.ticketId);
-    await mkdir(dirname(file), { recursive: true });
     const temporary = `${file}.${randomUUID()}.tmp`;
     try {
+      await mkdir(dirname(file), { recursive: true });
       await writeFile(temporary, `${JSON.stringify(withoutAudit(ticket), null, 2)}\n`);
       await rename(temporary, file);
     } catch (error) {
-      await rm(temporary, { force: true });
-      throw error;
+      await rm(temporary, { force: true }).catch(() => undefined);
+      throw new StoreWriteError(error);
     }
   }
 }

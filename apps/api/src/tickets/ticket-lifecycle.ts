@@ -3,7 +3,7 @@ import type { AuditEntry } from '../audit/audit-entry.js';
 import type { AuditLog } from '../audit/audit-log.js';
 import { TransitionError, type TicketStateMachine } from './state-machine.js';
 import type { TicketState } from './ticket-state.js';
-import type { TicketStore } from './ticket-store.js';
+import { StoreWriteError, type TicketStore } from './ticket-store.js';
 
 export interface TransitionContext {
   agent: AuditEntry['agent'];
@@ -26,7 +26,8 @@ export class TicketLifecycle {
   /**
    * Validates the transition, records it in the audit log and persists the new state, in this
    * order: without its audit entry, the status does not change (REQ-AUD-03). A rejected
-   * transition is recorded as `transition_rejected` and rethrown.
+   * transition is recorded as `transition_rejected` and rethrown. When the store fails to write,
+   * an `error` entry records it, if the audit log still writes, and the run stops.
    */
   async applyTransition(
     candidate: TicketState,
@@ -49,7 +50,20 @@ export class TicketLifecycle {
     }
     await this.audit.append({ ...entry, decision: 'transition', ...(data && { data }) });
     const next: TicketState = { ...candidate, status: to };
-    await this.store.save(next);
+    try {
+      await this.store.save(next);
+    } catch (error) {
+      if (error instanceof StoreWriteError) {
+        await this.audit.append({
+          ticketId: candidate.ticketId,
+          agent,
+          decision: 'error',
+          reason: 'the ticket store failed to write the ticket state',
+          data: { code: error.code },
+        });
+      }
+      throw error;
+    }
     return next;
   }
 }

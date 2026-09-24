@@ -324,7 +324,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- graph.internal-error`
   Bloqueada por: T-44
 
-- [ ] T-57 · Detener el recorrido cuando falla la escritura de la bitácora o del ticket store · Satisface: REQ-AUD-06, REQ-AUD-08
+- [x] T-57 · Detener el recorrido cuando falla la escritura de la bitácora o del ticket store · Satisface: REQ-AUD-06, REQ-AUD-08
   Hecho cuando: If the audit log or the ticket store fails to write, then the runtime shall stop the graph execution for that ticket with the error `AUDIT_WRITE_FAILED` or `STORE_WRITE_FAILED` respectively.
   Verifica: `pnpm -F api test -- audit.write-failure store.write-failure`
   Bloqueada por: T-56
