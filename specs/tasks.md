@@ -264,7 +264,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- escalation.package escalation.status escalation.terminal`
   Bloqueada por: T-43
 
-- [ ] T-45 · Construir el paquete de escalamiento con la plantilla determinista cuando falla el LLM o el nodo · Satisface: REQ-ESC-06, REQ-ESC-10, REQ-COM-03
+- [x] T-45 · Construir el paquete de escalamiento con la plantilla determinista cuando falla el LLM o el nodo · Satisface: REQ-ESC-06, REQ-ESC-10, REQ-COM-03
   Hecho cuando: If the LLM provider is unavailable or the escalation agent raises an error other than an I/O error, then the escalation agent shall build the escalation package from the deterministic template with the `ticketId` in `userMessage`.
   Verifica: `pnpm -F api test -- escalation.llm-down escalation.fallback escalation.user-message`
   Bloqueada por: T-44

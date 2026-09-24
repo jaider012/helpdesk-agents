@@ -8,25 +8,30 @@ import { buildGraph, type GraphNodes } from '../src/graph/build.js';
 import { compileAgents } from '../src/graph/compile-agents.js';
 import { createNodes } from '../src/graph/nodes/index.js';
 import { FakeChatModel } from '../src/llm/fake-chat-model.js';
-import { fakeResponder } from '../src/llm/fake-responder.js';
+import { createFakeResponder } from '../src/llm/fake-responder.js';
+import { templatesFromBundle } from '../src/messages/templates.js';
 import { TicketStateMachine } from '../src/tickets/state-machine.js';
 import { TicketStore } from '../src/tickets/ticket-store.js';
 import { REPO_ROOT } from './lifecycle-helpers.js';
 
 export const NOW = '2026-09-23T10:15:00.000Z';
 
+export interface RuntimeOptions {
+  model?: BaseChatModel;
+  override?: Partial<GraphNodes>;
+  audit?: (dataDir: string, clock: () => Date) => AuditLog;
+}
+
 /** The runtime graph over the real spec, a temporary data folder and the fake model. */
-export async function runtime(
-  options: { model?: BaseChatModel; override?: Partial<GraphNodes> } = {},
-) {
+export async function runtime(options: RuntimeOptions = {}) {
   const bundle = await loadSpec(REPO_ROOT);
   const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-runtime-'));
   const clock = () => new Date(NOW);
-  const audit = new AuditLog(dataDir, clock);
+  const audit = options.audit?.(dataDir, clock) ?? new AuditLog(dataDir, clock);
   const store = new TicketStore(dataDir);
   const nodes = createNodes({
     bundle,
-    model: options.model ?? new FakeChatModel(fakeResponder),
+    model: options.model ?? new FakeChatModel(createFakeResponder(templatesFromBundle(bundle))),
     audit,
     store,
     machine: TicketStateMachine.fromBundle(bundle),

@@ -1,8 +1,11 @@
 import type { BaseMessage } from '@langchain/core/messages';
+import type { MessageTemplates } from '../messages/templates.js';
 import type { FakeReply } from './fake-chat-model.js';
 
 /** Name of the structured-output tool of the triage node. */
 export const CLASSIFY_TOOL = 'classify_ticket';
+/** Name of the structured-output tool that drafts the escalation texts. */
+export const DRAFT_TOOL = 'draft_escalation';
 
 interface Rule {
   pattern: RegExp;
@@ -92,10 +95,30 @@ function lastHumanText(messages: BaseMessage[]): string {
   return typeof human?.content === 'string' ? human.content : '';
 }
 
-/** Answers of the fake model: the classification when the classify tool is bound, else ''. */
-export function fakeResponder(messages: BaseMessage[], tools: string[]): string | FakeReply {
-  if (tools.includes(CLASSIFY_TOOL)) {
-    return { toolCall: { name: CLASSIFY_TOOL, args: classifyByKeywords(lastHumanText(messages)) } };
-  }
-  return '';
+/**
+ * Answers of the fake model (design §12.3): the keyword classification for triage and, with the
+ * message templates of the spec, exactly the templates for the escalation texts (design §9).
+ */
+export function createFakeResponder(templates?: MessageTemplates) {
+  return (messages: BaseMessage[], tools: string[]): string | FakeReply => {
+    const text = lastHumanText(messages);
+    if (tools.includes(CLASSIFY_TOOL)) {
+      return { toolCall: { name: CLASSIFY_TOOL, args: classifyByKeywords(text) } };
+    }
+    if (tools.includes(DRAFT_TOOL)) {
+      const ticketId = /TCK-\d{8}-\d{6}-[0-9a-z]{3}/.exec(text)?.[0];
+      const args =
+        templates && ticketId
+          ? {
+              summary: templates.render('internal.summary', { ticketId }),
+              userMessage: templates.render('escalated', { ticketId }),
+            }
+          : {};
+      return { toolCall: { name: DRAFT_TOOL, args } };
+    }
+    return '';
+  };
 }
+
+/** The fake responder without message templates. */
+export const fakeResponder = createFakeResponder();

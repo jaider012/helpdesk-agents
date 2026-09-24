@@ -36,8 +36,12 @@ export function createNodes({
   salt,
   clock,
 }: NodeDeps): GraphNodes {
-  const triage = compileAgents(bundle).find(({ name }) => name === 'triage');
-  if (!triage) throw new Error('the spec has no triage agent');
+  const agents = compileAgents(bundle);
+  const systemPrompt = (name: string) => {
+    const agent = agents.find((candidate) => candidate.name === name);
+    if (!agent) throw new Error(`the spec has no ${name} agent`);
+    return agent.systemPrompt;
+  };
   const lifecycle = new TicketLifecycle(machine, audit, store);
   return {
     redact: createRedactNode({ audit, salt }),
@@ -45,8 +49,8 @@ export function createNodes({
       'triage',
       createTriageNode({
         model,
-        systemPrompt: triage.systemPrompt,
-        severity: compileSeverityMatrix(triage.systemPrompt),
+        systemPrompt: systemPrompt('triage'),
+        severity: compileSeverityMatrix(systemPrompt('triage')),
         audit,
         lifecycle,
       }),
@@ -56,6 +60,8 @@ export function createNodes({
     diagnostics: keepState,
     provisioning: keepState,
     escalation: createEscalationNode({
+      model,
+      systemPrompt: systemPrompt('escalation'),
       audit,
       lifecycle,
       templates: templatesFromBundle(bundle),
