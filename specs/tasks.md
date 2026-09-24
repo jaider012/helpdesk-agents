@@ -396,7 +396,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- validation.body`
   Bloqueada por: T-68
 
-- [ ] T-71 · Asignar `targetTeam` desde la tabla `## Equipos de escalamiento` · Satisface: REQ-ESC-07
+- [x] T-71 · Asignar `targetTeam` desde la tabla `## Equipos de escalamiento` · Satisface: REQ-ESC-07
   Hecho cuando: When the escalation agent builds the escalation package, the escalation agent shall assign `targetTeam` from the category-to-team table in `escalation.agent.md`.
   Verifica: `pnpm -F api test -- escalation.target-team`
   Bloqueada por: T-44

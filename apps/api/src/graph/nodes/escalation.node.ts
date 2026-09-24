@@ -10,6 +10,7 @@ import type { ApprovalRequest, Entities, EscalationPackage } from '../../tickets
 import { isIoError } from '../errors.js';
 import { handoffEnvelope, handoffMessages } from '../handoff.js';
 import { toTicketState, type GraphState, type GraphUpdate } from '../state.js';
+import type { TeamDirectory } from '../teams.js';
 
 /** The texts the LLM drafts in escalation (design §5.1). */
 export const EscalationDraft = z.object({
@@ -30,6 +31,8 @@ export interface EscalationNodeDeps {
   guard: UserMessageGuard;
   /** Limit of the drafting call (`LLM_TIMEOUT_MS`, REQ-COM-06). */
   timeoutMs: number;
+  /** The team of each category, from `## Equipos de escalamiento` (REQ-ESC-07). */
+  teams: TeamDirectory;
 }
 
 /** Every escalation reason code: those of the routing rules and the operator request. */
@@ -73,8 +76,8 @@ function approvalRequestFor(state: GraphState, templates: MessageTemplates): App
  * without it, or when the node fails for any reason other than I/O, the templates are used.
  */
 export function createEscalationNode(deps: EscalationNodeDeps) {
-  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs, guard, timeoutMs } =
-    deps;
+  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs, guard } = deps;
+  const { timeoutMs, teams } = deps;
   const draft = model.withStructuredOutput(EscalationDraft, { name: DRAFT_TOOL });
 
   const replaced = (ticketId: string, cause: string) =>
@@ -123,13 +126,16 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
   async function escalate(state: GraphState, withLlm: boolean): Promise<GraphUpdate> {
     const { ticketId } = state;
     const reason = escalationReason(state);
+    const category = state.category ?? 'unknown';
+    const targetTeam = teams(category);
     const base: Omit<EscalationPackage, 'summary'> = {
       ticketId,
-      category: state.category ?? 'unknown',
+      category,
       ...(state.severity && { severity: state.severity }),
       ...(state.entities && { entities: state.entities as Entities }),
       findings: state.findings,
       reason,
+      ...(targetTeam && { targetTeam }),
       ...(state.category === 'provisioning' && {
         approvalRequest: approvalRequestFor(state, templates),
       }),

@@ -19,6 +19,7 @@ import {
   withRouting,
 } from '../routing.js';
 import { compileSeverityMatrix } from '../severity-matrix.js';
+import { compileTeams } from '../teams.js';
 import { createDiagnosticsNode } from './diagnostics.node.js';
 import { createEscalationNode } from './escalation.node.js';
 import { createProvisioningNode } from './provisioning.node.js';
@@ -116,6 +117,7 @@ export function createNodes({
       handoffs,
       guard,
       timeoutMs: llmTimeoutMs,
+      teams: compileTeams(systemPrompt('escalation')),
     }),
   };
 }

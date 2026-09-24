@@ -19,6 +19,7 @@ describe('escalation.package', () => {
       entities: { userRef: 'usr_unknown', issueType: 'unknown', businessImpact: 'high' },
       findings: [],
       reason: 'critical_severity',
+      targetTeam: 'Mesa de Ayuda N2',
       summary: 'Caso TCK-20260923-101500-p1a escalado. Consulta los hallazgos adjuntos.',
       createdAt: NOW,
     });
