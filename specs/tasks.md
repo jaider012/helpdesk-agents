@@ -401,7 +401,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- escalation.target-team`
   Bloqueada por: T-44
 
-- [ ] T-72 · Detectar emails reales en `.github/` y en los fixtures · Satisface: REQ-SEC-13
+- [x] T-72 · Detectar emails reales en `.github/` y en los fixtures · Satisface: REQ-SEC-13
   Hecho cuando: If a file under `.github/` or a test fixture contains an email address outside the domains `example.com` and `example.internal`, then the spec validator shall report `PII_IN_FIXTURE`.
   Verifica: `pnpm -F agent-spec test -- pii.fixtures`
   Bloqueada por: T-30

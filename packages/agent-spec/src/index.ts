@@ -13,6 +13,7 @@ export {
   type TransitionSpec,
 } from './lifecycle.ts';
 export { loadSpec, type SpecBundle, type SpecFile, type SpecFileKind } from './load.ts';
+export { emailIssues, piiIssues } from './pii.ts';
 export {
   formatError,
   REQUIRED_FILES,

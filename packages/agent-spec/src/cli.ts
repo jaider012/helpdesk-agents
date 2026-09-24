@@ -2,11 +2,13 @@
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { loadSpec } from './load.ts';
+import { piiIssues } from './pii.ts';
 import { formatError, validateSpec } from './validate.ts';
 
 const { values } = parseArgs({ options: { root: { type: 'string', default: process.cwd() } } });
 
-const errors = validateSpec(await loadSpec(resolve(values.root)));
+const root = resolve(values.root);
+const errors = [...validateSpec(await loadSpec(root)), ...(await piiIssues(root))];
 for (const error of errors) console.log(formatError(error));
 console.log(
   errors.length === 0

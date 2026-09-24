@@ -41,7 +41,8 @@ export type ErrorCode =
   | 'UNKNOWN_PROMPT_AGENT'
   | 'PROMPT_VARIABLE_MISSING'
   | 'PROMPT_WITHOUT_TOOL_CALL'
-  | 'PROMPT_TOOL_UNDECLARED';
+  | 'PROMPT_TOOL_UNDECLARED'
+  | 'PII_IN_FIXTURE';
 
 /** Annex D of requirements.md. */
 export const REQUIRED_FILES = [
