@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 import {
+  InvalidTargetError,
   MissingVariablesError,
   PromptNotFoundError,
   TicketNotFoundError,
@@ -46,7 +47,10 @@ export class PromptsController {
     return { ticketId };
   }
 
-  /** Starts the run, with 404 for an unknown prompt or ticket and 400 for missing variables. */
+  /**
+   * Starts the run, with 404 for an unknown prompt or ticket and 400 for missing variables or a
+   * target that is malformed or not allowed.
+   */
   private async start(name: string, variables: Record<string, string>): Promise<StartedRun> {
     try {
       return await this.runner.start(name, variables);
@@ -54,6 +58,7 @@ export class PromptsController {
       if (error instanceof PromptNotFoundError || error instanceof TicketNotFoundError) {
         throw new NotFoundException(error.message);
       }
+      if (error instanceof InvalidTargetError) throw new BadRequestException(error.message);
       if (error instanceof MissingVariablesError) {
         throw new BadRequestException({ message: error.message, missing: error.missing });
       }

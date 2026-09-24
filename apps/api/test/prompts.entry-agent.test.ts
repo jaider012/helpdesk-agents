@@ -28,7 +28,10 @@ describe('prompts.entry-agent', () => {
 
   it('starts run-vpn-diagnostics at the diagnostics agent, checking the requested target', async () => {
     const server = await startTcpServer();
-    const { app, runner, audit, store } = await promptApp();
+    const target = `localhost:${server.port}`;
+    const { app, runner, audit, store } = await promptApp(undefined, {
+      VPN_ALLOWED_TARGETS: target,
+    });
     close = async () => {
       await app.close();
       await server.close();
@@ -38,7 +41,7 @@ describe('prompts.entry-agent', () => {
 
     const { done } = await runner.start('run-vpn-diagnostics', {
       ticketId: existing.ticketId,
-      target: `localhost:${server.port}`,
+      target,
     });
     const final = await done;
 

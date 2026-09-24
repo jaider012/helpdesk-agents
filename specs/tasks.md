@@ -354,7 +354,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- prompts.missing-variable prompts.not-found prompts.unknown-ticket`
   Bloqueada por: T-61
 
-- [ ] T-63 · Validar el formato de `target` y la lista `VPN_ALLOWED_TARGETS` en el prompt run · Satisface: REQ-SEC-15, REQ-SEC-14
+- [x] T-63 · Validar el formato de `target` y la lista `VPN_ALLOWED_TARGETS` en el prompt run · Satisface: REQ-SEC-15, REQ-SEC-14
   Hecho cuando: If a prompt run requests a `target` that does not match `^[a-z0-9.-]+:\d{1,5}$` or that is outside `VPN_ALLOWED_TARGETS`, then the api shall respond `400` before the graph starts.
   Verifica: `pnpm -F api test -- prompts.target-format prompts.target-allowlist`
   Bloqueada por: T-61

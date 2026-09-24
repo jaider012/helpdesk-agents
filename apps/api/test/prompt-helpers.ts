@@ -32,10 +32,10 @@ export async function recordingModel() {
   return { model, calls, humanOf };
 }
 
-/** The api over a temporary data folder, with `model` as chat model. */
-export async function promptApp(model?: BaseChatModel) {
+/** The api over a temporary data folder, with `model` as chat model and extra variables. */
+export async function promptApp(model?: BaseChatModel, env: Record<string, string> = {}) {
   const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-prompts-'));
-  process.env.DATA_DIR = dataDir;
+  Object.assign(process.env, { VPN_ALLOWED_TARGETS: '', ...env, DATA_DIR: dataDir });
   const builder = Test.createTestingModule({ imports: [AppModule] });
   if (model) builder.overrideProvider(CHAT_MODEL).useValue(model);
   const moduleRef = await builder.compile();

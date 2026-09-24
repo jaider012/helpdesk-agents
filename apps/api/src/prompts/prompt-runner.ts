@@ -42,6 +42,29 @@ export function newTicketId(now: Date): string {
     .padStart(3, '0')}`;
 }
 
+/** `host:port` in lowercase, the same format that the `SKILL.md` checks (REQ-SEC-15). */
+export const TARGET_PATTERN = /^[a-z0-9.-]+:\d{1,5}$/;
+
+/** `VPN_ALLOWED_TARGETS`, comma-separated; the list of `.env.example` when it is not set. */
+export function resolveAllowedTargets(env: Record<string, string | undefined>): Set<string> {
+  const list = env.VPN_ALLOWED_TARGETS || 'vpn-gw.example.internal:443,localhost:8443';
+  return new Set(
+    list
+      .split(',')
+      .map((target) => target.trim())
+      .filter(Boolean),
+  );
+}
+
+/** The `target` breaks the format or is outside `VPN_ALLOWED_TARGETS` (REQ-SEC-14, REQ-SEC-15). */
+export class InvalidTargetError extends Error {
+  constructor() {
+    // The value is not echoed: it comes from the request.
+    super('target must be host:port and appear in VPN_ALLOWED_TARGETS');
+    this.name = 'InvalidTargetError';
+  }
+}
+
 /** `:name` matches no prompt file (REQ-2.4-14). */
 export class PromptNotFoundError extends Error {
   constructor() {
@@ -85,6 +108,7 @@ export class PromptRunner {
     private readonly graph: CompiledGraph,
     private readonly store: TicketStore,
     private readonly audit: AuditLog,
+    private readonly allowedTargets: ReadonlySet<string>,
     private readonly clock: () => Date = () => new Date(),
   ) {
     this.prompts = compilePrompts(bundle);
@@ -95,6 +119,11 @@ export class PromptRunner {
     if (!definition) throw new PromptNotFoundError();
     const missing = definition.variables.filter((variable) => !variables[variable]?.trim());
     if (missing.length > 0) throw new MissingVariablesError(missing);
+    // The target never reaches check-vpn.js unless it is well formed and allowed.
+    const { target } = variables;
+    if (target !== undefined && !(TARGET_PATTERN.test(target) && this.allowedTargets.has(target))) {
+      throw new InvalidTargetError();
+    }
     const prompt = { name, template: definition.template, variables };
     const input = await this.initialState(definition, prompt);
     await this.audit.append({

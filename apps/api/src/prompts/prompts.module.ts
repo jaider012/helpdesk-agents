@@ -6,7 +6,7 @@ import { GRAPH, GraphModule } from '../graph/graph.module.js';
 import { SPEC_BUNDLE } from '../spec/spec.module.js';
 import type { TicketStore } from '../tickets/ticket-store.js';
 import { TICKET_STORE, TicketsModule } from '../tickets/tickets.module.js';
-import { PromptRunner, type CompiledGraph } from './prompt-runner.js';
+import { PromptRunner, resolveAllowedTargets, type CompiledGraph } from './prompt-runner.js';
 import { PromptsController } from './prompts.controller.js';
 import { PROMPT_RUNNER } from './tokens.js';
 
@@ -19,7 +19,7 @@ export { PROMPT_RUNNER } from './tokens.js';
     {
       provide: PROMPT_RUNNER,
       useFactory: (bundle: SpecBundle, graph: CompiledGraph, store: TicketStore, audit: AuditLog) =>
-        new PromptRunner(bundle, graph, store, audit),
+        new PromptRunner(bundle, graph, store, audit, resolveAllowedTargets(process.env)),
       inject: [SPEC_BUNDLE, GRAPH, TICKET_STORE, AUDIT_LOG],
     },
   ],
