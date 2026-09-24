@@ -386,7 +386,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- tickets.reply`
   Bloqueada por: T-53, T-66
 
-- [ ] T-69 · Exponer `GET /health` con el proveedor LLM y el estado de la spec · Satisface: REQ-API-10
+- [x] T-69 · Exponer `GET /health` con el proveedor LLM y el estado de la spec · Satisface: REQ-API-10
   Hecho cuando: When the api receives `GET /health`, the api shall return the active LLM provider and the spec validation status.
   Verifica: `pnpm -F api test -- health`
   Bloqueada por: T-32, T-33

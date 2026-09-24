@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GraphModule } from './graph/graph.module.js';
+import { HealthModule } from './health/health.module.js';
 import { LlmModule } from './llm/llm.module.js';
 import { PromptsModule } from './prompts/prompts.module.js';
 import { SpecModule } from './spec/spec.module.js';
@@ -16,6 +17,7 @@ import { ToolsModule } from './tools/tools.module.js';
     GraphModule,
     PromptsModule,
     TicketsApiModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

@@ -11,6 +11,9 @@ import { REPO_ROOT } from '../paths.js';
 /** Injection token of the validated `.github/` spec bundle. */
 export const SPEC_BUNDLE = Symbol('SPEC_BUNDLE');
 
+/** Injection token of the folder that contains the `.github/` spec. */
+export const SPEC_ROOT = Symbol('SPEC_ROOT');
+
 /** Folder that contains `.github/`: the repository root. */
 export const DEFAULT_SPEC_ROOT = REPO_ROOT;
 
@@ -40,12 +43,14 @@ export class SpecModule {
       module: SpecModule,
       global: true,
       providers: [
+        { provide: SPEC_ROOT, useValue: options.root ?? DEFAULT_SPEC_ROOT },
         {
           provide: SPEC_BUNDLE,
-          useFactory: () => loadValidatedSpec(options.root ?? DEFAULT_SPEC_ROOT),
+          useFactory: (root: string) => loadValidatedSpec(root),
+          inject: [SPEC_ROOT],
         },
       ],
-      exports: [SPEC_BUNDLE],
+      exports: [SPEC_BUNDLE, SPEC_ROOT],
     };
   }
 }
