@@ -11,6 +11,8 @@ Registro de las decisiones que Claude tomó por Jaider sin su aprobación explí
 | ID | Pregunta | Estado |
 | --- | --- | --- |
 | DA-01 | Proveedor LLM de la Fase 4: la spec dice Azure OpenAI → Anthropic → fake (ADR-04, REQ-LLM-01/02). Mencionaste DeepSeek (créditos pagos, sin OpenAI) y LM Studio local. Cambiarlo toca ADR-04, REQ-LLM-01/02 y T-82/T-83. | Sin decidir. Se plantea al llegar a T-82; hasta entonces los tests usan el modelo fake. |
+| DA-02 | Versión de Node: Angular CLI 22 exige Node ≥ 22.22.3 (o ≥ 24.15, ≥ 26), pero el `engines` de la raíz dice `>=22.18` y el `node` por defecto de esta Mac es 22.19.0, así que `pnpm test` falla en el test puente de la web salvo con `PATH=/opt/homebrew/bin:$PATH` (Node 26.9.0). Propuesta: subir `engines` a `^22.22.3 \|\| >=24.15`, añadir `.nvmrc` y fijar la versión en `azure-pipelines.yml` (T-84). | Abierta |
+| DA-03 | El timeline de la web (design §12.1) se deriva de `node_started`/`node_finished`, pero ninguna tarea los emite (hoy solo provisioning escribe `node_finished`). Sin ellos la web no muestra cada paso con su duración. Propuesta: que `withRouting` y el nodo escalation los escriban, como tarea nueva junto a T-73 (SSE). | Abierta |
 
 ## Fase 1 · `check-vpn.js` y `.github/`
 
