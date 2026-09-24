@@ -16,6 +16,10 @@ const AZURE = {
 };
 
 const DEEPSEEK = { DEEPSEEK_API_KEY: 'synthetic-deepseek-key' };
+const LMSTUDIO = {
+  LMSTUDIO_BASE_URL: 'http://localhost:1234/v1',
+  LMSTUDIO_MODEL: 'qwen/qwen3.5-9b',
+};
 
 /** Replaces `fetch` with a canned chat completion and keeps each request: nothing leaves the test. */
 function captureRequests(message: Record<string, unknown>) {
@@ -54,6 +58,7 @@ describe('llm.provider', () => {
       { AZURE_OPENAI_ENDPOINT: 'https://example-resource.openai.azure.com' },
     ],
     ['an empty DeepSeek key', { DEEPSEEK_API_KEY: '' }],
+    ['an LM Studio URL without a model', { LMSTUDIO_BASE_URL: 'http://localhost:1234/v1' }],
   ])('falls back to the fake model with a warning when there are %s', (_, variables) => {
     const selection = selectChatModel({ NODE_ENV: 'production', ...variables });
 
@@ -155,6 +160,43 @@ describe('llm.provider', () => {
     expect(requests[0]?.body).not.toHaveProperty('response_format');
   });
 
+  it('uses LM Studio through ChatOpenAI when neither Azure OpenAI nor DeepSeek is configured', () => {
+    const selection = selectChatModel({ NODE_ENV: 'production', ...LMSTUDIO });
+
+    expect(selection.provider).toBe('lmstudio');
+    expect(selection.warning).toBeUndefined();
+    expect(selection.model).toBeInstanceOf(ChatOpenAI);
+    expect(selection.model).toMatchObject({
+      model: 'qwen/qwen3.5-9b',
+      temperature: 0,
+      maxTokens: 1024,
+    });
+  });
+
+  it('prefers DeepSeek over LM Studio', () => {
+    expect(selectChatModel({ NODE_ENV: 'production', ...DEEPSEEK, ...LMSTUDIO }).provider).toBe(
+      'deepseek',
+    );
+  });
+
+  it('asks LM Studio for a json_schema answer without reasoning', async () => {
+    const requests = captureRequests({ content: '{"category":"infra"}' });
+    const { model } = selectChatModel({ NODE_ENV: 'production', ...LMSTUDIO });
+
+    const output = await model
+      .withStructuredOutput(Classification, { name: 'classify_ticket' })
+      .invoke('La VPN no conecta.');
+
+    expect(output).toEqual({ category: 'infra' });
+    expect(requests[0]?.url).toBe('http://localhost:1234/v1/chat/completions');
+    expect(requests[0]?.body).toMatchObject({
+      model: 'qwen/qwen3.5-9b',
+      max_tokens: 1024,
+      reasoning_effort: 'none',
+      response_format: { type: 'json_schema', json_schema: { name: 'classify_ticket' } },
+    });
+  });
+
   it('does not warn in test mode', () => {
     expect(selectChatModel({ NODE_ENV: 'test' }).warning).toBeUndefined();
   });
@@ -166,6 +208,8 @@ describe('llm.provider', () => {
       'AZURE_OPENAI_API_KEY',
       'AZURE_OPENAI_DEPLOYMENT',
       'DEEPSEEK_API_KEY',
+      'LMSTUDIO_BASE_URL',
+      'LMSTUDIO_MODEL',
     ]) {
       vi.stubEnv(name, '');
     }
