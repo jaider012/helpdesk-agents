@@ -1,6 +1,7 @@
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import type { SpecBundle } from 'agent-spec';
 import type { AuditLog } from '../../audit/audit-log.js';
+import { guardFromBundle } from '../../guards/user-message.guard.js';
 import { templatesFromBundle } from '../../messages/templates.js';
 import type { TicketStateMachine } from '../../tickets/state-machine.js';
 import { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
@@ -103,6 +104,7 @@ export function createNodes({
       templates,
       clock,
       handoffs: agents.flatMap(({ handoffs }) => handoffs),
+      guard: guardFromBundle(bundle),
     }),
   };
 }

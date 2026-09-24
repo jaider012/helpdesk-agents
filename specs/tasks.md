@@ -329,7 +329,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- audit.write-failure store.write-failure`
   Bloqueada por: T-56
 
-- [ ] T-58 · Aplicar las guardas del `userMessage` (design §8.2) · Satisface: REQ-SEC-10, REQ-COM-02, REQ-COM-04
+- [x] T-58 · Aplicar las guardas del `userMessage` (design §8.2) · Satisface: REQ-SEC-10, REQ-COM-02, REQ-COM-04
   Hecho cuando: If a generated `userMessage` asks for a password, a token or an MFA code, contains a term from the jargon list or contains a `userRef` or a JSON fragment, then the runtime shall replace the message with the plain-language template for the ticket outcome and append a `message_replaced` entry to the audit log.
   Verifica: `pnpm -F api test -- guard.credential-request guard.jargon guard.internal-data`
   Bloqueada por: T-45, T-52

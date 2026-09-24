@@ -2,6 +2,7 @@ import type { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import type { EscalationReason, HandoffEdge } from 'agent-spec';
 import { z } from 'zod';
 import type { AuditLog } from '../../audit/audit-log.js';
+import type { UserMessageGuard } from '../../guards/user-message.guard.js';
 import { DRAFT_TOOL } from '../../llm/fake-responder.js';
 import type { MessageTemplates } from '../../messages/templates.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
@@ -25,6 +26,8 @@ export interface EscalationNodeDeps {
   clock: () => Date;
   /** The handoffs of the spec, for the prompt of the envelope (REQ-2.3-17). */
   handoffs: readonly HandoffEdge[];
+  /** The guards of the user message (design §8.2). */
+  guard: UserMessageGuard;
 }
 
 /** The reason that the routing decision carried, or an operator request when there is none. */
@@ -55,7 +58,7 @@ function approvalRequestFor(state: GraphState, templates: MessageTemplates): App
  * without it, or when the node fails for any reason other than I/O, the templates are used.
  */
 export function createEscalationNode(deps: EscalationNodeDeps) {
-  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs } = deps;
+  const { model, systemPrompt, audit, lifecycle, templates, clock, handoffs, guard } = deps;
   const draft = model.withStructuredOutput(EscalationDraft, { name: DRAFT_TOOL });
 
   const replaced = (ticketId: string, cause: string) =>
@@ -91,8 +94,9 @@ export function createEscalationNode(deps: EscalationNodeDeps) {
       await replaced(ticketId, 'llm_unavailable');
       return template;
     }
-    if (!drafted.userMessage.includes(ticketId)) {
-      await replaced(ticketId, 'ticket_id_missing');
+    const broken = guard.check(drafted.userMessage, { ticketId, status: 'ESCALATED' });
+    if (broken) {
+      await replaced(ticketId, broken);
       return { summary: drafted.summary, userMessage: template.userMessage };
     }
     return drafted;

@@ -1,7 +1,7 @@
 import { findTable, type SpecBundle } from 'agent-spec';
 
 export const TEMPLATES_HEADING = '## Plantillas de mensaje';
-const COPILOT_INSTRUCTIONS = '.github/copilot-instructions.md';
+export const COPILOT_INSTRUCTIONS = '.github/copilot-instructions.md';
 
 export interface MessageTemplates {
   keys: string[];
