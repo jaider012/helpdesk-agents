@@ -9,6 +9,11 @@ export const BLOCKING_SCRIPT = fileURLToPath(
   new URL('./fixtures/skills/block-event-loop.js', import.meta.url),
 );
 
+/** A script that exits with code 0 and prints text instead of JSON. */
+export const TEXT_SCRIPT = fileURLToPath(
+  new URL('./fixtures/skills/print-text.js', import.meta.url),
+);
+
 /** check-vpn.js as the runtime compiles it from the real vpn-diagnostics skill. */
 export async function checkVpnScript(): Promise<SkillScript> {
   const scripts = compileSkillScripts(await loadSpec(REPO_ROOT));

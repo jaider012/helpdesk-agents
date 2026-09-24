@@ -289,7 +289,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- vpn-tool.run vpn-tool.timeout audit.tool`
   Bloqueada por: T-41
 
-- [ ] T-50 · Convertir el resultado de `check-vpn` en hallazgo o en `skill_resource_unavailable` · Satisface: REQ-2.2-25, REQ-2.2-26, REQ-2.2-27
+- [x] T-50 · Convertir el resultado de `check-vpn` en hallazgo o en `skill_resource_unavailable` · Satisface: REQ-2.2-25, REQ-2.2-26, REQ-2.2-27
   Hecho cuando: If the check-vpn tool times out, exits with code `2` or returns invalid JSON, then the runtime shall set `nextAgent` to `escalation` with reason `skill_resource_unavailable` and append an audit entry with that decision, the exit code and the elapsed time.
   Verifica: `pnpm -F api test -- vpn-tool.failure vpn-tool.finding`
   Bloqueada por: T-49
