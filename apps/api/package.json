@@ -1,0 +1,28 @@
+{
+  "name": "api",
+  "private": true,
+  "type": "module",
+  "description": "NestJS runtime that compiles the .github/ spec into a LangGraph graph.",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "start": "node dist/main.js",
+    "dev": "tsc -b tsconfig.build.json && node dist/main.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "agent-spec": "workspace:*",
+    "@langchain/core": "^1.2.12",
+    "@nestjs/common": "^12.1.0",
+    "@nestjs/core": "^12.1.0",
+    "@nestjs/platform-express": "^12.1.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^12.1.0",
+    "@types/node": "^22.20.4",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.1"
+  }
+}

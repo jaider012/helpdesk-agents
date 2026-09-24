@@ -1,0 +1,6 @@
+# Angular CLI build output and caches
+/dist
+/out-tsc
+/tmp
+/.angular
+/coverage

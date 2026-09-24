@@ -1,0 +1,28 @@
+{
+  "name": "agent-spec",
+  "private": true,
+  "type": "module",
+  "description": "Loads, validates and compiles the .github/ agent customization spec.",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.1"
+  },
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  }
+}

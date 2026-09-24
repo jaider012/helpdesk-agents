@@ -1,0 +1,6 @@
+---
+- applyTo
+- '**/tickets/**'
+---
+
+Cuerpo.

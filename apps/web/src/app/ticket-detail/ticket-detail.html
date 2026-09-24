@@ -1,0 +1,77 @@
+<p><a routerLink="/tickets">← Volver a la bandeja</a></p>
+
+@if (notFound()) {
+  <p role="alert">No encontramos el ticket {{ id() }}.</p>
+} @else if (ticket.error()) {
+  <p role="alert">No se pudo cargar el ticket. Vuelve a intentarlo en unos segundos.</p>
+} @else if (ticket.value(); as detail) {
+  <h1>Ticket {{ detail.ticketId }}</h1>
+  <dl class="summary">
+    <div>
+      <dt>Estado</dt>
+      <dd>{{ statusLabels[detail.status] }}</dd>
+    </div>
+    <div>
+      <dt>Categoría</dt>
+      <dd>{{ detail.category ? categoryLabels[detail.category] : pendingLabel }}</dd>
+    </div>
+    <div>
+      <dt>Severidad</dt>
+      <dd>{{ detail.severity ?? pendingLabel }}</dd>
+    </div>
+    <div>
+      <dt>Plazo de atención</dt>
+      <dd>
+        @if (detail.slaDueAt) {
+          <time [attr.datetime]="detail.slaDueAt">{{
+            detail.slaDueAt | date: 'dd/MM/yyyy HH:mm'
+          }}</time>
+        } @else {
+          {{ pendingLabel }}
+        }
+      </dd>
+    </div>
+  </dl>
+
+  <section class="ticket-text" aria-labelledby="ticket-text-heading">
+    <h2 id="ticket-text-heading">Descripción del problema</h2>
+    <p class="hint">Los datos personales aparecen ocultos, por ejemplo [EMAIL] o [PHONE].</p>
+    <!-- Only the redacted text: the raw text of the user never reaches the web app (REQ-WEB-06). -->
+    <blockquote>{{ detail.redactedText }}</blockquote>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Vistas del ticket">
+    <button
+      type="button"
+      role="tab"
+      id="tab-timeline"
+      aria-controls="ticket-panel"
+      [attr.aria-selected]="tab() === 'timeline'"
+      (click)="tab.set('timeline')"
+    >
+      Recorrido
+    </button>
+    <button
+      type="button"
+      role="tab"
+      id="tab-audit"
+      aria-controls="ticket-panel"
+      [attr.aria-selected]="tab() === 'audit'"
+      (click)="tab.set('audit')"
+    >
+      Bitácora
+    </button>
+  </div>
+
+  <section id="ticket-panel" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
+    @if (audit.error()) {
+      <p role="alert">No se pudo cargar la bitácora del ticket.</p>
+    } @else if (tab() === 'timeline') {
+      <app-timeline [entries]="audit.value()" />
+    } @else {
+      <app-audit-view [entries]="audit.value()" />
+    }
+  </section>
+} @else {
+  <p>Cargando ticket…</p>
+}

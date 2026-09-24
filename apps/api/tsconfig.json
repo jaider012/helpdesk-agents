@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    // NestJS dependency injection reads the constructor parameter types from decorator metadata.
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // Type-check agent-spec from its sources (the `source` export condition, `.ts` import paths).
+    "customConditions": ["source"],
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+}

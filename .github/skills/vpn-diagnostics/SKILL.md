@@ -1,0 +1,55 @@
+---
+name: vpn-diagnostics
+description: 'Diagnostica la conexión con el servicio central de VPN: resuelve el nombre del servidor, abre una conexión TCP a host:puerto y mide la latencia con el script scripts/check-vpn.js, e interpreta el resultado. Úsala cuando un ticket de categoría infra diga que la VPN no conecta, se cae, se queda conectando o va lenta, o cuando el operador pida un diagnóstico de VPN sobre un host:puerto con /run-vpn-diagnostics.'
+---
+
+# Skill vpn-diagnostics
+
+Comprueba en tres pasos si el servicio central de VPN responde, con el script sin dependencias [scripts/check-vpn.js](./scripts/check-vpn.js):
+
+| check | qué comprueba |
+| --- | --- |
+| `dns` | que el nombre del servidor VPN resuelve a una dirección |
+| `tcp` | que el servidor acepta una conexión en el puerto indicado |
+| `latency` | que el tiempo de conexión está por debajo del umbral (300 ms por defecto) |
+
+## Procedimiento
+
+1. Verifica que el ticket es `infra` con `entities.issueType` igual a `vpn`, o que el operador indicó un `target` con `/run-vpn-diagnostics`. Si no, no uses esta skill.
+2. Obtén el `target`: el que indicó el operador o, si no hay ninguno, el objetivo por defecto `vpn-gw.example.internal:443`.
+3. Valida el `target` antes de ejecutar nada. Debe cumplir completo la expresión `^[a-z0-9.-]+:\d{1,5}$`: solo minúsculas, dígitos, puntos y guiones, después `:` y de 1 a 5 dígitos. Si no la cumple (por ejemplo, si contiene espacios, `;`, `|`, `&`, `$`, comillas, barras o mayúsculas):
+   - no ejecutes ningún comando en la terminal, ni siquiera una versión «limpiada» del valor;
+   - no cambies el estado del ticket y añade a la bitácora una entrada `error` con `reason: invalid_target`, sin copiar el valor recibido;
+   - pide al operador un `target` válido con la forma `host:puerto`, por ejemplo `vpn-gw.example.internal:443`.
+4. Ejecuta en la terminal, desde la raíz del repositorio, exactamente este comando con el `target` ya validado y sin añadir nada más. Es el único comando de terminal de toda la skill: para leer o comprobar archivos usa la herramienta de lectura, nunca `ls`, `cat` ni otros comandos.
+
+   ```sh
+   node .github/skills/vpn-diagnostics/scripts/check-vpn.js --target <target>
+   ```
+
+5. Antes de mirar el exit code, comprueba que la salida es un único objeto JSON con las claves `ok`, `checks` y `summary`. Si no lo es, o si el comando no termina a tiempo, sigue «Manejo de fallos».
+6. Interpreta el resultado con la tabla de «Interpretación del resultado».
+7. Registra el hallazgo en `findings` del ticket, con `source: check-vpn`, los `checks`, el `exitCode`, el `summary` y la duración.
+8. Añade a la bitácora una entrada `tool_run` con `data`: `{ "tool": "check-vpn", "exitCode", "status", "durationMs" }`, donde `status` es `ok`, `failed` o `unavailable`.
+9. Aplica la acción o recomienda el handoff que indica la tabla. El mensaje para el usuario sale de la plantilla de la acción, en español llano y sin términos de la lista de jerga.
+
+## Interpretación del resultado
+
+| exit code | significado | hallazgo | siguiente paso |
+| --- | --- | --- | --- |
+| `0` | todos los checks en `pass` | `conclusive: true`, `cause: gateway_healthy` | acción `instruct_vpn_reconnect` y `RESOLVED` |
+| `1` | al menos un check en `fail` | `conclusive: true`; `cause` según el primer check en `fail`: `dns` → `dns_failure`, `tcp` → `gateway_unreachable`, `latency` → `high_latency` | **Escalar** con `vpn_gateway_unhealthy` |
+| `2` | argumentos inválidos, error interno o plazo total superado (ver `error.code`) | `conclusive: false`, `cause: resource_unavailable` | **Escalar** con `skill_resource_unavailable` («Manejo de fallos») |
+
+## Manejo de fallos
+
+- **Timeout:** 10 s
+- **Cuándo el recurso no está disponible.** El resultado es `skill_resource_unavailable` en cualquiera de estos casos:
+  - el comando no termina en 10 s;
+  - sale con exit `2`;
+  - lo que imprime no es un único objeto JSON con `ok`, `checks` y `summary`, **sea cual sea el exit code**.
+- **Por qué importa la última regla.** Si falta el script, Node sale con exit `1` e imprime un error (`Cannot find module`) sin JSON. Sin esta regla se leería como un fallo del servicio VPN (`vpn_gateway_unhealthy`), cuando el problema es la herramienta de diagnóstico.
+- **Qué registrar:**
+  - en `findings` del ticket, el hallazgo `{ "source": "check-vpn", "conclusive": false, "cause": "resource_unavailable" }` con el exit code (`null` si no terminó) y la duración;
+  - en la bitácora, una entrada `tool_run` con `status: unavailable` y otra `skill_resource_unavailable` con `data`: `{ "exitCode", "durationMs", "cause": "timeout" | "exit_2" | "invalid_output" }`. Nunca copies la salida completa del comando.
+- **Qué hacer después:** no reintentes, no ejecutes otro comando y no apliques ninguna acción. Añade una entrada `routed` hacia `escalation` y recomienda pulsar **Escalar** con el motivo `skill_resource_unavailable`. El mensaje para el usuario lo redacta `escalation` con la plantilla `escalated`.
