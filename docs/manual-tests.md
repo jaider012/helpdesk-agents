@@ -170,3 +170,13 @@ Ejecución del 2026-09-23: la lanzó Claude Code con `code chat` en la ventana d
 - SSE: en los 7 casos, los eventos `audit` coinciden con `GET /tickets/:id/audit` (14–18 entradas, con `node_started`/`node_finished`) y el último evento es `done` con el estado guardado.
 - PII: ni el correo, ni el teléfono, ni la contraseña sintéticos aparecen en `data/tickets` ni en `data/audit`.
 - Hallazgos: DA-04 (7/7 tickets daban 404 en el detalle durante los 7–9 s de la clasificación) → T-90; 3 de 11 borradores sin `maxTokens` se quedaron generando hasta el timeout → design §12.3.
+
+## E2E con el proveedor LM Studio del api (T-89)
+
+2026-09-23 · api compilado (`feat/phase-4-azure`, `00cc305`) sin conector de prueba: `LMSTUDIO_BASE_URL=http://localhost:1234/v1`, `LMSTUDIO_MODEL=qwen/qwen3.5-9b`, `LLM_TIMEOUT_MS=60000`. `GET /health` informa `lmstudio`. Los mismos siete tickets sintéticos del E2E anterior.
+
+- **Proveedor:** las siete clasificaciones salen de LM Studio con `json_schema` y sin razonamiento, en 6–9 s. Las rutas coinciden con el E2E anterior: 6/7 categorías como se esperaba, e «impresora» otra vez `infra/app`.
+- **SSE:** 7/7 con los eventos `audit` iguales a `GET /tickets/:id/audit` (15–19 entradas, ahora con `ticket_created`) y `done` con el estado final.
+- **DA-04 (T-90):** el ticket queda guardado en `NEW` 3–12 ms después del 202. Pidiendo el detalle a los 100 ms, como hace la web al navegar, responde 200 en 3/3 (antes, 404 en 7/7).
+- **Borradores:** 6 de 7 mensajes cayeron a la plantilla (`message_replaced`, `llm_unavailable`). La causa, reproducida aparte: qwen3.5-9b copia el paquete de escalamiento en JSON dentro de `userMessage`, así que o llega al tope de 1024 tokens (JSON cortado) o la guarda de datos internos lo rechazaría. El sistema degrada como está diseñado: plantilla sin jerga y bitácora con la causa.
+- **PII:** ni el correo, ni el teléfono, ni la contraseña sintéticos aparecen en `data/tickets` ni en `data/audit`.

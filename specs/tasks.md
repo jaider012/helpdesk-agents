@@ -483,7 +483,7 @@ Gate de entrada: `aprobado fase 3`.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red)
   Bloqueada por: T-82
 
-- [ ] T-89 · Usar LM Studio (`ChatOpenAI` con `LMSTUDIO_BASE_URL`) cuando no hay Azure ni DeepSeek · Satisface: REQ-LLM-05
+- [x] T-89 · Usar LM Studio (`ChatOpenAI` con `LMSTUDIO_BASE_URL`) cuando no hay Azure ni DeepSeek · Satisface: REQ-LLM-05
   Hecho cuando: Where the Azure OpenAI variables and `DEEPSEEK_API_KEY` are absent and `LMSTUDIO_BASE_URL` and `LMSTUDIO_MODEL` are set, the runtime shall use LM Studio through `ChatOpenAI` as the LLM provider.
   Verifica: `pnpm -F api test -- llm.provider` (variables sintéticas, sin red) + E2E con LM Studio registrado en `docs/manual-tests.md`
   Bloqueada por: T-83
