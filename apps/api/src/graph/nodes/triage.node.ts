@@ -7,6 +7,7 @@ import type { AuditLog } from '../../audit/audit-log.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import { CLASSIFY_TOOL } from '../../llm/fake-responder.js';
 import { entryPrompt } from '../../prompts/render.js';
+import type { SlaPolicy } from '../../tickets/sla.js';
 import { ISSUE_TYPES, LEVELS } from '../../tickets/ticket-state.js';
 import type { SeverityMatrix } from '../severity-matrix.js';
 import {
@@ -38,6 +39,8 @@ export interface TriageNodeDeps {
   model: BaseChatModel;
   systemPrompt: string;
   severity: SeverityMatrix;
+  /** `slaDueAt` from the SLA table (REQ-2.1-14). */
+  sla: SlaPolicy;
   audit: AuditLog;
   lifecycle: TicketLifecycle;
   /** Limit of the classification call (`LLM_TIMEOUT_MS`, REQ-ESC-04). */
@@ -72,6 +75,7 @@ export function createTriageNode({
   model,
   systemPrompt,
   severity,
+  sla,
   audit,
   lifecycle,
   timeoutMs,
@@ -127,6 +131,7 @@ export function createTriageNode({
     const update = {
       category: output.category,
       severity: derived,
+      ...(state.createdAt && { slaDueAt: sla(derived, state.createdAt) }),
       urgency: output.urgency,
       entities,
     };

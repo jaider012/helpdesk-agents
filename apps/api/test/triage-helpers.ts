@@ -10,6 +10,7 @@ import { createTriageNode } from '../src/graph/nodes/triage.node.js';
 import { compileSeverityMatrix } from '../src/graph/severity-matrix.js';
 import { FakeChatModel } from '../src/llm/fake-chat-model.js';
 import { fakeResponder } from '../src/llm/fake-responder.js';
+import { slaFromBundle } from '../src/tickets/sla.js';
 import { TicketStateMachine } from '../src/tickets/state-machine.js';
 import { TicketLifecycle } from '../src/tickets/ticket-lifecycle.js';
 import { TicketStore } from '../src/tickets/ticket-store.js';
@@ -36,6 +37,7 @@ export async function triage(rawText: string) {
     model,
     systemPrompt: agent.systemPrompt,
     severity: compileSeverityMatrix(agent.systemPrompt),
+    sla: slaFromBundle(bundle),
     audit,
     lifecycle,
     timeoutMs: 30_000,

@@ -4,6 +4,7 @@ import type { AuditLog } from '../../audit/audit-log.js';
 import { guardFromBundle } from '../../guards/user-message.guard.js';
 import { templatesFromBundle } from '../../messages/templates.js';
 import type { TicketStateMachine } from '../../tickets/state-machine.js';
+import { slaFromBundle } from '../../tickets/sla.js';
 import { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { TicketStore } from '../../tickets/ticket-store.js';
 import { ActionService } from '../../tools/actions.js';
@@ -69,6 +70,7 @@ export function createNodes({
         model,
         systemPrompt: systemPrompt('triage'),
         severity: compileSeverityMatrix(systemPrompt('triage')),
+        sla: slaFromBundle(bundle),
         audit,
         lifecycle,
         timeoutMs: llmTimeoutMs,

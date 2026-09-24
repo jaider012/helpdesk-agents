@@ -361,7 +361,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
 
 ### 2.3 Extras SHOULD de la API y del validador
 
-- [ ] T-64 · Calcular `slaDueAt` desde la tabla `## SLA` · Satisface: REQ-2.1-14
+- [x] T-64 · Calcular `slaDueAt` desde la tabla `## SLA` · Satisface: REQ-2.1-14
   Hecho cuando: When the triage agent assigns a severity, the runtime shall set `slaDueAt` from the SLA table in `ticket-lifecycle.instructions.md`.
   Verifica: `pnpm -F api test -- lifecycle.sla`
   Bloqueada por: T-42
