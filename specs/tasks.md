@@ -432,7 +432,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web test -- timeline`
   Bloqueada por: T-75
 
-- [ ] T-77 · Crear la pestaña de bitácora del ticket · Satisface: REQ-WEB-03
+- [x] T-77 · Crear la pestaña de bitácora del ticket · Satisface: REQ-WEB-03
   Hecho cuando: When the operator opens the audit view of a ticket, the web app shall display the audit entries in write order.
   Verifica: `pnpm -F web test -- audit-view`
   Bloqueada por: T-76

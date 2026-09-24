@@ -33,12 +33,36 @@
     </div>
   </dl>
 
-  <section aria-labelledby="timeline-heading">
-    <h2 id="timeline-heading">Recorrido</h2>
+  <div class="tabs" role="tablist" aria-label="Vistas del ticket">
+    <button
+      type="button"
+      role="tab"
+      id="tab-timeline"
+      aria-controls="ticket-panel"
+      [attr.aria-selected]="tab() === 'timeline'"
+      (click)="tab.set('timeline')"
+    >
+      Recorrido
+    </button>
+    <button
+      type="button"
+      role="tab"
+      id="tab-audit"
+      aria-controls="ticket-panel"
+      [attr.aria-selected]="tab() === 'audit'"
+      (click)="tab.set('audit')"
+    >
+      Bitácora
+    </button>
+  </div>
+
+  <section id="ticket-panel" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
     @if (audit.error()) {
-      <p role="alert">No se pudo cargar el recorrido del ticket.</p>
-    } @else {
+      <p role="alert">No se pudo cargar la bitácora del ticket.</p>
+    } @else if (tab() === 'timeline') {
       <app-timeline [entries]="audit.value()" />
+    } @else {
+      <app-audit-view [entries]="audit.value()" />
     }
   </section>
 } @else {
