@@ -2,7 +2,7 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import { loadSpec } from 'agent-spec';
+import { loadSpec, type SpecBundle } from 'agent-spec';
 import { AuditLog } from '../src/audit/audit-log.js';
 import { buildGraph, type GraphNodes } from '../src/graph/build.js';
 import { compileAgents } from '../src/graph/compile-agents.js';
@@ -23,11 +23,14 @@ export interface RuntimeOptions {
   llmTimeoutMs?: number;
   /** `VPN_GATEWAY_TARGET`; by default a closed local port, so check-vpn exits 1 at once. */
   vpnTarget?: string;
+  /** Changes the loaded spec before the graph compiles it. */
+  spec?: (bundle: SpecBundle) => SpecBundle;
 }
 
 /** The runtime graph over the real spec, a temporary data folder and the fake model. */
 export async function runtime(options: RuntimeOptions = {}) {
-  const bundle = await loadSpec(REPO_ROOT);
+  const loaded = await loadSpec(REPO_ROOT);
+  const bundle = options.spec?.(loaded) ?? loaded;
   const dataDir = await mkdtemp(join(tmpdir(), 'helpdesk-runtime-'));
   const clock = () => new Date(NOW);
   const audit = options.audit?.(dataDir, clock) ?? new AuditLog(dataDir, clock);

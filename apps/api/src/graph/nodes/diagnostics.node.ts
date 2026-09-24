@@ -2,7 +2,7 @@ import type { Category, DiagnosticsOutcome } from 'agent-spec';
 import type { MessageTemplates } from '../../messages/templates.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import type { DiagnosticFinding, IssueType } from '../../tickets/ticket-state.js';
-import type { ActionService } from '../../tools/actions.js';
+import { ActionError, type ActionService } from '../../tools/actions.js';
 import type { CheckVpnTool } from '../../tools/check-vpn-tool.js';
 import { mergeUpdate, toTicketState, type GraphState, type GraphUpdate } from '../state.js';
 
@@ -59,7 +59,8 @@ export function createDiagnosticsNode({
 
   /**
    * Delivers an allowlisted action after a conclusive finding and resolves the ticket (T5), with the
-   * plain-language template of the action as `userMessage`.
+   * plain-language template of the action as `userMessage`. A rejected action routes to escalation
+   * (R-D8, REQ-2.3-32); the action service has already audited the rejection.
    */
   async function resolveWith(
     current: GraphState,
@@ -69,11 +70,17 @@ export function createDiagnosticsNode({
   ): Promise<GraphUpdate> {
     const { ticketId } = current;
     const found = { status: current.status, findings: [finding] };
-    const action = await actions.execute(
-      toTicketState(mergeUpdate(current, found)),
-      actionId,
-      'diagnostics',
-    );
+    let action;
+    try {
+      action = await actions.execute(
+        toTicketState(mergeUpdate(current, found)),
+        actionId,
+        'diagnostics',
+      );
+    } catch (error) {
+      if (error instanceof ActionError) return { ...found, diagnosticsOutcome: 'action_rejected' };
+      throw error;
+    }
     const update = {
       ...found,
       actions: [action],

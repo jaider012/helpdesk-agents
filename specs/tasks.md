@@ -309,7 +309,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- graph.waiting-user`
   Bloqueada por: T-51
 
-- [ ] T-54 · Escalar cuando el runtime rechaza una acción de diagnostics · Satisface: REQ-2.3-32
+- [x] T-54 · Escalar cuando el runtime rechaza una acción de diagnostics · Satisface: REQ-2.3-32
   Hecho cuando: If the runtime rejects an action with `ACTION_NOT_ALLOWLISTED`, then the diagnostics agent shall hand off to the escalation agent with reason `action_not_allowlisted`.
   Verifica: `pnpm -F api test -- allowlist.escalate`
   Bloqueada por: T-52
