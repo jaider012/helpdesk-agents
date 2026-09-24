@@ -437,7 +437,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web test -- audit-view`
   Bloqueada por: T-76
 
-- [ ] T-78 · Mostrar solo `redactedText` en el detalle del ticket · Satisface: REQ-WEB-06
+- [x] T-78 · Mostrar solo `redactedText` en el detalle del ticket · Satisface: REQ-WEB-06
   Hecho cuando: The web app shall display only the redacted ticket text.
   Verifica: `pnpm -F web test -- redacted-only`
   Bloqueada por: T-76

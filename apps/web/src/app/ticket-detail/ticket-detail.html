@@ -33,6 +33,13 @@
     </div>
   </dl>
 
+  <section class="ticket-text" aria-labelledby="ticket-text-heading">
+    <h2 id="ticket-text-heading">Descripción del problema</h2>
+    <p class="hint">Los datos personales aparecen ocultos, por ejemplo [EMAIL] o [PHONE].</p>
+    <!-- Only the redacted text: the raw text of the user never reaches the web app (REQ-WEB-06). -->
+    <blockquote>{{ detail.redactedText }}</blockquote>
+  </section>
+
   <div class="tabs" role="tablist" aria-label="Vistas del ticket">
     <button
       type="button"
