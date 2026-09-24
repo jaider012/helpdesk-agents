@@ -391,7 +391,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- health`
   Bloqueada por: T-32, T-33
 
-- [ ] T-70 · Validar con zod el body de todas las peticiones · Satisface: REQ-API-11
+- [x] T-70 · Validar con zod el body de todas las peticiones · Satisface: REQ-API-11
   Hecho cuando: If a request body fails schema validation, then the api shall respond `400` with the validation errors.
   Verifica: `pnpm -F api test -- validation.body`
   Bloqueada por: T-68

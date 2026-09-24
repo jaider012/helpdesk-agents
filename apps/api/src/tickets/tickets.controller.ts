@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -13,10 +12,11 @@ import {
 import type { AuditEntry } from '../audit/audit-entry.js';
 import type { AuditLog } from '../audit/audit-log.js';
 import { AUDIT_LOG } from '../audit/audit.module.js';
+import { z } from 'zod';
+import { parseBody } from '../http/parse-body.js';
 import type { PromptRunner } from '../prompts/prompt-runner.js';
 import { logRunFailure, startRun } from '../prompts/start-run.js';
 import { PROMPT_RUNNER } from '../prompts/tokens.js';
-import { z } from 'zod';
 import { TransitionError, type TicketStateMachine } from './state-machine.js';
 import { TICKET_ID_PATTERN } from './ticket-id.js';
 import { TicketLifecycle } from './ticket-lifecycle.js';
@@ -24,10 +24,11 @@ import { ISSUE_TYPES, type Entities, type TicketState } from './ticket-state.js'
 import type { TicketStore } from './ticket-store.js';
 import { STATE_MACHINE, TICKET_STORE } from './tickets.module.js';
 
-interface CreateTicketBody {
-  text?: string;
-  channel?: string;
-}
+/** Body of `POST /tickets` (design §12.1). */
+const CreateBody = z.object({
+  text: z.string().trim().min(1),
+  channel: z.enum(['email', 'chat', 'portal', 'phone']),
+});
 
 /** Body of `POST /tickets/:id/close` (design §12.1). */
 const CloseBody = z.object({
@@ -61,10 +62,9 @@ export class TicketsController {
   /** Alias of `POST /prompts/triage-ticket/run` (REQ-API-02, REQ-API-03). */
   @Post()
   @HttpCode(202)
-  async create(@Body() body: CreateTicketBody): Promise<{ ticketId: string }> {
-    const variables = { ticket: body?.text ?? '', channel: body?.channel ?? '' };
-    const field = (variable: string) => (variable === 'ticket' ? 'text' : variable);
-    return { ticketId: await startRun(this.runner, 'triage-ticket', variables, field) };
+  async create(@Body() body: unknown): Promise<{ ticketId: string }> {
+    const { text, channel } = parseBody(CreateBody, body);
+    return { ticketId: await startRun(this.runner, 'triage-ticket', { ticket: text, channel }) };
   }
 
   /** The inbox, newest first (REQ-API-04). */
@@ -104,14 +104,8 @@ export class TicketsController {
   @Post(':id/close')
   @HttpCode(200)
   async close(@Param('id') id: string, @Body() body: unknown): Promise<Omit<TicketState, 'audit'>> {
-    const parsed = CloseBody.safeParse(body);
-    if (!parsed.success) {
-      throw new BadRequestException({
-        message: 'closeReason must be user_confirmed, no_user_reply or handled_by_team',
-      });
-    }
+    const { closeReason } = parseBody(CloseBody, body);
     const ticket = await this.find(id);
-    const { closeReason } = parsed.data;
     try {
       const closed: Partial<TicketState> = await this.lifecycle.applyTransition(
         { ...ticket, closeReason },
@@ -135,10 +129,7 @@ export class TicketsController {
   @Post(':id/reply')
   @HttpCode(202)
   async reply(@Param('id') id: string, @Body() body: unknown): Promise<{ ticketId: string }> {
-    const parsed = ReplyBody.safeParse(body);
-    if (!parsed.success) {
-      throw new BadRequestException({ message: 'issueType must be a known issue type' });
-    }
+    const { issueType } = parseBody(ReplyBody, body);
     const ticket = await this.find(id);
     if (ticket.status !== 'WAITING_USER') {
       throw new ConflictException({
@@ -147,11 +138,11 @@ export class TicketsController {
       });
     }
     // A ticket in WAITING_USER went through triage, so it has the rest of its entities.
-    const entities = { ...ticket.entities, issueType: parsed.data.issueType } as Entities;
+    const entities = { ...ticket.entities, issueType } as Entities;
     const resumed = await this.lifecycle.applyTransition({ ...ticket, entities }, 'IN_PROGRESS', {
       agent: 'runtime',
       reason: 'the user replied with the issue type',
-      data: { issueType: parsed.data.issueType },
+      data: { issueType },
     });
     const { ticketId, done } = this.runner.resume(resumed, 'diagnostics');
     logRunFailure(ticketId, done);

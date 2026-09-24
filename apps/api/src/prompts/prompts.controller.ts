@@ -1,13 +1,6 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  HttpCode,
-  Inject,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Param, Post } from '@nestjs/common';
 import { z } from 'zod';
+import { parseBody } from '../http/parse-body.js';
 import type { PromptRunner } from './prompt-runner.js';
 import { startRun } from './start-run.js';
 import { PROMPT_RUNNER } from './tokens.js';
@@ -23,10 +16,7 @@ export class PromptsController {
   @Post(':name/run')
   @HttpCode(202)
   async run(@Param('name') name: string, @Body() body: unknown): Promise<{ ticketId: string }> {
-    const parsed = RunBody.safeParse(body ?? {});
-    if (!parsed.success) {
-      throw new BadRequestException({ message: 'variables must be an object of text values' });
-    }
-    return { ticketId: await startRun(this.runner, name, parsed.data.variables ?? {}) };
+    const { variables = {} } = parseBody(RunBody, body);
+    return { ticketId: await startRun(this.runner, name, variables) };
   }
 }
