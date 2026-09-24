@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { AuditLog } from '../../audit/audit-log.js';
 import type { TicketLifecycle } from '../../tickets/ticket-lifecycle.js';
 import { CLASSIFY_TOOL } from '../../llm/fake-responder.js';
+import { entryPrompt } from '../../prompts/render.js';
 import { ISSUE_TYPES, LEVELS } from '../../tickets/ticket-state.js';
 import type { SeverityMatrix } from '../severity-matrix.js';
 import {
@@ -76,13 +77,12 @@ export function createTriageNode({
   timeoutMs,
 }: TriageNodeDeps) {
   const classify = model.withStructuredOutput(TriageOutput, { name: CLASSIFY_TOOL });
-  const classifyTicket = async (redactedText: string): Promise<Classification> => {
+  const classifyTicket = async (text: string): Promise<Classification> => {
     const signal = AbortSignal.timeout(timeoutMs);
     try {
-      const raw = await classify.invoke(
-        [new SystemMessage(systemPrompt), new HumanMessage(redactedText)],
-        { signal },
-      );
+      const raw = await classify.invoke([new SystemMessage(systemPrompt), new HumanMessage(text)], {
+        signal,
+      });
       // The base structured output returns the raw tool arguments: validate them here.
       return { ok: true, output: TriageOutput.parse(raw) };
     } catch (error) {
@@ -90,7 +90,8 @@ export function createTriageNode({
     }
   };
   return async (state: GraphState): Promise<GraphUpdate> => {
-    const classification = await classifyTicket(state.redactedText);
+    // In a prompt run, the rendered prompt file is the human message (design §7).
+    const classification = await classifyTicket(entryPrompt(state, 'triage') ?? state.redactedText);
     if (!classification.ok) {
       await audit.append({
         ticketId: state.ticketId,

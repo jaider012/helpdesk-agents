@@ -8,6 +8,7 @@ import type {
   TicketStatus,
 } from 'agent-spec';
 import type { AuditEntry } from '../audit/audit-entry.js';
+import type { PromptRun } from '../prompts/render.js';
 import type {
   Channel,
   DiagnosticFinding,
@@ -48,6 +49,8 @@ export const TicketGraphState = Annotation.Root({
   llmFailure: Annotation<LlmFailure | undefined>(),
   // Transient: the outcome of the diagnostics procedure that R-D1..R-D8 route on (design §2.2).
   diagnosticsOutcome: Annotation<DiagnosticsOutcome | undefined>(),
+  // Transient: the prompt file of an operator run, its variables redacted by the redact node.
+  prompt: Annotation<PromptRun | undefined>(),
   // TicketState.escalation: LangGraph forbids a channel named like the `escalation` node (DC-42).
   escalationPackage: Annotation<EscalationPackage | undefined>(),
   userMessage: Annotation<string | undefined>(),
@@ -77,6 +80,14 @@ export function toTicketState(state: GraphState): TicketState {
   delete ticket.rawText;
   delete ticket.llmFailure;
   delete ticket.diagnosticsOutcome;
+  delete ticket.prompt;
   delete ticket.escalationPackage;
   return ticket as unknown as TicketState;
+}
+
+/** The graph state of a stored ticket, the inverse of `toTicketState`. */
+export function fromTicketState(ticket: TicketState): GraphState {
+  const state: Record<string, unknown> = { ...ticket, escalationPackage: ticket.escalation };
+  delete state.escalation;
+  return state as unknown as GraphState;
 }

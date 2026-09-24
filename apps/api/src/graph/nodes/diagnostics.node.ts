@@ -157,9 +157,9 @@ export function createDiagnosticsNode(deps: DiagnosticsNodeDeps) {
   }
 
   /** The vpn-diagnostics skill (REQ-2.2-09, REQ-2.2-28, REQ-2.2-29). */
-  async function diagnoseVpn(state: GraphState): Promise<GraphUpdate> {
+  async function diagnoseVpn(state: GraphState, target: string): Promise<GraphUpdate> {
     const current = await takeCase(state);
-    const { finding, outcome } = await checkVpn.run(vpnTarget, {
+    const { finding, outcome } = await checkVpn.run(target, {
       ticketId: current.ticketId,
       findingId: `fnd_${current.findings.length + 1}`,
     });
@@ -197,8 +197,12 @@ export function createDiagnosticsNode(deps: DiagnosticsNodeDeps) {
   }
 
   return async (state: GraphState): Promise<GraphUpdate> => {
+    // run-vpn-diagnostics applies the skill to its target, whatever the category (design §2.2).
+    const promptTarget =
+      state.entryAgent === 'diagnostics' ? state.prompt?.variables.target : undefined;
+    if (promptTarget) return diagnoseVpn(state, promptTarget);
     const procedure = procedureFor(state.category, state.entities?.issueType);
-    if (procedure === 'vpn') return diagnoseVpn(state);
+    if (procedure === 'vpn') return diagnoseVpn(state, vpnTarget);
     if (procedure === 'lockout') return instructUnlock(state);
     if (procedure === 'ask_user') return askUser(state);
     return { diagnosticsOutcome: procedure };

@@ -344,7 +344,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- redact.persistence redact.logs`
   Bloqueada por: T-53, T-55, T-58
 
-- [ ] T-61 · Exponer `POST /prompts/:name/run` con redacción de variables, render y agente de entrada (design §7) · Satisface: REQ-2.4-11, REQ-2.4-12, REQ-SEC-06
+- [x] T-61 · Exponer `POST /prompts/:name/run` con redacción de variables, render y agente de entrada (design §7) · Satisface: REQ-2.4-11, REQ-2.4-12, REQ-SEC-06
   Hecho cuando: When the api receives `POST /prompts/:name/run`, the runtime shall redact the free-text variables, render the template with them and start the graph at the agent named in the `agent` field of that prompt.
   Verifica: `pnpm -F api test -- prompts.render prompts.entry-agent redact.prompt-variables`
   Bloqueada por: T-51, T-55

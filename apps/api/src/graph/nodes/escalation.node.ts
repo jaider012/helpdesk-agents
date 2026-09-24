@@ -1,5 +1,5 @@
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import type { EscalationReason, HandoffEdge } from 'agent-spec';
+import { ROUTING_RULES, type EscalationReason, type HandoffEdge } from 'agent-spec';
 import { z } from 'zod';
 import type { AuditLog } from '../../audit/audit-log.js';
 import type { UserMessageGuard } from '../../guards/user-message.guard.js';
@@ -32,10 +32,23 @@ export interface EscalationNodeDeps {
   timeoutMs: number;
 }
 
-/** The reason that the routing decision carried, or an operator request when there is none. */
+/** Every escalation reason code: those of the routing rules and the operator request. */
+const REASON_CODES: ReadonlySet<string> = new Set([
+  ...Object.values(ROUTING_RULES).flatMap((rules) =>
+    (rules as ReadonlyArray<{ reason?: string }>).flatMap(({ reason }) => (reason ? [reason] : [])),
+  ),
+  'operator_request',
+]);
+
+/**
+ * The reason that the routing decision carried; without one, the reason of an escalate-ticket run
+ * when it is a reason code, or an operator request otherwise.
+ */
 function escalationReason(state: GraphState): EscalationReason {
   const route = state.lastRoute;
-  return route?.to === 'escalation' && route.reason ? route.reason : 'operator_request';
+  if (route?.to === 'escalation' && route.reason) return route.reason;
+  const requested = state.prompt?.variables.reason?.trim() ?? '';
+  return REASON_CODES.has(requested) ? (requested as EscalationReason) : 'operator_request';
 }
 
 /**

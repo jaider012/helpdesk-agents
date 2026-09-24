@@ -1,5 +1,6 @@
 import { HumanMessage, SystemMessage, type BaseMessage } from '@langchain/core/messages';
 import type { AgentName, HandoffEdge, RouteDecision } from 'agent-spec';
+import { entryPrompt } from '../prompts/render.js';
 import type { TicketState } from '../tickets/ticket-state.js';
 import type { GraphState } from './state.js';
 
@@ -16,7 +17,10 @@ export interface HandoffEnvelope {
   context: HandoffContext;
   /** The routing decision that led here; absent when an operator starts at this agent. */
   route?: RouteDecision;
-  /** `handoffs[].prompt` of the source `.agent.md`; empty without a handoff. */
+  /**
+   * `handoffs[].prompt` of the source `.agent.md`; at the entry agent of a prompt run, the rendered
+   * prompt file (design §7); otherwise empty.
+   */
   prompt: string;
 }
 
@@ -37,7 +41,7 @@ export function handoffEnvelope(
       findings: state.findings,
     },
     ...(route && { route }),
-    prompt: handoff?.prompt ?? '',
+    prompt: handoff?.prompt ?? entryPrompt(state, target) ?? '',
   };
 }
 
