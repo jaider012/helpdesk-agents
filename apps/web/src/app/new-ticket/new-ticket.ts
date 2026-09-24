@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, requiredError, validate } from '@angular/forms/signals';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../core/api.service';
 import { Channel } from '../core/contracts';
@@ -12,7 +12,7 @@ interface NewTicketModel {
 
 @Component({
   selector: 'app-new-ticket',
-  imports: [FormField, FormRoot],
+  imports: [FormField, FormRoot, RouterLink],
   templateUrl: './new-ticket.html',
   styleUrl: './new-ticket.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

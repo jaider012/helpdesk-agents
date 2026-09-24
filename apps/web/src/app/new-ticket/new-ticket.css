@@ -1,80 +1,98 @@
-:host {
-  display: grid;
-  gap: 1.25rem;
+.page-body {
   max-width: 46rem;
+  margin: 0 auto;
+  padding-top: 2.5rem;
 }
 
-.lead {
-  max-width: 60ch;
-  margin: 0.375rem 0 0;
+.composer {
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.06);
 }
 
-.new-ticket {
-  display: grid;
-  gap: 1.25rem;
-  padding: 1.25rem;
-}
-
-.field {
-  display: grid;
-  gap: 0.375rem;
-}
-
-label {
-  font-weight: 600;
-}
-
-textarea,
-select {
-  width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-surface);
-  color: var(--color-ink);
-  font: inherit;
+.composer:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border-strong));
 }
 
 textarea {
-  min-height: 9rem;
+  display: block;
+  width: 100%;
+  min-height: 11rem;
+  padding: 1.25rem 1.25rem 0.5rem;
+  border: 0;
+  outline: none;
   resize: vertical;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
   font-size: var(--text-lg);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-select {
-  max-width: 20rem;
+textarea::placeholder {
+  color: var(--text-tertiary);
 }
 
-textarea:hover,
-select:hover {
-  border-color: var(--color-muted);
+.error {
+  margin: 0 1.25rem;
+  color: var(--danger);
+  font-weight: 500;
 }
 
 .hint {
   display: flex;
   gap: 0.5rem;
   margin: 0;
-  color: var(--color-muted);
+  padding: 0.5rem 1.25rem 0.875rem;
+  color: var(--text-tertiary);
   font-size: var(--text-sm);
 }
 
 .hint svg {
   flex: none;
-  width: 1rem;
-  height: 1rem;
+  width: 0.875rem;
+  height: 0.875rem;
   margin-top: 0.125rem;
   fill: currentColor;
 }
 
-.error {
-  margin: 0;
-  color: var(--color-critical);
-  font-weight: 600;
+.alert {
+  margin: 0 1.25rem 0.875rem;
 }
 
-.actions {
+.composer-bar {
   display: flex;
-  justify-content: flex-end;
-  padding-top: 0.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem 0.625rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+
+.composer-bar label {
+  color: var(--text-secondary);
+}
+
+select {
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.note {
+  margin: 1rem 0.25rem 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
 }

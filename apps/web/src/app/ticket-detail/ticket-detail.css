@@ -1,100 +1,164 @@
-:host {
+.detail {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  min-height: calc(100dvh - 3.9rem);
 }
 
-.back {
-  justify-self: start;
-  font-size: var(--text-md);
-  text-decoration: none;
+.content {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2rem 2rem 3rem;
 }
 
-h1 .mono {
+.subject {
+  font-size: var(--text-2xl);
   font-weight: 600;
-  white-space: nowrap;
-}
-
-@media (max-width: 640px) {
-  h1 {
-    font-size: var(--text-xl);
-  }
-}
-
-.summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 1rem 1.5rem;
-  margin: 0;
-  padding: 1rem 1.25rem;
-}
-
-.summary dd {
-  margin: 0.375rem 0 0;
-  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 .ticket-text {
-  padding: 1.25rem;
-}
-
-.hint {
-  margin: 0.25rem 0 0.75rem;
-  font-size: var(--text-sm);
+  margin-top: 0.75rem;
 }
 
 blockquote {
-  max-width: 70ch;
   margin: 0;
-  padding-left: 1rem;
-  border-left: 3px solid var(--color-border);
+  color: var(--text);
   font-size: var(--text-lg);
-  line-height: 1.6;
+  line-height: 1.65;
   white-space: pre-wrap;
+}
+
+.hint {
+  margin: 0.75rem 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
 }
 
 /* A placeholder of hidden personal data, drawn as redaction tape. */
 .redaction {
-  padding: 0 0.3em;
-  border-radius: 3px;
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--color-surface-muted) 0 6px,
-    var(--color-border) 6px 8px
-  );
-  color: var(--color-ink);
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 4px;
+  background: repeating-linear-gradient(-45deg, var(--bg-selected) 0 5px, var(--bg-hover) 5px 10px);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
   font-family: var(--font-mono);
-  font-size: 0.85em;
+  font-size: 0.8em;
   font-weight: 600;
 }
 
-.tabs {
+.activity {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.activity-head {
   display: flex;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.activity-head h2 {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+/* Segmented control. */
+.tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
 }
 
 .tabs button {
-  padding: 0.625rem 1rem;
+  height: 1.5rem;
+  padding: 0 0.625rem;
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-radius: 4px;
   background: none;
-  color: var(--color-muted);
+  color: var(--text-secondary);
   font: inherit;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
 }
 
 .tabs button:hover {
-  color: var(--color-ink);
+  color: var(--text);
 }
 
 .tabs button[aria-selected='true'] {
-  border-bottom-color: var(--color-accent);
-  color: var(--color-accent);
+  background: var(--bg-panel);
+  color: var(--text);
+  box-shadow: 0 0 0 1px var(--border-strong);
 }
 
-.tab-panel {
-  margin-top: 1rem;
-  padding: 1rem 1.25rem;
+#ticket-panel {
   overflow-x: auto;
+}
+
+.props {
+  padding: 1rem 1.25rem;
+  border-left: 1px solid var(--border);
+}
+
+.props-title {
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.summary {
+  display: grid;
+  margin: 0;
+}
+
+.summary > div {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: center;
+  min-height: 2rem;
+}
+
+.summary dt {
+  color: var(--text-secondary);
+}
+
+.summary dd {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .props {
+    order: -1;
+    border-bottom: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .summary {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    column-gap: 1.5rem;
+  }
+
+  .content {
+    padding: 1.5rem 1.25rem 2.5rem;
+  }
 }

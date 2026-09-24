@@ -1,4 +1,4 @@
-import { AuditDecision, AuditEntry, Category, TicketStatus } from './contracts';
+import { AuditDecision, AuditEntry, Category, Channel, Severity, TicketStatus } from './contracts';
 
 // Operator-facing texts in Spanish, without the jargon listed in .github/copilot-instructions.md.
 
@@ -71,3 +71,28 @@ export const DECISION_LABELS: Record<AuditDecision, string> = {
 export function decisionLabel(decision: string): string {
   return DECISION_LABELS[decision as AuditDecision] ?? decision;
 }
+
+/** Order of the inbox groups: the ticket lifecycle (specs/design.md §3). */
+export const STATUS_ORDER: readonly TicketStatus[] = [
+  'NEW',
+  'TRIAGED',
+  'IN_PROGRESS',
+  'WAITING_USER',
+  'ESCALATED',
+  'RESOLVED',
+  'CLOSED',
+];
+
+export const SEVERITY_LABELS: Record<Severity, string> = {
+  P1: 'Crítica',
+  P2: 'Alta',
+  P3: 'Media',
+  P4: 'Baja',
+};
+
+export const CHANNEL_LABELS: Record<Channel, string> = {
+  email: 'Correo electrónico',
+  chat: 'Chat',
+  portal: 'Portal de autoservicio',
+  phone: 'Teléfono',
+};

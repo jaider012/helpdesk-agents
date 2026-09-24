@@ -1,116 +1,141 @@
-<a class="back" routerLink="/tickets">← Volver a la bandeja</a>
+<header class="topbar">
+  <nav class="crumbs" aria-label="Ruta">
+    <a routerLink="/tickets">Bandeja</a>
+    <span class="sep" aria-hidden="true">›</span>
+    <span class="current num">{{ id() }}</span>
+  </nav>
+</header>
 
 @if (notFound()) {
-  <p class="alert" role="alert">No encontramos el ticket {{ id() }}.</p>
+  <div class="page-body">
+    <p class="alert" role="alert">No encontramos el ticket {{ id() }}.</p>
+  </div>
 } @else if (ticket.error()) {
-  <p class="alert" role="alert">
-    No se pudo cargar el ticket. Vuelve a intentarlo en unos segundos.
-  </p>
-} @else if (ticket.value(); as detail) {
-  <h1>
-    Ticket <span class="mono">{{ detail.ticketId }}</span>
-  </h1>
-
-  <dl class="summary panel">
-    <div>
-      <dt class="eyebrow">Estado</dt>
-      <dd>
-        <span class="pill" [attr.data-status]="detail.status">{{
-          statusLabels[detail.status]
-        }}</span>
-      </dd>
-    </div>
-    <div>
-      <dt class="eyebrow">Categoría</dt>
-      <dd>
-        @if (detail.category) {
-          {{ categoryLabels[detail.category] }}
-        } @else {
-          <span class="pending">{{ pendingLabel }}</span>
-        }
-      </dd>
-    </div>
-    <div>
-      <dt class="eyebrow">Severidad</dt>
-      <dd>
-        @if (detail.severity) {
-          <span class="sev" [attr.data-severity]="detail.severity">{{ detail.severity }}</span>
-        } @else {
-          <span class="pending">{{ pendingLabel }}</span>
-        }
-      </dd>
-    </div>
-    <div>
-      <dt class="eyebrow">Plazo de atención</dt>
-      <dd>
-        @if (detail.slaDueAt) {
-          <time class="mono" [attr.datetime]="detail.slaDueAt">{{
-            detail.slaDueAt | date: 'dd/MM/yyyy HH:mm'
-          }}</time>
-        } @else {
-          <span class="pending">{{ pendingLabel }}</span>
-        }
-      </dd>
-    </div>
-  </dl>
-
-  <section class="ticket-text panel" aria-labelledby="ticket-text-heading">
-    <h2 id="ticket-text-heading">Descripción del problema</h2>
-    <p class="hint muted">
-      Los datos personales aparecen ocultos, por ejemplo
-      <span class="redaction">[EMAIL]</span> o <span class="redaction">[PHONE]</span>.
+  <div class="page-body">
+    <p class="alert" role="alert">
+      No se pudo cargar el ticket. Vuelve a intentarlo en unos segundos.
     </p>
-    <!-- Only the redacted text: the raw text of the user never reaches the web app (REQ-WEB-06). -->
-    <blockquote>
-      @for (part of textParts(); track $index) {
-        <span
-          [class.redaction]="part.redacted"
-          [attr.title]="part.redacted ? 'Dato personal oculto' : null"
-          >{{ part.text }}</span
-        >
-      }
-    </blockquote>
-  </section>
+  </div>
+} @else if (ticket.value(); as detail) {
+  <div class="detail">
+    <div class="content">
+      <h1 class="subject">{{ subject() || 'Ticket ' + detail.ticketId }}</h1>
 
-  <div class="views">
-    <div class="tabs" role="tablist" aria-label="Vistas del ticket">
-      <button
-        type="button"
-        role="tab"
-        id="tab-timeline"
-        aria-controls="ticket-panel"
-        [attr.aria-selected]="tab() === 'timeline'"
-        (click)="tab.set('timeline')"
-      >
-        Recorrido
-      </button>
-      <button
-        type="button"
-        role="tab"
-        id="tab-audit"
-        aria-controls="ticket-panel"
-        [attr.aria-selected]="tab() === 'audit'"
-        (click)="tab.set('audit')"
-      >
-        Bitácora
-      </button>
+      <section class="ticket-text" aria-label="Descripción del problema">
+        <!-- Only the redacted text: the raw text of the user never reaches the web app (REQ-WEB-06). -->
+        <blockquote>
+          @for (part of textParts(); track $index) {
+            <span
+              [class.redaction]="part.redacted"
+              [attr.title]="part.redacted ? 'Dato personal oculto' : null"
+              >{{ part.text }}</span
+            >
+          }
+        </blockquote>
+        <p class="hint">
+          Los datos personales aparecen ocultos, por ejemplo
+          <span class="redaction">[EMAIL]</span> o <span class="redaction">[PHONE]</span>.
+        </p>
+      </section>
+
+      <section class="activity" aria-labelledby="activity-heading">
+        <div class="activity-head">
+          <h2 id="activity-heading">Actividad</h2>
+          <div class="tabs" role="tablist" aria-label="Vistas de la actividad">
+            <button
+              type="button"
+              role="tab"
+              id="tab-timeline"
+              aria-controls="ticket-panel"
+              [attr.aria-selected]="tab() === 'timeline'"
+              (click)="tab.set('timeline')"
+            >
+              Recorrido
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="tab-audit"
+              aria-controls="ticket-panel"
+              [attr.aria-selected]="tab() === 'audit'"
+              (click)="tab.set('audit')"
+            >
+              Bitácora
+            </button>
+          </div>
+        </div>
+
+        <div id="ticket-panel" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
+          @if (audit.error()) {
+            <p class="alert" role="alert">No se pudo cargar la bitácora del ticket.</p>
+          } @else if (tab() === 'timeline') {
+            <app-timeline [entries]="entries()" />
+          } @else {
+            <app-audit-view [entries]="entries()" />
+          }
+        </div>
+      </section>
     </div>
 
-    <section
-      id="ticket-panel"
-      class="panel tab-panel"
-      role="tabpanel"
-      [attr.aria-labelledby]="'tab-' + tab()"
-    >
-      @if (audit.error()) {
-        <p class="alert" role="alert">No se pudo cargar la bitácora del ticket.</p>
-      } @else if (tab() === 'timeline') {
-        <app-timeline [entries]="entries()" />
-      } @else {
-        <app-audit-view [entries]="entries()" />
-      }
-    </section>
+    <aside class="props" aria-labelledby="props-heading">
+      <h2 id="props-heading" class="props-title">Propiedades</h2>
+      <dl class="summary">
+        <div>
+          <dt>Estado</dt>
+          <dd>
+            <app-status-icon [status]="detail.status" />
+            {{ statusLabels[detail.status] }}
+          </dd>
+        </div>
+        <div>
+          <dt>Severidad</dt>
+          <dd>
+            <app-severity-icon [severity]="detail.severity" />
+            @if (detail.severity) {
+              {{ detail.severity }}
+              <span class="muted">{{ severityLabels[detail.severity] }}</span>
+            } @else {
+              <span class="pending">{{ pendingLabel }}</span>
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>Categoría</dt>
+          <dd>
+            @if (detail.category) {
+              {{ categoryLabels[detail.category] }}
+            } @else {
+              <span class="pending">{{ pendingLabel }}</span>
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>Plazo de atención</dt>
+          <dd>
+            @if (detail.slaDueAt) {
+              <time class="num" [attr.datetime]="detail.slaDueAt">{{
+                detail.slaDueAt | date: 'dd/MM/yyyy HH:mm'
+              }}</time>
+            } @else {
+              <span class="pending">{{ pendingLabel }}</span>
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>Canal</dt>
+          <dd>{{ channelLabels[detail.channel] }}</dd>
+        </div>
+        <div>
+          <dt>Creado</dt>
+          <dd>
+            <time class="num" [attr.datetime]="detail.createdAt">{{
+              detail.createdAt | date: 'dd/MM/yyyy HH:mm'
+            }}</time>
+          </dd>
+        </div>
+      </dl>
+    </aside>
   </div>
 } @else {
-  <p class="panel empty">Cargando ticket…</p>
+  <p class="empty">Cargando ticket…</p>
 }

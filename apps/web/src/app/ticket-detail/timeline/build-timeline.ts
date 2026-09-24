@@ -14,6 +14,8 @@ export interface TimelineItem {
   durationMs?: number;
   /** A node that has started and not finished yet. */
   running?: boolean;
+  /** For a status transition, the status it reaches. */
+  status?: string;
 }
 
 /**
@@ -58,6 +60,7 @@ export function buildTimeline(entries: readonly AuditEntry[]): TimelineItem[] {
         items.push({
           ...base(entry, 'transition'),
           title: `${statusLabel(entry.from)} → ${statusLabel(entry.to)}`,
+          status: entry.to,
         });
         break;
       case 'tool_run':

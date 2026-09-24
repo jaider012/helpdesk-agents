@@ -1,135 +1,121 @@
 .timeline {
-  max-width: 52rem;
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .item {
   display: grid;
-  grid-template-columns: 4.75rem 1rem minmax(0, 1fr) auto;
-  grid-template-areas: 'time marker body duration';
-  column-gap: 0.875rem;
-  padding: 0.5rem 0;
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  column-gap: 0.75rem;
+  align-items: start;
+  padding: 0.4375rem 0;
 }
 
-.time {
-  grid-area: time;
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-/* The rail joins the markers; each kind of event has its own marker. */
+/* A faint line joins the markers, as in an activity feed. */
 .marker {
-  grid-area: marker;
   position: relative;
+  display: grid;
+  place-items: center;
+  height: 1.25rem;
+  color: var(--text-secondary);
 }
 
-.marker::before {
+.item:not(:last-child) .marker::after {
   content: '';
   position: absolute;
-  top: -0.5rem;
-  bottom: -0.5rem;
-  left: calc(50% - 1px);
-  width: 2px;
-  background: var(--color-border);
+  top: 1.25rem;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 1.125rem;
+  background: var(--border-strong);
 }
 
-.item:first-child .marker::before {
-  top: 0.75rem;
+.marker svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.item:last-child .marker::before {
-  bottom: calc(100% - 0.75rem);
-}
-
-.marker::after {
-  content: '';
-  position: absolute;
-  top: 0.375rem;
-  left: calc(50% - 0.375rem);
-  width: 0.75rem;
-  height: 0.75rem;
-  border: 2px solid var(--color-muted);
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 50%;
-  background: var(--color-surface);
+  background: var(--accent);
 }
 
-[data-kind='node'] .marker::after {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-}
-
-[data-kind='handoff'] .marker::after {
-  border-color: var(--color-accent);
-  border-radius: 2px;
-  transform: scale(0.8) rotate(45deg);
-}
-
-[data-kind='tool'] .marker::after {
-  border-radius: 3px;
-  background: var(--color-surface-muted);
-}
-
-.running .marker::after {
+.running .dot {
   animation: pulse 1.6s ease-out infinite;
 }
 
 @keyframes pulse {
   from {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 50%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
   }
   to {
-    box-shadow: 0 0 0 0.5rem transparent;
+    box-shadow: 0 0 0 0.4375rem transparent;
   }
 }
 
 .body {
-  grid-area: body;
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+  padding-top: 0.0625rem;
+}
+
+.line {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.125rem 0.625rem;
-}
-
-.kind {
-  color: var(--color-muted);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  column-gap: 0.375rem;
 }
 
 .title {
-  font-weight: 600;
+  font-weight: 500;
 }
 
-.reason {
-  width: 100%;
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
+.kind,
+.duration {
+  color: var(--text-secondary);
+}
+
+.kind::before,
+.duration::before {
+  content: '·';
+  margin-right: 0.375rem;
+  color: var(--text-tertiary);
 }
 
 .duration {
-  grid-area: duration;
-  color: var(--color-muted);
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 .running .duration {
-  color: var(--color-accent);
-  font-weight: 600;
+  color: var(--accent);
+  font-weight: 500;
 }
 
+.reason {
+  overflow-wrap: anywhere;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.time {
+  padding-top: 0.0625rem;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+/* On a phone the marker already tells the kind of event. */
 @media (max-width: 640px) {
-  .item {
-    grid-template-columns: 1rem minmax(0, 1fr);
-    grid-template-areas:
-      'marker time'
-      'marker body'
-      'marker duration';
+  .kind {
+    display: none;
   }
 }

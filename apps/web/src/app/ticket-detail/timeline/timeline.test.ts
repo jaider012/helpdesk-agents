@@ -43,7 +43,8 @@ describe('ticket timeline (REQ-WEB-02)', () => {
   it('shows visited nodes, handoffs, decisions and durations in order', async () => {
     const page = await openTicket();
 
-    expect(page.querySelector('h1')?.textContent).toContain(TICKET_ID);
+    expect(page.querySelector('.crumbs .current')?.textContent).toBe(TICKET_ID);
+    expect(page.querySelector('h1')?.textContent).toBe('No puedo conectarme a la VPN desde casa');
     expect(timelineItems(page)).toEqual([
       ['Paso', 'Protección de datos', '', 'Duración: 40 ms'],
       ['Derivación', 'Protección de datos → Clasificación', 'Motivo: entry_agent', ''],

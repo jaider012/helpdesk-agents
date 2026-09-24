@@ -1,20 +1,26 @@
-<header class="page-header">
-  <h1>Nuevo ticket</h1>
-  <p class="lead muted">
-    Primero se ocultan los datos personales y después el ticket pasa a clasificación. Podrás seguir
-    su recorrido en cuanto lo crees.
-  </p>
+<header class="topbar">
+  <nav class="crumbs" aria-label="Ruta">
+    <a routerLink="/tickets">Bandeja</a>
+    <span class="sep" aria-hidden="true">›</span>
+    <h1 class="current">Nuevo ticket</h1>
+  </nav>
 </header>
 
-<form class="panel new-ticket" [formRoot]="ticketForm">
-  <div class="field">
-    <label for="ticket-text">Describe el problema</label>
+<div class="page-body">
+  <form class="composer" [formRoot]="ticketForm">
+    <label class="sr-only" for="ticket-text">Describe el problema</label>
     <textarea
       id="ticket-text"
-      rows="7"
+      rows="8"
+      placeholder="Describe el problema…"
       aria-describedby="ticket-text-hint"
       [formField]="ticketForm.ticket"
     ></textarea>
+    @if (ticketForm.ticket().touched()) {
+      @for (error of ticketForm.ticket().errors(); track error.kind) {
+        <p class="error" role="alert">{{ error.message }}</p>
+      }
+    }
     <p id="ticket-text-hint" class="hint">
       <svg viewBox="0 0 16 16" aria-hidden="true">
         <path
@@ -24,29 +30,27 @@
       No escribas contraseñas ni códigos de verificación: soporte nunca los pide. Los datos
       personales se ocultan antes de guardar el ticket.
     </p>
-    @if (ticketForm.ticket().touched()) {
-      @for (error of ticketForm.ticket().errors(); track error.kind) {
-        <p class="error" role="alert">{{ error.message }}</p>
-      }
+    @if (failed()) {
+      <p class="alert" role="alert">
+        No se pudo crear el ticket. Vuelve a intentarlo en unos segundos.
+      </p>
     }
-  </div>
-
-  <div class="field">
-    <label for="ticket-channel">Canal por el que llegó</label>
-    <select id="ticket-channel" [formField]="ticketForm.channel">
-      <option value="email">Correo electrónico</option>
-      <option value="chat">Chat</option>
-      <option value="portal">Portal de autoservicio</option>
-      <option value="phone">Teléfono</option>
-    </select>
-  </div>
-
-  @if (failed()) {
-    <p class="alert" role="alert">
-      No se pudo crear el ticket. Vuelve a intentarlo en unos segundos.
-    </p>
-  }
-  <div class="actions">
-    <button class="btn" type="submit" [disabled]="ticketForm().submitting()">Crear ticket</button>
-  </div>
-</form>
+    <div class="composer-bar">
+      <label for="ticket-channel">Canal</label>
+      <select id="ticket-channel" [formField]="ticketForm.channel">
+        <option value="email">Correo electrónico</option>
+        <option value="chat">Chat</option>
+        <option value="portal">Portal de autoservicio</option>
+        <option value="phone">Teléfono</option>
+      </select>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" type="submit" [disabled]="ticketForm().submitting()">
+        Crear ticket
+      </button>
+    </div>
+  </form>
+  <p class="note">
+    Primero se ocultan los datos personales y después el ticket pasa a clasificación. Podrás seguir
+    su recorrido en cuanto lo crees.
+  </p>
+</div>

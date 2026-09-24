@@ -6,41 +6,36 @@
 }
 
 .audit th {
-  padding: 0.5rem 0.625rem;
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-muted);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  padding: 0.375rem 0.625rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 500;
   text-align: left;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .audit td {
-  padding: 0.5rem 0.625rem;
-  border-bottom: 1px solid var(--color-border);
+  padding: 0.4375rem 0.625rem;
+  border-bottom: 1px solid var(--border);
   vertical-align: top;
 }
 
 .audit tbody tr:hover {
-  background: var(--color-surface-muted);
+  background: var(--bg-hover);
 }
 
 .seq {
-  color: var(--color-muted);
+  color: var(--text-tertiary);
   text-align: right;
 }
 
-.audit time,
-.audit td .mono,
-.data {
+.audit .mono {
   font-size: var(--text-xs);
 }
 
 .code {
   display: block;
-  color: var(--color-muted);
+  color: var(--text-tertiary);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
 }
@@ -57,5 +52,5 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  color: var(--color-muted);
+  color: var(--text-secondary);
 }

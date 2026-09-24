@@ -7,15 +7,24 @@ import { filter, scan, startWith, tap } from 'rxjs';
 import { ApiService } from '../core/api.service';
 import { AuditEntry } from '../core/contracts';
 import { EventsService } from '../core/events.service';
-import { CATEGORY_LABELS, PENDING_LABEL, STATUS_LABELS } from '../core/labels';
+import {
+  CATEGORY_LABELS,
+  CHANNEL_LABELS,
+  PENDING_LABEL,
+  SEVERITY_LABELS,
+  STATUS_LABELS,
+} from '../core/labels';
+import { SeverityIcon } from '../shared/severity-icon';
+import { StatusIcon } from '../shared/status-icon';
 import { AuditView } from './audit/audit-view';
 import { mergeAudit } from './merge-audit';
 import { redactionParts } from './redaction';
+import { subjectOf } from './subject';
 import { Timeline } from './timeline/timeline';
 
 @Component({
   selector: 'app-ticket-detail',
-  imports: [AuditView, DatePipe, RouterLink, Timeline],
+  imports: [AuditView, DatePipe, RouterLink, SeverityIcon, StatusIcon, Timeline],
   templateUrl: './ticket-detail.html',
   styleUrl: './ticket-detail.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,6 +75,10 @@ export class TicketDetail {
     mergeAudit(this.audit.hasValue() ? this.audit.value() : [], this.live.value()),
   );
 
+  /** Title of the page: the first sentence of the redacted text. */
+  protected readonly subject = computed(() =>
+    this.ticket.hasValue() ? subjectOf(this.ticket.value().redactedText) : '',
+  );
   /** The redacted text split around its placeholders, which the view marks as hidden data. */
   protected readonly textParts = computed(() =>
     this.ticket.hasValue() ? redactionParts(this.ticket.value().redactedText) : [],
@@ -73,6 +86,8 @@ export class TicketDetail {
 
   protected readonly tab = signal<'timeline' | 'audit'>('timeline');
   protected readonly categoryLabels = CATEGORY_LABELS;
+  protected readonly channelLabels = CHANNEL_LABELS;
+  protected readonly severityLabels = SEVERITY_LABELS;
   protected readonly statusLabels = STATUS_LABELS;
   protected readonly pendingLabel = PENDING_LABEL;
 }

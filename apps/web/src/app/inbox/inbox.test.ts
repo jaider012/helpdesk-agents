@@ -17,7 +17,23 @@ const TICKETS: TicketSummary[] = [
     slaDueAt: '2026-09-24T10:15:00.000Z',
   },
   { ticketId: 'TCK-20260923-102000-c2d', status: 'NEW' },
+  {
+    ticketId: 'TCK-20260923-110500-e3f',
+    category: 'provisioning',
+    severity: 'P3',
+    status: 'ESCALATED',
+    slaDueAt: '2026-09-24T11:05:00.000Z',
+  },
+  {
+    ticketId: 'TCK-20260923-091200-k7m',
+    category: 'infra',
+    severity: 'P1',
+    status: 'ESCALATED',
+    slaDueAt: '2026-09-23T13:12:00.000Z',
+  },
 ];
+
+const due = (iso: string) => formatDate(iso, 'dd/MM HH:mm', 'en-US');
 
 describe('inbox (REQ-WEB-01)', () => {
   let harness: RouterTestingHarness;
@@ -37,8 +53,9 @@ describe('inbox (REQ-WEB-01)', () => {
     return harness.routeNativeElement as HTMLElement;
   }
 
+  /** Cells of each ticket row: severity, ticketId, status, category and SLA. */
   function rows(): string[][] {
-    return [...page().querySelectorAll('tbody tr')].map((row) =>
+    return [...page().querySelectorAll('tbody tr.row')].map((row) =>
       [...row.querySelectorAll('td')].map((cell) => cell.textContent?.trim() ?? ''),
     );
   }
@@ -47,11 +64,41 @@ describe('inbox (REQ-WEB-01)', () => {
     http.expectOne({ method: 'GET', url: '/api/tickets' }).flush(TICKETS);
     await harness.fixture.whenStable();
 
-    const dueAt = formatDate('2026-09-24T10:15:00.000Z', 'dd/MM/yyyy HH:mm', 'en-US');
     expect(rows()).toEqual([
-      ['TCK-20260923-101500-a1b', 'Infraestructura y software', 'P3', 'Resuelto', dueAt],
-      ['TCK-20260923-102000-c2d', 'Pendiente', 'Pendiente', 'Nuevo', 'Pendiente'],
+      ['Pendiente', 'TCK-20260923-102000-c2d', 'Nuevo', 'Pendiente', 'Pendiente'],
+      [
+        'P1',
+        'TCK-20260923-091200-k7m',
+        'Escalado',
+        'Infraestructura y software',
+        due('2026-09-23T13:12:00.000Z'),
+      ],
+      [
+        'P3',
+        'TCK-20260923-110500-e3f',
+        'Escalado',
+        'Aprovisionamiento y permisos',
+        due('2026-09-24T11:05:00.000Z'),
+      ],
+      [
+        'P3',
+        'TCK-20260923-101500-a1b',
+        'Resuelto',
+        'Infraestructura y software',
+        due('2026-09-24T10:15:00.000Z'),
+      ],
     ]);
+  });
+
+  it('groups the tickets by status in lifecycle order, the most severe first', async () => {
+    http.expectOne('/api/tickets').flush(TICKETS);
+    await harness.fixture.whenStable();
+
+    const groups = [...page().querySelectorAll('tbody tr.group')].map((group) =>
+      group.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    expect(groups).toEqual(['Nuevo 1', 'Escalado 2', 'Resuelto 1']);
+    expect(page().querySelector('.topbar .count-badge')?.textContent?.trim()).toBe('4');
   });
 
   it('shows a loading message until the list arrives', async () => {
