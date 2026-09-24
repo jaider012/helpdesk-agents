@@ -21,6 +21,7 @@ export interface NodeDeps {
   machine: TicketStateMachine;
   salt: string;
   clock: () => Date;
+  llmTimeoutMs: number;
 }
 
 // Nodes whose behaviour is not implemented yet leave the state unchanged (decision DC-43).
@@ -35,6 +36,7 @@ export function createNodes({
   machine,
   salt,
   clock,
+  llmTimeoutMs,
 }: NodeDeps): GraphNodes {
   const agents = compileAgents(bundle);
   const systemPrompt = (name: string) => {
@@ -53,6 +55,7 @@ export function createNodes({
         severity: compileSeverityMatrix(systemPrompt('triage')),
         audit,
         lifecycle,
+        timeoutMs: llmTimeoutMs,
       }),
       triageRouteInput,
       audit,

@@ -38,6 +38,7 @@ export async function triage(rawText: string) {
     severity: compileSeverityMatrix(agent.systemPrompt),
     audit,
     lifecycle,
+    timeoutMs: 30_000,
   });
   const base = {
     ticketId: 'TCK-20260923-101500-abc',

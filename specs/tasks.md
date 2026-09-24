@@ -274,7 +274,7 @@ Gate de entrada: `aprobado fase 1`. Primero el validador (`spec:validate` en ver
   Verifica: `pnpm -F api test -- escalation.approval-request`
   Bloqueada por: T-44
 
-- [ ] T-47 · Escalar cuando el LLM de triage falla, tarda más de 30 s o devuelve una salida inválida · Satisface: REQ-ESC-04, REQ-ESC-05
+- [x] T-47 · Escalar cuando el LLM de triage falla, tarda más de 30 s o devuelve una salida inválida · Satisface: REQ-ESC-04, REQ-ESC-05
   Hecho cuando: If the LLM call of the triage agent fails, exceeds 30 s or returns output that fails schema validation, then the runtime shall route the ticket to the escalation agent with reason `llm_unavailable` for a failure or timeout and `invalid_llm_output` for a schema failure.
   Verifica: `pnpm -F api test -- llm.failure llm.invalid-output`
   Bloqueada por: T-44

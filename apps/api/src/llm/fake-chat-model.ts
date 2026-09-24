@@ -8,7 +8,10 @@ export interface FakeReply {
 }
 
 /** Decides the answer from the messages and the names of the bound tools. */
-export type FakeResponder = (messages: BaseMessage[], tools: string[]) => string | FakeReply;
+export type FakeResponder = (
+  messages: BaseMessage[],
+  tools: string[],
+) => string | FakeReply | Promise<string | FakeReply>;
 
 function toolName(tool: BindToolsInput): string {
   const candidate = tool as { name?: unknown; function?: { name?: unknown } };
@@ -39,7 +42,7 @@ export class FakeChatModel extends BaseChatModel {
   }
 
   async _generate(messages: BaseMessage[]): Promise<ChatResult> {
-    const reply = this.respond(messages, this.boundTools);
+    const reply = await this.respond(messages, this.boundTools);
     const { content = '', toolCall } = typeof reply === 'string' ? { content: reply } : reply;
     // A chunk, because the structured-output parser of @langchain/core only accepts chunks.
     const message = new AIMessageChunk({

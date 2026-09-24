@@ -40,6 +40,7 @@ async function setup() {
       severity: compileSeverityMatrix(triageAgent.systemPrompt),
       audit,
       lifecycle,
+      timeoutMs: 30_000,
     }),
     triageRouteInput,
     audit,

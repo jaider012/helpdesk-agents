@@ -37,12 +37,16 @@ export const TicketGraphState = Annotation.Root({
   entryAgent: Annotation<AgentName>(),
   nextAgent: Annotation<TicketState['nextAgent']>(),
   lastRoute: Annotation<RouteDecision | undefined>(),
+  // Transient: the LLM failure the triage node routes on (R-X1, R-X2); never persisted (DC-51).
+  llmFailure: Annotation<LlmFailure | undefined>(),
   // TicketState.escalation: LangGraph forbids a channel named like the `escalation` node (DC-42).
   escalationPackage: Annotation<EscalationPackage | undefined>(),
   userMessage: Annotation<string | undefined>(),
   slaDueAt: Annotation<string | undefined>(),
   closeReason: Annotation<TicketState['closeReason']>(),
 });
+
+export type LlmFailure = 'llm_unavailable' | 'invalid_llm_output';
 
 export type GraphState = typeof TicketGraphState.State;
 export type GraphUpdate = typeof TicketGraphState.Update;
@@ -62,6 +66,7 @@ export function mergeUpdate(state: GraphState, update: GraphUpdate): GraphState 
 export function toTicketState(state: GraphState): TicketState {
   const ticket: Record<string, unknown> = { ...state, escalation: state.escalationPackage };
   delete ticket.rawText;
+  delete ticket.llmFailure;
   delete ticket.escalationPackage;
   return ticket as unknown as TicketState;
 }

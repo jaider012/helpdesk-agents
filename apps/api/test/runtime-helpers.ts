@@ -20,6 +20,7 @@ export interface RuntimeOptions {
   model?: BaseChatModel;
   override?: Partial<GraphNodes>;
   audit?: (dataDir: string, clock: () => Date) => AuditLog;
+  llmTimeoutMs?: number;
 }
 
 /** The runtime graph over the real spec, a temporary data folder and the fake model. */
@@ -37,6 +38,7 @@ export async function runtime(options: RuntimeOptions = {}) {
     machine: TicketStateMachine.fromBundle(bundle),
     salt: 'synthetic-test-salt',
     clock,
+    llmTimeoutMs: options.llmTimeoutMs ?? 30_000,
   });
   const graph = buildGraph(bundle, compileAgents(bundle), { ...nodes, ...options.override });
   return { graph, audit, store, dataDir };

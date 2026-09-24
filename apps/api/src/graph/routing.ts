@@ -15,8 +15,12 @@ export type RouteInputOf<A extends RoutingAgent> = (
   update: GraphUpdate,
 ) => RouteInputs[A];
 
-/** Triage routes on its classification; without one, it routes an internal error (R-X3). */
+/**
+ * Triage routes on its classification (R-T1..R-T5), on the failure of its LLM call (R-X1, R-X2)
+ * and, without a classification, on an internal error (R-X3).
+ */
 export const triageRouteInput: RouteInputOf<'triage'> = (state, update): TriageRouteInput => {
+  if (update.llmFailure) return { kind: 'error', error: update.llmFailure };
   const category = update.category ?? state.category;
   const severity = update.severity ?? state.severity;
   return category && severity

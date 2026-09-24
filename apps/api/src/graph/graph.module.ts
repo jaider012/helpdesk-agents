@@ -4,6 +4,7 @@ import type { SpecBundle } from 'agent-spec';
 import { AUDIT_LOG, AuditModule } from '../audit/audit.module.js';
 import type { AuditLog } from '../audit/audit-log.js';
 import { CHAT_MODEL, LlmModule } from '../llm/llm.module.js';
+import { resolveLlmTimeoutMs } from '../llm/provider.js';
 import { resolveRedactionSalt } from '../redact/redact-node.js';
 import { SPEC_BUNDLE } from '../spec/spec.module.js';
 import type { TicketStateMachine } from '../tickets/state-machine.js';
@@ -41,7 +42,16 @@ const REDACTION_SALT = Symbol('REDACTION_SALT');
         buildGraph(
           bundle,
           compileAgents(bundle),
-          createNodes({ bundle, model, audit, store, machine, salt, clock: () => new Date() }),
+          createNodes({
+            bundle,
+            model,
+            audit,
+            store,
+            machine,
+            salt,
+            clock: () => new Date(),
+            llmTimeoutMs: resolveLlmTimeoutMs(process.env),
+          }),
         ),
       inject: [SPEC_BUNDLE, CHAT_MODEL, AUDIT_LOG, TICKET_STORE, STATE_MACHINE, REDACTION_SALT],
     },

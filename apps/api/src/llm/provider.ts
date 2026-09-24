@@ -15,6 +15,14 @@ export interface ChatModelSelection {
 export const NO_PROVIDER_WARNING =
   'No LLM provider variables are set: the api runs on the deterministic fake model';
 
+export const DEFAULT_LLM_TIMEOUT_MS = 30_000;
+
+/** The timeout of each LLM call: `LLM_TIMEOUT_MS` when it is a positive integer, 30 s otherwise. */
+export function resolveLlmTimeoutMs(env: Record<string, string | undefined>): number {
+  const value = Number(env.LLM_TIMEOUT_MS);
+  return Number.isInteger(value) && value > 0 ? value : DEFAULT_LLM_TIMEOUT_MS;
+}
+
 /** Chooses the chat model from the environment variables, in the order of design §12.3. */
 export function selectChatModel(
   env: Record<string, string | undefined>,
