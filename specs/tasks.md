@@ -422,7 +422,7 @@ Gate de entrada: `aprobado fase 2`.
   Verifica: `pnpm -F web build` y `pnpm -F web test -- app.smoke`
   Bloqueada por: T-01
 
-- [ ] T-75 · Crear `ApiService` (`HttpClient`) y la vista de bandeja · Satisface: REQ-WEB-01
+- [x] T-75 · Crear `ApiService` (`HttpClient`) y la vista de bandeja · Satisface: REQ-WEB-01
   Hecho cuando: When the operator opens the inbox view, the web app shall list tickets with `ticketId`, `category`, `severity`, `status` and SLA.
   Verifica: `pnpm -F web test -- inbox`
   Bloqueada por: T-66, T-74

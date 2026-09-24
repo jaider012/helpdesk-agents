@@ -1,1 +1,40 @@
 <h1>Bandeja de tickets</h1>
+
+@if (tickets.error()) {
+  <p role="alert">No se pudo cargar la bandeja. Vuelve a intentarlo en unos segundos.</p>
+} @else if (tickets.isLoading()) {
+  <p>Cargando tickets…</p>
+} @else if (tickets.value().length === 0) {
+  <p>No hay tickets todavía.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Caso</th>
+        <th scope="col">Categoría</th>
+        <th scope="col">Severidad</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Plazo de atención</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (ticket of tickets.value(); track ticket.ticketId) {
+        <tr>
+          <td class="ticket-id">{{ ticket.ticketId }}</td>
+          <td>{{ ticket.category ? categoryLabels[ticket.category] : pendingLabel }}</td>
+          <td>{{ ticket.severity ?? pendingLabel }}</td>
+          <td>{{ statusLabels[ticket.status] }}</td>
+          <td>
+            @if (ticket.slaDueAt) {
+              <time [attr.datetime]="ticket.slaDueAt">{{
+                ticket.slaDueAt | date: 'dd/MM/yyyy HH:mm'
+              }}</time>
+            } @else {
+              {{ pendingLabel }}
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
